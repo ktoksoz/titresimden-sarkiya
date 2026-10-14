@@ -19,6 +19,10 @@ eq("443 Hz'in adı La4", T.nearest(443).name, "La4");
 eq("Do♯4 adı", T.name(61), "Do♯4");
 eq("Si♭ bemollü yazım", T.name(70, { flats: true }), "Si♭4");
 
+eq("map(T.mtof) sıra numarasını akort saymaz", [60, 64, 67].map(T.mtof).map((f) => +f.toFixed(2)), [261.63, 329.63, 392]);
+eq("Açık akort frekansı çalışır (La4 = 442)", T.mtof(69, 442), 442);
+eq("map(T.ftom) sıra numarasını akort saymaz", [440, 880].map(T.ftom), [69, 81]);
+
 // Aralıklar ve cent
 eq("ET beşli = 700 cent", T.cents(T.TUNINGS.equal[7]), 700);
 eq("ET büyük üçlü = 400 cent", T.cents(T.TUNINGS.equal[4]), 400);

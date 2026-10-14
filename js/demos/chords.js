@@ -43,10 +43,10 @@
     const c = Snd.ready(); if (!c) return;
     const t = c.currentTime + 0.02;
     notes.forEach((m, i) => Snd.pluck(T.mtof(m), { when: t + i * gap, gain: 0.24, dur: 0.5 }));
-    Snd.chord(notes.map(T.mtof), { when: t + notes.length * gap + 0.12, gain: 0.34, dur: 1.4 });
+    Snd.chord(notes.map((m) => T.mtof(m)), { when: t + notes.length * gap + 0.12, gain: 0.34, dur: 1.4 });
   }
   function block(notes, when = 0, dur = 1.1, gain = 0.32) {
-    return Snd.chord(notes.map(T.mtof), { when, gain, dur });
+    return Snd.chord(notes.map((m) => T.mtof(m)), { when, gain, dur });
   }
 
   /* --- Küçük porte (SVG): sol anahtarı + nota başları --- */
@@ -332,7 +332,7 @@
       const nm = T.chordName(dc.root, dc.type);
       const say = { tonic: "dinlenme, varış hissi", sub: "evden uzaklaşma", dom: "gerilim, toniğe dönme isteği" }[fn];
       setInfo(fn, dc.roman, `${nm} (${T.chordLetter(dc.root, dc.type)}) ${T.CHORDS[dc.type].ad.toLocaleLowerCase("tr")}`, `${FN_AD[fn][0].toLocaleUpperCase("tr") + FN_AD[fn].slice(1)}: ${say}.`);
-      Snd.chord(ns.map(T.mtof), { gain: 0.32, dur: 1.2, strum: 0.025 });
+      Snd.pad(ns.map((m) => T.mtof(m)), { gain: 0.42, dur: 1.4 });
     }
 
     /* V7 → I: Sol3 Si3 Re4 Fa4 → Do3 Do4 Do4 Mi4 */
@@ -387,7 +387,7 @@
       setInfo("dom", "V7", "Sol7, dominant yedili", "Si ile Fa arasındaki triton gerilir…");
       const c = Snd.ready();
       const t0 = c ? c.currentTime + 0.03 : 0;
-      if (c) block(V7, t0, 1.25, 0.34);
+      if (c) Snd.pad(V7.map((m) => T.mtof(m)), { when: t0, dur: 1.4, gain: 0.46 });
       timers.push(setTimeout(() => {
         arrowsOn = true;
         drawArrows(0);
@@ -396,7 +396,7 @@
           setTimeout(() => arrows.querySelectorAll(".ch-head").forEach((p) => p.setAttribute("opacity", 1)), 650);
         });
       }, 700));
-      if (c) block(I, t0 + 1.5, 2.2, 0.36);
+      if (c) Snd.pad(I.map((m) => T.mtof(m)), { when: t0 + 1.5, dur: 2.4, gain: 0.46 });
       timers.push(setTimeout(() => {
         btns.forEach((b, i) => b.classList.toggle("on", i === 0));
         fnBar.dataset.on = "tonic";
@@ -513,7 +513,7 @@
       panel.append(h("div.ch-sigrow", sigStaff(K.acc), h("p.ch-desc", sigText)));
       const row = h("div.ch-ivrow");
       chordsOf(sel).forEach((c) => {
-        row.append(h("button.ch-deg.f-" + c.fn + ".main", { type: "button", "aria-label": `${c.r}: ${c.name}`, onclick: () => { Snd.chord(voice(c.pc, [0, 4, 7], 55).map(T.mtof), { gain: 0.32, dur: 1.1, strum: 0.02 }); } },
+        row.append(h("button.ch-deg.f-" + c.fn + ".main", { type: "button", "aria-label": `${c.r}: ${c.name}`, onclick: () => { Snd.chord(voice(c.pc, [0, 4, 7], 55).map((m) => T.mtof(m)), { gain: 0.32, dur: 1.1, strum: 0.02 }); } },
           h("b", c.r), h("small", c.name)));
       });
       panel.append(h("p.ch-lab", "Ana akorlar"), row,

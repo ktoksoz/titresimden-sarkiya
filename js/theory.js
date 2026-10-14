@@ -10,8 +10,11 @@
   const pcOf = (m) => ((Math.round(m) % 12) + 12) % 12;
 
   // MIDI 69 = La4 = 440 Hz; 60 = Do4 (orta Do)
-  const mtof = (m, a4 = A4) => a4 * Math.pow(2, (m - 69) / 12);
-  const ftom = (f, a4 = A4) => 69 + 12 * Math.log2(f / a4);
+  // a4 yalnız gerçek bir akort frekansıysa kullanılır: notes.map(T.mtof) gibi çağrılarda
+  // map'in geçirdiği sıra numarası (0, 1, 2…) akort sanılıp sessiz frekanslar üretmesin.
+  const pitch = (a4) => (typeof a4 === "number" && a4 > 100 ? a4 : A4);
+  const mtof = (m, a4) => pitch(a4) * Math.pow(2, (m - 69) / 12);
+  const ftom = (f, a4) => 69 + 12 * Math.log2(f / pitch(a4));
   const cents = (ratio) => 1200 * Math.log2(ratio);
   const centsBetween = (f1, f2) => 1200 * Math.log2(f2 / f1);
   const octaveOf = (m) => Math.floor(Math.round(m) / 12) - 1;

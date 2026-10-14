@@ -178,6 +178,13 @@
     return freqs.map((f, i) => pluck(f, { ...opts, gain: g, when: (opts.when || 0) + (opts.strum || 0) * i }));
   }
 
+  // Tutulan akor (org / elektrik piyano benzeri): yavaş söner, gerilim ve çözülme duyulsun diye
+  function pad(freqs, opts = {}) {
+    const g = (opts.gain || 0.34) / Math.sqrt(freqs.length);
+    return freqs.map((f) => note(f, { amps: [1, 0.45, 0.28, 0.14, 0.07, 0.04], attack: 0.03, decay: opts.decay || 1.8,
+      dur: opts.dur || 1.5, release: 0.45, gain: g, when: opts.when || 0 }));
+  }
+
   /* Sürekli ses (osiloskop, monokord, vuru demoları): canlı değiştirilebilir */
   function drone(opts = {}) {
     const c = ready(); if (!c) return null;
@@ -307,6 +314,6 @@
     get ctx() { return build(); }, ready, running, unlock, now, hint,
     get volume() { return volume; }, get muted() { return muted; }, setVolume, setMuted, duck,
     onChange(f) { listeners.add(f); }, get analyser() { build(); return analyser; }, get bus() { build(); return demo; },
-    note, pluck, chord, drone, drum, scheduler, wave, own, stopAll, TYPE_GAIN,
+    note, pluck, chord, pad, drone, drum, scheduler, wave, own, stopAll, TYPE_GAIN,
   };
 })();
