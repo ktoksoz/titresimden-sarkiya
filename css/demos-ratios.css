@@ -28,3 +28,14 @@
   .tu-table th, .tu-table td { padding: 4px 6px; }
   .ph-note { min-width: 2.2em; font-size: 0.74rem; }
 }
+
+/* Lissajous: konsonans / dissonans etiketi */
+.cons-badge {
+  display: flex; flex-direction: column; gap: 1px; padding: 4px 12px; min-width: 15em;
+  border-left: 3px solid var(--tonic); background: rgba(242, 190, 75, 0.08);
+}
+.cons-badge b { color: var(--tonic); font-size: 0.95rem; font-weight: 700; }
+.cons-badge small { color: var(--ink-2); font-size: 0.78rem; line-height: 1.3; }
+.cons-badge.dis { border-left-color: var(--tension); background: rgba(216, 70, 94, 0.1); }
+.cons-badge.dis b { color: var(--tension); }
+@media (max-width: 860px) { .cons-badge { min-width: 0; flex: 1 1 100%; } }

@@ -778,6 +778,7 @@
     const PHI = Math.PI / 4;           // başlangıç faz farkı: şekiller düz çizgiye dönüşmesin
     const MAXTURNS = 40;               // kapanmayan eğrilerde gösterilen son tur sayısı
     const PRESETS = [
+      { k: "birli", ad: "Birli", n: 1, d: 1 },
       { k: "oktav", ad: "Oktav", n: 2, d: 1 },
       { k: "besli", ad: "Beşli", n: 3, d: 2 },
       { k: "dortlu", ad: "Dörtlü", n: 4, d: 3 },
@@ -789,12 +790,14 @@
     ];
     let ratio = 1.5, close = 2, cur = "besli", tau = 0, speed = 1, closedAt = -1, playing = false, d1 = null, d2 = null;
 
-    // yalnızca listedeki sade oranlar kapanır (birinci ses payda kadar tur atınca);
-    // kaydırıcıdaki ara değerler basit bir orana denk gelmez ve eğri kayar
+    // Saf aralıklar (1:1 … 2:1) sade kesirdir: eğri, birinci ses payda kadar tur atınca kapanır.
+    // Bunlara denk gelmeyen değerler (eşit beşli, kaydırıcıdaki ara değerler) kapanmaz, eğri kayar.
+    const JUST = T.INTERVALS.map((iv) => ({ s: iv.s, ad: iv.ad, n: iv.oran[0], d: iv.oran[1], c: T.cents(iv.oran[0] / iv.oran[1]) }));
+    let just = null; // eğrinin oturduğu saf aralık
     function setRatio(r, key) {
       ratio = r; cur = key || null;
-      const p = PRESETS.find((x) => x.k === key);
-      close = p && p.n ? p.d : Infinity;
+      just = JUST.find((j) => Math.abs(T.cents(r) - j.c) < 1e-6) || null;
+      close = just ? just.d : Infinity;
       tau = 0; closedAt = -1;
       if (d2) d2.setFreq(F1 * ratio);
       upd();
@@ -918,7 +921,11 @@
       oninput: (v) => {
         // basit bir orana 3 cent yakınsa ona otur
         let r = Math.pow(2, v / 1200), key = null;
-        for (const p of PRESETS) if (p.n && Math.abs(v - T.cents(p.n / p.d)) < 3) { r = p.n / p.d; key = p.k; }
+        for (const j of JUST) if (Math.abs(v - j.c) < 3) {
+          r = j.n / j.d;
+          const p = PRESETS.find((x) => x.n === j.n && x.d === j.d);
+          key = p ? p.k : null;
+        }
         segEl.set(key);
         setRatio(r, key);
       } });
@@ -926,8 +933,9 @@
     const readout = h("span.readout");
     function upd() {
       const name = cur ? PRESETS.find((p) => p.k === cur).ad : null;
-      const p = PRESETS.find((x) => x.k === cur);
-      readout.innerHTML = `<b>${hz(F1)}</b> ve <b>${hz(F1 * ratio)}</b> · oran ${p && p.n ? p.n + ":" + p.d : "≈ " + fmtNum(ratio, 4)}${name ? " · " + name : ""}`;
+      const nm = name || (just ? just.ad : null);
+      readout.innerHTML = `<b>${hz(F1)}</b> ve <b>${hz(F1 * ratio)}</b> · oran ${just ? just.n + ":" + just.d : "≈ " + fmtNum(ratio, 4)}${nm ? " · " + nm : ""}`;
+      badge();
     }
     const listen = h("button.btn", { type: "button", onclick: () => {
       if (playing) { d1 && d1.stop(); d2 && d2.stop(); d1 = d2 = null; playing = false; }
@@ -939,8 +947,30 @@
       listen.textContent = playing ? "Sesi durdur" : "Dinle"; listen.classList.toggle("on", playing);
     } }, "Dinle");
     const restart = h("button.btn", { type: "button", onclick: () => { tau = 0; closedAt = -1; } }, "Baştan çiz");
-    stage.append(h("div.controls.top", segEl), h("div.controls", sl, listen, restart, spd, h("span.spacer"), readout));
-    upd();
+    // Konsonans etiketi: geleneksel sınıflandırma (en yakın yarım ses sayısına göre)
+    const consEl = h("div.cons-badge", { "aria-live": "polite" }, h("b"), h("small"));
+    function badge() {
+      const c = T.cents(ratio), s = Math.round(c / 100), off = c - (just ? just.c : s * 100);
+      const iv = T.INTERVALS[s];
+      const perfect = [0, 5, 7, 12].includes(s), imperfect = [3, 4, 8, 9].includes(s);
+      const kind = perfect ? "Konsonans" : imperfect ? "Konsonans" : "Dissonans";
+      let sub = perfect ? "tam konsonans" : imperfect ? "yetkin konsonans" : s === 6 ? "triton: en gergin aralık" : "pürüzlü, çözülmek ister";
+      if (!just) {
+        const nearJust = JUST.reduce((a, j) => (Math.abs(c - j.c) < Math.abs(c - a.c) ? j : a));
+        const dev = c - nearJust.c;
+        sub = cur === "et5" ? `eşit tamperamanla saf beşliden ${fmtNum(Math.abs(dev), 1)} cent pes; hafif vuru`
+          : Math.abs(dev) < 15 ? `${nearJust.ad.toLocaleLowerCase("tr")} ama ${fmtNum(Math.abs(dev), 0)} cent kayık: vuru var`
+          : "basit bir orana denk gelmiyor: pürüzlü";
+      }
+      // saf orandan kaymış konsonans (eşit beşli dışında): vuru duyulur, gerilim rengiyle gösterilir
+      const shifted = !just && cur !== "et5" && kind === "Konsonans";
+      const dis = kind === "Dissonans" || shifted;
+      consEl.classList.toggle("dis", dis);
+      consEl.querySelector("b").textContent = (shifted ? "Kayık konsonans" : kind) + (iv && just ? " · " + just.ad : "");
+      consEl.querySelector("small").textContent = sub;
+    }
+    stage.append(h("div.controls.top", segEl, h("span.spacer"), consEl), h("div.controls", sl, listen, restart, spd, h("span.spacer"), readout));
+    setRatio(1.5, "besli");
     return {
       enter() { lp.start(); },
       leave() { lp.stop(); if (d1) d1.stop(); if (d2) d2.stop(); d1 = d2 = null; playing = false; listen.textContent = "Dinle"; listen.classList.remove("on"); },
