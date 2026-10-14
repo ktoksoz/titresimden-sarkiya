@@ -556,10 +556,20 @@
         row.append(h("button.ch-deg.f-" + c.fn + ".main", { type: "button", "aria-label": `${c.r}: ${c.name}`, onclick: () => { Snd.chord(voice(c.pc, T.CHORDS[c.type].iv, 55).map((m) => T.mtof(m)), { gain: 0.32, dur: 1.1, strum: 0.02 }); } },
           h("b", c.r), h("small", c.name)));
       });
-      panel.append(h("p.ch-lab", "Ana akorlar"), row,
+      // üç ana akorun notaları, doğru yazımla: birlikte gamın yedi notasını kapsar
+      const cs = chordsOf(sel);
+      const notesOf = (c) => {
+        const root = c.name.split(" (")[0].replace(/m$/, ""), rl = LET.indexOf(root.replace(/[♯♭]+$/, ""));
+        return spellChord(60 + c.pc, rl, c.type).map((n) => n.name).join("–");
+      };
+      const parts = cs.map((c) => `${c.r}: ${notesOf(c)}`).join(" · ");
+      panel.append(h("p.ch-lab", mode === "min" ? "Ana akorlar: i, iv, V" : "Ana akorlar: I, IV, V"), row,
+        h("p.ch-why", mode === "min"
+          ? acc(`Minör tonun üç temel akoru: gamın 1., 4. ve 5. derecesi üzerine kurulur. i (tonik) ev, iv (subdominant) uzaklaşma, V (dominant) gerilim ve eve dönme isteğidir. Üçü birlikte gamın yedi notasının hepsini içerir (${parts}), bu yüzden bir ezgiye eşlik etmek için çoğu zaman yeter.`)
+          : acc(`Tonun üç temel akoru: gamın 1., 4. ve 5. derecesi üzerine kurulur. I (tonik) ev, IV (subdominant) uzaklaşma, V (dominant) gerilim ve eve dönme isteğidir. Üçü birlikte gamın yedi notasının hepsini içerir (${parts}); bu yüzden pek çok halk ve pop şarkısı yalnızca bu üç akorla çalınabilir.`)),
         h("p.ch-desc", mode === "min"
-          ? "Minörde iv akoru iç halkada solda (yeşil), majör V ise dış halkada dört adım ötede (kırmızı)."
-          : "Saat yönündeki komşu (dominant) kırmızı, ters yöndeki komşu (subdominant) yeşil. Çemberde yan yana duran altı akor, bu tonun ailesi."));
+          ? "Çemberde: iv iç halkada solda (yeşil), majör V dış halkada dört adım ötede (kırmızı)."
+          : "Çemberde de yan yanadırlar: IV ters yönde (yeşil), V saat yönünde (kırmızı) komşudur."));
     }
     let timers = [];
     function playCadence() {

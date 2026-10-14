@@ -254,3 +254,4 @@
 .coc[data-mode="min"] [data-role="tonic"].seg-min { fill: rgba(242, 190, 75, 0.36); }
 .coc[data-mode="min"] [data-role="tonic"].seg-maj { fill: rgba(242, 190, 75, 0.14); }
 .coc[data-mode="min"] .lab-min[data-role="tonic"] { fill: var(--tonic); font-weight: 700; }
+.ch-keypanel .ch-why { color: var(--ink); font-size: .9rem; line-height: 1.5; margin: 10px 0 6px; }
