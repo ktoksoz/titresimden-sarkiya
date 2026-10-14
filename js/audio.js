@@ -5,13 +5,15 @@
 (function () {
   const AC = window.AudioContext || window.webkitAudioContext;
   let ctx = null, master = null, demo = null, limiter = null, analyser = null, noiseBuf = null;
-  let volume = 0.7, muted = false, ducked = false;
+  let volume = 0.7, muted = false, ducked = false, resuming = false;
   const DUCK = 0.28;
 
+  // Ses düzeyi hatırlanır; sessize alma ise yalnızca o oturum içindir (sayfa sessiz açılıp
+  // kullanıcıyı şaşırtmasın). Neredeyse sıfıra kaydedilmiş düzey de varsayılana döner.
   try {
     const v = localStorage.getItem("ses.duzey");
-    if (v != null) volume = Math.max(0, Math.min(1, +v));
-    muted = localStorage.getItem("ses.kapali") === "1";
+    if (v != null && +v >= 0.05) volume = Math.max(0, Math.min(1, +v));
+    localStorage.removeItem("ses.kapali");
   } catch (e) {}
 
   function build() {
@@ -37,9 +39,14 @@
   const running = () => !!ctx && ctx.state === "running";
 
   // ilk kullanıcı hareketi: bağlamı aç
+  // Açılış bir an sürer; bu sırada gelen notalar atılmaz, askıdaki bağlama planlanır ve
+  // bağlam açılınca çalar (ilk dokunuşun notası da duyulsun diye).
   function unlock() {
     build();
-    if (ctx && ctx.state !== "running") ctx.resume().then(sync, () => {});
+    if (ctx && ctx.state !== "running" && !resuming) {
+      resuming = true;
+      ctx.resume().then(() => { resuming = false; sync(); }, () => { resuming = false; });
+    }
     sync();
   }
   ["pointerdown", "keydown", "touchend"].forEach((t) =>
@@ -48,14 +55,16 @@
   /* --- "Sesi açmak için dokunun" uyarısı --- */
   let hintEl = null, hintT = 0;
   function hint() {
-    if (running()) return;
+    const isMuted = muted || volume === 0;
+    if (running() && !isMuted) return;
     if (!hintEl) {
       hintEl = document.createElement("button");
       hintEl.id = "sound-hint"; hintEl.type = "button";
-      hintEl.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 10v4h4l5 4V6L8 10z" fill="currentColor"/><path d="M16.5 8.5a5 5 0 0 1 0 7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>Sesi açmak için dokunun';
-      hintEl.addEventListener("click", () => { unlock(); hideHint(); });
+      hintEl.addEventListener("click", () => { unlock(); if (muted || volume === 0) { if (volume === 0) volume = 0.7; setMuted(false); } hideHint(); });
       document.body.append(hintEl);
     }
+    hintEl.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 10v4h4l5 4V6L8 10z" fill="currentColor"/><path d="M16.5 8.5a5 5 0 0 1 0 7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>' +
+      (running() ? "Ses kapalı: açmak için dokunun" : "Sesi açmak için dokunun");
     hintEl.classList.add("on");
     clearTimeout(hintT);
     hintT = setTimeout(hideHint, 5000);
@@ -68,18 +77,17 @@
     if (master) master.gain.setTargetAtTime(muted ? 0 : volume, ctx.currentTime, 0.02);
     // bağlam sonradan açıldıysa kısma durumunu yeniden uygula
     if (demo) demo.gain.setTargetAtTime(ducked ? DUCK : 1, ctx.currentTime, 0.05);
-    if (running()) hideHint();
+    if (running() && !muted && volume > 0) hideHint();
     listeners.forEach((f) => f());
   }
   function setVolume(v) {
     volume = Math.max(0, Math.min(1, v));
     if (volume > 0 && muted) muted = false;
-    try { localStorage.setItem("ses.duzey", String(volume)); localStorage.setItem("ses.kapali", muted ? "1" : "0"); } catch (e) {}
+    try { localStorage.setItem("ses.duzey", String(volume)); } catch (e) {}
     sync();
   }
   function setMuted(m) {
     muted = m;
-    try { localStorage.setItem("ses.kapali", muted ? "1" : "0"); } catch (e) {}
     sync();
   }
   // anlatım çalarken demo seslerini kıs
@@ -93,7 +101,8 @@
   function ready() {
     build();
     if (!ctx) return null;
-    if (ctx.state !== "running") { hint(); return null; }
+    if (ctx.state !== "running" && !resuming) { hint(); return null; }
+    if (muted || volume === 0) hint(); // çalar ama duyulmaz: kullanıcıya söyle
     return ctx;
   }
   const now = () => (ctx ? ctx.currentTime : 0);
