@@ -248,3 +248,9 @@
 .md-node text.md-let { font-size: 6.5px; font-weight: 600; fill: var(--muted); }
 .md-node.min text.md-let { font-size: 5.5px; }
 .md-node.on text.md-let { fill: #2a1608; }
+/* minör seçiliyken iç halkadaki tonik vurgulanır */
+.coc .seg-min:hover { fill: rgba(239, 228, 204, 0.09); }
+.coc .seg-min:focus-visible { outline: none; stroke: var(--brass-hi); }
+.coc[data-mode="min"] [data-role="tonic"].seg-min { fill: rgba(242, 190, 75, 0.36); }
+.coc[data-mode="min"] [data-role="tonic"].seg-maj { fill: rgba(242, 190, 75, 0.14); }
+.coc[data-mode="min"] .lab-min[data-role="tonic"] { fill: var(--tonic); font-weight: 700; }

@@ -418,7 +418,7 @@
   const SHARP_POS = [8, 5, 9, 6, 3, 7, 4];
   const FLAT_POS = [4, 7, 3, 6, 2, 5, 1];
   Demos.circle = (stage) => {
-    let sel = 0, rot = 0, target = 0;
+    let sel = 0, rot = 0, target = 0, mode = "maj"; // mode: dış halka majör, iç halka akraba minör
     const body = h("div.ch-circlewrap");
     const svg = sv("svg", { class: "coc", viewBox: "-200 -200 400 400", role: "group", "aria-label": "Beşliler çemberi" });
     const panel = h("div.ch-keypanel", { "aria-live": "polite" });
@@ -445,10 +445,12 @@
       // harf karşılıkları: majör tonun altında C, minörün altında Am
       const t4 = sv("text", { class: "lab-let", "text-anchor": "middle", "dominant-baseline": "central" }, T.toLetter(lab));
       const t5 = sv("text", { class: "lab-let lab-let-min", "text-anchor": "middle", "dominant-baseline": "central" }, T.toLetter(K.minor));
-      [outer, inner].forEach((el) => {
-        el.addEventListener("click", () => choose(k));
-      });
-      outer.addEventListener("keydown", (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); e.stopPropagation(); choose(k); } });
+      outer.addEventListener("click", () => choose(k, "maj"));
+      inner.addEventListener("click", () => choose(k, "min"));
+      inner.setAttribute("role", "button"); inner.setAttribute("tabindex", 0); inner.removeAttribute("aria-hidden");
+      inner.setAttribute("aria-label", K.minor.replace(/m$/, "") + " minör");
+      inner.addEventListener("keydown", (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); e.stopPropagation(); choose(k, "min"); } });
+      outer.addEventListener("keydown", (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); e.stopPropagation(); choose(k, "maj"); } });
       rimG.append(outer, inner, t1, t2, t3, t4, t5);
       segs.push({ outer, inner, t1, t2, t3, t4, t5 });
     }
@@ -472,9 +474,15 @@
         s.t5.setAttribute("x", x2); s.t5.setAttribute("y", y2 + 8);
         s.t3.setAttribute("x", x3); s.t3.setAttribute("y", y3);
         const rel = (k - sel + 12) % 12;
-        const role = rel === 0 ? "tonic" : rel === 1 ? "dom" : rel === 11 ? "sub" : "";
-        s.outer.dataset.role = role; s.inner.dataset.role = role;
-        s.t1.dataset.role = role; s.t2.dataset.role = role;
+        // majörde: I, V (saat yönü komşu), IV (ters yön komşu). Minörde: i ve iv iç halkada,
+        // majör V dış halkada dört adım ötede (La minör → Mi majör)
+        let roleO, roleI;
+        if (mode === "min") {
+          roleO = rel === 0 ? "tonic" : rel === 4 ? "dom" : "";
+          roleI = rel === 0 ? "tonic" : rel === 11 ? "sub" : "";
+        } else roleO = roleI = rel === 0 ? "tonic" : rel === 1 ? "dom" : rel === 11 ? "sub" : "";
+        s.outer.dataset.role = roleO; s.inner.dataset.role = roleI;
+        s.t1.dataset.role = roleO; s.t2.dataset.role = roleI;
       });
     }
     // dönüş animasyonu
@@ -484,11 +492,26 @@
       rot += diff * Math.min(1, dt * 7);
       draw();
     });
+    // minör tonun kökü ve harfi: "Fa♯m" → kök Fa♯, harf Fa
+    function minorRoot(k) {
+      const K = T.CIRCLE[k], base = K.minor.replace(/m$/, "");
+      return { pc: (K.pc + 9) % 12, letter: LET.indexOf(base.replace(/[♯♭]+$/, "")) };
+    }
     function chordsOf(k) {
       const K = T.CIRCLE[k], flats = K.acc < 0;
+      if (mode === "min") {
+        // i – iv – V: V majördür, çünkü minörün 7. derecesi yarım ses yükseltilir (armonik minör)
+        const R = minorRoot(k);
+        const mk = (r, step, semis, type, fn) => {
+          const n = spell(60 + ((R.pc + semis) % 12), (R.letter + step) % 7);
+          const nm = n.name + (type === "min" ? "m" : "");
+          return { r, pc: (R.pc + semis) % 12, fn, type, name: `${nm} (${T.toLetter(nm)})` };
+        };
+        return [mk("i", 0, 0, "min", "tonic"), mk("iv", 3, 5, "min", "sub"), mk("V", 4, 7, "maj", "dom")];
+      }
       const I = K.pc, IV = T.CIRCLE[(k + 11) % 12].pc, V = T.CIRCLE[(k + 1) % 12].pc;
       const nm = (pc) => T.name(pc, { flats, octave: false });
-      return [["I", I, "tonic"], ["IV", IV, "sub"], ["V", V, "dom"]].map(([r, pc, fn]) => ({ r, pc, fn, name: `${nm(pc)} (${T.letter(pc, { flats, octave: false })})` }));
+      return [["I", I, "tonic"], ["IV", IV, "sub"], ["V", V, "dom"]].map(([r, pc, fn]) => ({ r, pc, fn, type: "maj", name: `${nm(pc)} (${T.letter(pc, { flats, octave: false })})` }));
     }
     function sigStaff(acc) {
       const W = 150, gap = 9, base = gap * 7.2;
@@ -506,11 +529,22 @@
       const K = T.CIRCLE[sel];
       const name = sel === 6 ? "Fa♯ / Sol♭" : K.label;
       const nm = sel === 6 ? "Fa♯" : K.label;
-      cName.textContent = nm.replace(/[♯♭]/, "");
-      if (/[♯♭]/.test(nm)) cName.append(sv("tspan", { class: "acc" }, nm.match(/[♯♭]/)[0]));
-      cSub.textContent = "majör · " + T.toLetter(nm);
+      const minName = K.minor.replace(/m$/, "");
+      const big = mode === "min" ? K.minor : nm;
+      // değiştirici işaret yerinde kalsın: "Fa♯m" → Fa + ♯ + m
+      cName.textContent = "";
+      big.split(/([♯♭])/).filter(Boolean).forEach((part) => cName.append(/[♯♭]/.test(part) ? sv("tspan", { class: "acc" }, part) : document.createTextNode(part)));
+      cSub.textContent = (mode === "min" ? "minör · " : "majör · ") + T.toLetter(big);
+      svg.dataset.mode = mode;
       panel.innerHTML = "";
-      panel.append(h("p.ch-sym", acc(name + " majör"), h("small.ch-let", acc(T.toLetter(name)))), h("p.ch-full", acc("Akraba minör: " + K.minor.replace(/m$/, "") + " minör (" + T.toLetter(K.minor) + ")")));
+      if (mode === "min") {
+        const R = minorRoot(sel), lt = spell(60 + ((R.pc + 11) % 12), (R.letter + 6) % 7).name;
+        panel.append(h("p.ch-sym", acc(minName + " minör"), h("small.ch-let", acc(T.toLetter(K.minor)))),
+          h("p.ch-full", acc("Akraba majör: " + name + " majör (" + T.toLetter(name) + ")")),
+          h("p.ch-desc", acc(`Donanımı akraba majörüyle aynıdır. V akoru majördür: 7. derece yarım ses yükseltilir (${lt}), böylece toniğe çeken bir yeden oluşur.`)));
+      } else {
+        panel.append(h("p.ch-sym", acc(name + " majör"), h("small.ch-let", acc(T.toLetter(name)))), h("p.ch-full", acc("Akraba minör: " + minName + " minör (" + T.toLetter(K.minor) + ")")));
+      }
       let sigText;
       if (K.acc === 0) sigText = "Donanım yok: diyez de bemol de yok.";
       else if (sel === 6) sigText = "6 diyez (Fa♯ majör) ya da 6 bemol (Sol♭ majör). Eşit tamperamanda aynı tuşlar.";
@@ -519,11 +553,13 @@
       panel.append(h("div.ch-sigrow", sigStaff(K.acc), h("p.ch-desc", sigText)));
       const row = h("div.ch-ivrow");
       chordsOf(sel).forEach((c) => {
-        row.append(h("button.ch-deg.f-" + c.fn + ".main", { type: "button", "aria-label": `${c.r}: ${c.name}`, onclick: () => { Snd.chord(voice(c.pc, [0, 4, 7], 55).map((m) => T.mtof(m)), { gain: 0.32, dur: 1.1, strum: 0.02 }); } },
+        row.append(h("button.ch-deg.f-" + c.fn + ".main", { type: "button", "aria-label": `${c.r}: ${c.name}`, onclick: () => { Snd.chord(voice(c.pc, T.CHORDS[c.type].iv, 55).map((m) => T.mtof(m)), { gain: 0.32, dur: 1.1, strum: 0.02 }); } },
           h("b", c.r), h("small", c.name)));
       });
       panel.append(h("p.ch-lab", "Ana akorlar"), row,
-        h("p.ch-desc", "Saat yönündeki komşu (dominant) kırmızı, ters yöndeki komşu (subdominant) yeşil. Çemberde yan yana duran altı akor, bu tonun ailesi."));
+        h("p.ch-desc", mode === "min"
+          ? "Minörde iv akoru iç halkada solda (yeşil), majör V ise dış halkada dört adım ötede (kırmızı)."
+          : "Saat yönündeki komşu (dominant) kırmızı, ters yöndeki komşu (subdominant) yeşil. Çemberde yan yana duran altı akor, bu tonun ailesi."));
     }
     let timers = [];
     function playCadence() {
@@ -532,13 +568,14 @@
       const btns = panel.querySelectorAll(".ch-ivrow .ch-deg");
       const c = Snd.ready(); const t0 = c ? c.currentTime + 0.05 : 0;
       seq.forEach((ch, i) => {
-        if (c) block(voice(ch.pc, [0, 4, 7], 55), t0 + i * 0.55, i === 3 ? 1.4 : 0.5, 0.3);
+        if (c) block(voice(ch.pc, T.CHORDS[ch.type].iv, 55), t0 + i * 0.55, i === 3 ? 1.4 : 0.5, 0.3);
         timers.push(setTimeout(() => { btns.forEach((b) => b.classList.toggle("on", b.querySelector("b").textContent === ch.r)); }, i * 550 + 30));
       });
       timers.push(setTimeout(() => btns.forEach((b) => b.classList.remove("on")), 4 * 550 + 900));
     }
-    function choose(k) {
-      sel = k;
+    function choose(k, m = "maj") {
+      sel = k; mode = m;
+      allBtn.textContent = m === "min" ? "i–iv–V–i çal" : "I–IV–V–I çal";
       let t = -k * 30;
       while (t - rot > 180) t -= 360;
       while (t - rot < -180) t += 360;
