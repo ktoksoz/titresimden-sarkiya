@@ -14,14 +14,14 @@ Hazırlayan: **Koray Toksöz**
 | --- | --- |
 | Giriş | Dokununca pentatonik notalar çalan parlayan teller |
 | 1. Ses nedir? | Sıkışan ve seyrelen hava molekülleri, osilatör ve osiloskop, duyma sınırı testi, çalgı tınıları, harmonik çubuklarıyla toplamsal sentez, titreşen telde harmonik dizisi |
-| 2. Oranlar ve akort | Sürüklenebilir köprülü monokord, vuru ve Plomp–Levelt pürüzlülük eğrisi, iki sesin Lissajous eğrisi (basit oranlar hızla kapanır), 3B perde sarmalı, Pisagor koması, tamperaman (komanın Pisagor, ortalama ton, Werckmeister III ve eşit tamperamanda paylaştırılması, kurt beşli), Pisagor / saf / eşit tamperaman karşılaştırması, 53 komalık ızgarada Hicaz dizisi |
+| 2. Oranlar ve akort | Sürüklenebilir köprülü monokord, vuru ve Plomp–Levelt pürüzlülük eğrisi, iki sesin Lissajous eğrisi (basit oranlar hızla kapanır), 3B perde sarmalı, Pisagor koması, tamperaman (komanın Pisagor, ortalama ton, Werckmeister III ve eşit tamperamanda paylaştırılması, kurt beşli), Pisagor / saf / eşit tamperaman karşılaştırması, 53 komalık ızgarada Hicaz dizisi, makam seyri (Rast, Uşşak, Hicaz: durak, güçlü, kısa seyir) |
 | 3. Gamlar ve modlar | Nota adları (harf, solfej, Almanca, Türk müziği perdeleri; Guido d'Arezzo'nun ilahisi), piyano portesinde sol ve fa anahtarı (nota koyunca adı ve yeri, okuma alıştırması), aralıklar, T-T-Y-T-T-T-Y desenli majör gam, üç minör, döndürülebilir mod diski, 12 ölçülük blues eşliğinde siyah tuşlarla (Mi♭ minör pentatonik) doğaçlama |
-| 4. Akorlar ve armoni | Üç sesliler, kök seçilip kök konumu / 1. / 2. çevrim (I–IV–V–I'yi çevrimlerle bağlama), dört sesli yedili akorlar, V7 → I çözülmesi, dönen beşliler çemberi, I–V–vi–IV / ii–V–I / 12 ölçülük blues |
-| 5. Ritim ve zaman | Metronom, 16 adımlı davul sıralayıcısı, aksak usuller (9/8, 7/8, 5/8), senkop, 3'e karşı 2 poliritim |
+| 4. Akorlar ve armoni | Üç sesliler, kök seçilip kök konumu / 1. / 2. çevrim (I–IV–V–I'yi çevrimlerle bağlama), dört sesli yedili akorlar, V7 → I çözülmesi, dönen beşliler çemberi, I–V–vi–IV / ii–V–I / 12 ölçülük blues, modülasyon (komşu ton, akraba ve paralel minör, bir basamak yukarı) |
+| 5. Ritim ve zaman | Metronom, nota süreleri (4/4'lük ölçü kurma, nokta ve sus), 16 adımlı davul sıralayıcısı, aksak usuller (9/8, 7/8, 5/8), senkop, 3'e karşı 2 poliritim |
 | 6. Hepsi bir arada | Akor yürüyüşü + davul + gama kilitli melodi ızgarasıyla mini beste, gamı seçilebilen teller |
 
 Ek olarak:
-- **Sesli anlatım:** 18 dakika, Türkçe.
+- **Sesli anlatım:** 20 dakika, Türkçe.
 - **Hayalet el:** Her deneyin ilk hamlesini gösterir.
 - **Tanım balonları:** Terimlerin üzerine gelince açılır.
 - **Sunucu notları.**
@@ -81,7 +81,8 @@ Piyanolu slaytlarda bilgisayar klavyesi de çalar: `A S D F G H J K L` beyaz, `W
 **Anlatım sesleri** ElevenLabs ile üretildi. Ayarlar:
 - Ses: "İrem", `voice_id` `hy7OAv1nH3Eqqj96Aude`
 - Model: `eleven_multilingual_v2`, dil `tr`
-- Biçim: `mp3_44100_128`
+- Biçim: `mp3_44100_128` olarak üretildi, sonra siteye 64 kbps mono MP3 olarak sıkıştırıldı:
+  `ffmpeg -i girdi.mp3 -ac 1 -codec:a libmp3lame -b:a 64k audio/<slayt-id>.mp3`
 
 Metinler `tools/narration.json` dosyasındadır. Her anahtar bir slayt kimliğidir ve çıktı `audio/<slayt-id>.mp3` olarak kaydedilir.
 
@@ -127,6 +128,8 @@ Betik önce `index.html` içindeki `?v=` sürüm etiketini yeniler, böylece tar
 - **Hicaz dörtlüsünün AEU rumuzu (SA12S):** MEB, *Türk Müziği Teori ve Uygulaması* ([tymm.meb.gov.tr](https://tymm.meb.gov.tr/muzik-okullari-turk-muzigi-teori-uygulamasi-dersi/unite/1112)).
 - **Hicaz makamının dizisi (hicaz dörtlüsü + nevâda rast beşlisi):** TDV İslâm Ansiklopedisi, [Hicaz](https://islamansiklopedisi.org.tr/hicaz--musiki).
 
+- **Makamların durak, güçlü ve seyri:** [Rast](https://en.wikipedia.org/wiki/Rast_(Turkish_makam)), [Uşşak](https://en.wikipedia.org/wiki/U%C5%9F%C5%9Fak_(Turkish_makam)) (Wikipedia); TDV İslâm Ansiklopedisi, [Hicaz](https://islamansiklopedisi.org.tr/hicaz--musiki).
+
 **Nota adları**
 - **Solfej ve Guido d'Arezzo (Ut queant laxis):** [Solfège](https://en.wikipedia.org/wiki/Solf%C3%A8ge), [Ut queant laxis](https://en.wikipedia.org/wiki/Ut_queant_laxis), [Guido of Arezzo](https://en.wikipedia.org/wiki/Guido_of_Arezzo) (Wikipedia).
 - **Porte ve anahtarlar:** [Clef](https://en.wikipedia.org/wiki/Clef), [Staff (music)](https://en.wikipedia.org/wiki/Staff_(music)), [Ledger line](https://en.wikipedia.org/wiki/Ledger_line) (Wikipedia).
@@ -135,6 +138,8 @@ Betik önce `index.html` içindeki `?v=` sürüm etiketini yeniler, böylece tar
 
 **Armoni ve ritim**
 - **Beşliler çemberinin tarihi (Diletsky, Heinichen):** [Circle of fifths (Wikipedia)](https://en.wikipedia.org/wiki/Circle_of_fifths).
+- **Nota süreleri:** [Note value](https://en.wikipedia.org/wiki/Note_value), [Rest (music)](https://en.wikipedia.org/wiki/Rest_(music)) (Wikipedia).
+- **Modülasyon:** [Modulation (music)](https://en.wikipedia.org/wiki/Modulation_(music)) (Wikipedia).
 - **Metronom (Maelzel, 1815):** [Metronome (Wikipedia)](https://en.wikipedia.org/wiki/Metronome).
 - **Aksak ritimler:** [Aksak (Wikipedia)](https://en.wikipedia.org/wiki/Aksak).
 - **Brubeck ve 9/8:** [Blue Rondo à la Turk (Wikipedia)](https://en.wikipedia.org/wiki/Blue_Rondo_%C3%A0_la_Turk).

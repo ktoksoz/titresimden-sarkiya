@@ -33,3 +33,46 @@
   .sq-lab .short { display: inline; }
   .sq-cell { aspect-ratio: 1 / 1.6; }
 }
+
+/* ---------- Nota süreleri ---------- */
+.du-main { display: flex; flex-direction: column; justify-content: center; gap: 18px; padding: 14px 18px 8px; }
+.du-top { flex: 0 1 auto; min-height: 0; display: grid; grid-template-columns: minmax(0, 1fr) 210px; gap: 18px; align-items: center; }
+.du-staffbox { min-width: 0; height: 100%; display: flex; align-items: center; }
+.du-staff { width: 100%; height: auto; max-height: 100%; }
+.du-staff .du-line, .du-staff .du-bar { stroke: rgba(239, 228, 204, 0.55); stroke-width: 1; }
+.du-staff .du-bar { stroke-width: 2; }
+.du-staff .du-clef { fill: var(--ink); }
+.du-staff .du-ts { fill: var(--ink); font: 800 25px var(--f-body); }
+.du-staff .du-head { stroke: var(--tonic); stroke-width: 1.5; opacity: 0; }
+.du-treebox { border-left: 1px solid var(--line-soft); padding-left: 14px; }
+.du-tree { width: 100%; height: auto; }
+.du-tree .du-tl-lab { fill: var(--ink-2); font: 600 10px var(--f-body); }
+.du-tlwrap { display: flex; flex-direction: column; gap: 6px; }
+.du-tl { position: relative; height: 46px; border: 1px solid var(--line); border-radius: var(--r-sm); background: repeating-linear-gradient(90deg, transparent 0 calc(6.25% - 1px), rgba(239,228,204,.06) calc(6.25% - 1px) 6.25%); }
+.du-beat { position: absolute; top: -1px; bottom: -1px; border-left: 1px solid rgba(239,228,204,.35); font-size: .66rem; color: var(--muted); padding-left: 3px; }
+.du-bars { position: absolute; inset: 14px 0 3px 0; }
+.du-b { position: absolute; top: 0; bottom: 0; display: flex; align-items: center; justify-content: center; overflow: hidden;
+  background: rgba(239,228,204,.75); border: 1px solid var(--bg-2); border-radius: 2px; color: #2b1714; font-size: .66rem; font-weight: 600; transition: background .1s; }
+.du-b.down { background: rgba(242,190,75,.75); }
+.du-b.rest { background: repeating-linear-gradient(135deg, rgba(154,134,112,.35) 0 4px, transparent 4px 8px); color: var(--muted); }
+.du-b.on { background: var(--tonic); color: #2b1714; }
+.du-b small { white-space: nowrap; }
+.du-tlhead { position: absolute; top: 0; bottom: 0; width: 2px; margin-left: -1px; background: var(--tonic); opacity: 0; box-shadow: 0 0 8px var(--tonic); }
+.du-info { display: flex; gap: 14px; align-items: baseline; font-size: .85rem; min-height: 1.3em; }
+.du-left { color: var(--ink-2); font-weight: 600; }
+.du-left.full { color: var(--tonic); }
+.du-msg { color: var(--tension); }
+.du-val { display: inline-flex; align-items: center; gap: 4px; padding-left: .6em; }
+.du-ico { width: 15px; height: 19px; }
+.du-sep { width: 1px; align-self: stretch; background: var(--line); margin: 0 4px; }
+.du-lab { color: var(--muted); font-size: .82rem; }
+@media (max-width: 1100px) { .du-top { grid-template-columns: minmax(0, 1fr) 170px; } }
+@media (max-width: 860px) {
+  .du-main { min-height: 300px; padding: 10px 8px 6px; }
+  .du-top { grid-template-columns: 1fr; }
+  .du-treebox { border-left: 0; border-top: 1px solid var(--line-soft); padding: 8px 0 0; }
+  .du-tree { max-height: 120px; }
+  .du-b small { display: none; }
+}
+.du-ctl { gap: 8px 8px; }
+.du-ctl .btn { padding: .45em .7em; }

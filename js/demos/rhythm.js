@@ -523,4 +523,161 @@
     };
   };
   G.poliritim = [{ click: "Başlat" }, { wait: 3000 }, { click: "4:3" }, { wait: 3000 }, { click: "İç çember" }, { wait: 2200 }, { click: "İç çember" }];
+
+  /* ---------- Nota süreleri: 4/4'lük ölçü kurucu ----------
+     Birim: otuzikilik (ölçü = 32 birim). Süre düğmeleri ölçüyü doldurur; dolunca metronomla çalar. */
+  Demos.durations = (stage) => {
+    const NS = "http://www.w3.org/2000/svg";
+    const sv = (tag, a = {}) => { const e = document.createElementNS(NS, tag); for (const k in a) e.setAttribute(k, a[k]); return e; };
+    const VALS = [["birlik", "Birlik", 32], ["ikilik", "İkilik", 16], ["dortluk", "Dörtlük", 8], ["sekizlik", "Sekizlik", 4], ["onaltilik", "Onaltılık", 2]];
+    const BPM = 80, CAP = 32;
+    let items = [], dotted = false, rest = false, loopsLeft = 0, cur = -1;
+    const used = () => items.reduce((a, b) => a + b.len, 0);
+    const beatsTxt = (u) => fmtNum(u / 8, u % 8 === 0 ? 0 : u % 4 === 0 ? 1 : u % 2 === 0 ? 2 : 3);
+
+    /* ---- glif çizimi (çizgi aralığı s; y = Sol4 çizgisi) ---- */
+    function glyph(g, x, y, s, base, dot, isRest, col) {
+      const add = (e) => { g.append(e); return e; };
+      if (!isRest) {
+        const hollow = base >= 16;
+        add(sv("ellipse", { cx: x, cy: y, rx: s * 0.62, ry: s * 0.44, transform: `rotate(-22 ${x} ${y})`, fill: hollow ? "none" : col, stroke: col, "stroke-width": hollow ? s * 0.16 : 0 }));
+        if (base < 32) {
+          const sx = x + s * 0.55, top = y - s * 3.4;
+          add(sv("line", { x1: sx, x2: sx, y1: y - s * 0.1, y2: top, stroke: col, "stroke-width": s * 0.12 }));
+          const flags = base === 4 ? 1 : base === 2 ? 2 : 0;
+          for (let f = 0; f < flags; f++) {
+            const fy = top + f * s * 0.75;
+            add(sv("path", { d: `M${sx} ${fy} c ${s * 0.15} ${s * 0.9}, ${s * 1.2} ${s * 1.1}, ${s * 0.8} ${s * 2.4} c ${s * 0.15} ${-s * 1.0}, ${-s * 0.4} ${-s * 1.4}, ${-s * 0.8} ${-s * 1.7} z`, fill: col }));
+          }
+        }
+        if (dot) add(sv("circle", { cx: x + s * 1.15, cy: y - s * 0.5, r: s * 0.16, fill: col }));
+        return;
+      }
+      // sus işaretleri (L3 = Si4 çizgisi: y - s, L2 = Re5: y - 2s)
+      const L3 = y - s, L2 = y - 2 * s;
+      if (base === 32) add(sv("rect", { x: x - s * 0.6, y: L2, width: s * 1.2, height: s * 0.5, fill: col }));
+      else if (base === 16) add(sv("rect", { x: x - s * 0.6, y: L3 - s * 0.5, width: s * 1.2, height: s * 0.5, fill: col }));
+      else if (base === 8) add(sv("path", { d: `M${x - s * 0.25} ${L3 - s * 1.5} l ${s * 0.6} ${s * 0.75} l ${-s * 0.55} ${s * 0.7} l ${s * 0.55} ${s * 0.75} c ${-s * 0.6} ${-s * 0.3}, ${-s * 0.9} ${s * 0.2}, ${-s * 0.4} ${s * 0.75}`, fill: "none", stroke: col, "stroke-width": s * 0.22, "stroke-linejoin": "round", "stroke-linecap": "round" }));
+      else {
+        const hooks = base === 4 ? 1 : 2;
+        add(sv("line", { x1: x + s * 0.45, y1: L3 - s * 0.8, x2: x - s * 0.15, y2: L3 + s * (hooks === 1 ? 1.2 : 1.9), stroke: col, "stroke-width": s * 0.14 }));
+        for (let k = 0; k < hooks; k++) {
+          const hy = L3 - s * 0.7 + k * s * 0.85;
+          add(sv("circle", { cx: x - s * 0.3, cy: hy, r: s * 0.24, fill: col }));
+          add(sv("path", { d: `M${x - s * 0.3} ${hy + s * 0.1} q ${s * 0.4} ${s * 0.35} ${s * 0.75} ${-s * 0.2}`, fill: "none", stroke: col, "stroke-width": s * 0.14 }));
+        }
+      }
+      if (dot) add(sv("circle", { cx: x + s * 0.95, cy: L3 - s * 0.5, r: s * 0.16, fill: col }));
+    }
+    function icon(base) {
+      const e = sv("svg", { viewBox: "0 0 24 30", class: "du-ico", "aria-hidden": "true" });
+      glyph(e, 9, 24, 5.2, base, false, false, "currentColor");
+      return e;
+    }
+
+    /* ---- yerleşim ---- */
+    const W = 420, H = 112, S = 10, X0 = 84, X1 = W - 14, YS = 74; // YS: Sol4 çizgisi
+    const top = h("div.du-top");
+    const svg = sv("svg", { viewBox: `0 0 ${W} ${H}`, class: "du-staff", role: "img", "aria-label": "4/4'lük ölçü" });
+    const lines = sv("g"), notesG = sv("g"), head = sv("line", { class: "du-head", y1: 18, y2: 100, x1: X0, x2: X0 });
+    svg.append(lines, notesG, head);
+    for (let i = 0; i < 5; i++) { const y = YS + S - i * S; lines.append(sv("line", { x1: 14, x2: W - 6, y1: y, y2: y, class: "du-line" })); }
+    lines.append(sv("line", { x1: W - 6, x2: W - 6, y1: YS - 3 * S, y2: YS + S, class: "du-bar" }));
+    lines.append(sv("line", { x1: 14, x2: 14, y1: YS - 3 * S, y2: YS + S, class: "du-line" }));
+    lines.append(sv("path", { d: L.GCLEF_D, class: "du-clef", transform: L.gclefTransform(18, YS - 3 * S, S) }));
+    ["4", "4"].forEach((t, k) => { const e = sv("text", { x: 60, y: YS - 3 * S + (k ? 4 * S : 2 * S) - 1.5, class: "du-ts", "text-anchor": "middle" }); e.textContent = t; lines.append(e); });
+    // değer ağacı
+    const tree = sv("svg", { viewBox: "0 0 250 150", class: "du-tree", role: "img", "aria-label": "1 birlik = 2 ikilik = 4 dörtlük = 8 sekizlik = 16 onaltılık" });
+    [[32, 1, "1 birlik"], [16, 2, "2 ikilik"], [8, 4, "4 dörtlük"], [4, 8, "8 sekizlik"], [2, 16, "16 onaltılık"]].forEach(([b, n, lab], r) => {
+      const y = 26 + r * 28, w = 170 / n;
+      for (let k = 0; k < n; k++) glyph(tree, 8 + w * k + w / 2 - (n > 8 ? 2 : 0), y, n > 8 ? 3.2 : 4.2, b, false, false, r === 0 ? C.tonic : C.ink);
+      const t = sv("text", { x: 248, y: y + 3, class: "du-tl-lab", "text-anchor": "end" }); t.textContent = lab; tree.append(t);
+    });
+    top.append(h("div.du-staffbox", svg), h("div.du-treebox", tree));
+    // orantılı zaman çizgisi
+    const tl = h("div.du-tl"), headTl = h("i.du-tlhead");
+    for (let b = 0; b < 4; b++) tl.append(h("span.du-beat", { style: { left: b * 25 + "%" } }, String(b + 1)));
+    const bars = h("div.du-bars"); tl.append(bars, headTl);
+    const left = h("span.du-left"), msg = h("span.du-msg", { "aria-live": "polite" });
+    stage.append(h("div.fill.du-main", top, h("div.du-tlwrap", tl, h("div.du-info", left, msg))));
+
+    function render() {
+      while (notesG.firstChild) notesG.firstChild.remove();
+      bars.innerHTML = "";
+      let pos = 0;
+      items.forEach((it, i) => {
+        const x = X0 + 10 + (pos / CAP) * (X1 - X0 - 20);
+        const col = i === cur ? C.tonic : it.rest ? C.muted : pos === 0 ? rgba(C.tonic, 0.9) : C.ink;
+        glyph(notesG, x, YS, S, it.base, it.dot, it.rest, col);
+        bars.append(h("span.du-b" + (it.rest ? ".rest" : "") + (i === cur ? ".on" : "") + (pos === 0 ? ".down" : ""), { style: { left: (pos / CAP) * 100 + "%", width: (it.len / CAP) * 100 + "%" } },
+          h("small", VALS.find((v) => v[2] === it.base)[1].toLocaleLowerCase("tr") + (it.dot ? " ." : ""))));
+        pos += it.len;
+      });
+      const u = CAP - used();
+      left.textContent = u ? `Kalan: ${beatsTxt(u)} vuruş` : "Ölçü dolu";
+      left.classList.toggle("full", !u);
+    }
+    function addVal(base) {
+      const len = dotted ? base * 1.5 : base;
+      const u = CAP - used();
+      if (!u) { msg.textContent = "Ölçü dolu. Temizleyip yeniden başlayın."; return; }
+      if (len > u) { msg.textContent = `Ölçüde yalnız ${beatsTxt(u)} vuruşluk yer kaldı`; return; }
+      msg.textContent = "";
+      items.push({ base, len, dot: dotted, rest });
+      if (!rest) Snd.pluck(T.mtof(67), { gain: 0.22, dur: 0.25 });
+      render();
+      if (used() === CAP) play(1);
+    }
+
+    /* ---- çalma: otuzikilik adımlarla, her vuruşta metronom ---- */
+    let starts = [];
+    const tr = Transport({
+      interval: () => 60 / BPM / 8,
+      step(i, t) {
+        const p = i % CAP, loop = Math.floor(i / CAP);
+        if (loop >= loopsLeft) { if (p === 0) setTimeout(() => { tr.stop(); syncBtn(); cur = -1; render(); }, 0); return; }
+        if (p % 8 === 0) Snd.drum(p === 0 ? "accent" : "click", t, p === 0 ? 0.8 : 0.5);
+        const k = starts.indexOf(p);
+        if (k >= 0 && !items[k].rest) Snd.pluck(T.mtof(67), { when: t, gain: 0.3, dur: Math.min(1.6, (items[k].len / 8) * (60 / BPM) * 0.9) });
+      },
+    });
+    function play(loops) {
+      if (!items.length) { msg.textContent = "Önce birkaç süre ekleyin."; return; }
+      starts = []; let pos = 0; items.forEach((it) => { starts.push(pos); pos += it.len; });
+      tr.stop(); loopsLeft = loops; tr.start(); syncBtn();
+    }
+    const playBtn = h("button.btn.primary", { type: "button", onclick: () => { if (tr.on) { tr.stop(); cur = -1; render(); syncBtn(); } else play(2); } }, "Çal");
+    function syncBtn() { playBtn.textContent = tr.on ? "Durdur" : "Çal"; playBtn.classList.toggle("on", tr.on); playBtn.classList.toggle("primary", !tr.on); }
+    const dotBtn = h("button.btn", { type: "button", "aria-pressed": "false", onclick: () => { dotted = !dotted; dotBtn.classList.toggle("on", dotted); dotBtn.setAttribute("aria-pressed", dotted); } }, "Noktalı");
+    const restBtn = h("button.btn", { type: "button", "aria-pressed": "false", onclick: () => { rest = !rest; restBtn.classList.toggle("on", rest); restBtn.setAttribute("aria-pressed", rest); } }, "Sus");
+    const clearBtn = h("button.btn", { type: "button", onclick: () => { tr.stop(); syncBtn(); items = []; cur = -1; msg.textContent = ""; render(); } }, "Temizle");
+    const valBtns = VALS.map(([, ad, b]) => h("button.btn.du-val", { type: "button", "aria-label": ad, onclick: () => addVal(b) }, icon(b), ad));
+    const PRE = {
+      mars: [[8], [8], [16]],
+      noktali: [[12, 8, 1], [4, 4], [12, 8, 1], [4, 4]],
+      senkop: [[4, 4], [8], [4, 4], [4, 4], [8], [4, 4]],
+      sus: [[8], [8, 8, 0, 1], [8], [8, 8, 0, 1]],
+    };
+    const preset = seg([["mars", "Marş"], ["noktali", "Noktalı ritim"], ["senkop", "Senkoplu"], ["sus", "Suslu"]], null, (k) => {
+      items = PRE[k].map(([len, base = len, dot = 0, r = 0]) => ({ len, base, dot: !!dot, rest: !!r }));
+      msg.textContent = ""; render(); play(2);
+    }, "Örnek ritimler");
+    stage.append(h("div.controls.du-ctl", ...valBtns, h("span.du-sep"), dotBtn, restBtn),
+      h("div.controls", h("span.du-lab", "Örnek ritimler"), preset, h("span.spacer"), playBtn, clearBtn));
+
+    // çalan notayı ve oynatma kafasını izle
+    const lp = loop(() => {
+      const p = tr.pos();
+      if (p < 0 || !tr.on) { head.setAttribute("opacity", 0); headTl.style.opacity = 0; return; }
+      const q = p % CAP;
+      const x = X0 + 10 + (q / CAP) * (X1 - X0 - 20);
+      head.setAttribute("x1", x); head.setAttribute("x2", x); head.setAttribute("opacity", 1);
+      headTl.style.opacity = 1; headTl.style.left = (q / CAP) * 100 + "%";
+      let k = -1; starts.forEach((s0, i) => { if (q >= s0) k = i; });
+      if (k !== cur) { cur = k; render(); }
+    });
+    render();
+    return { enter() { lp.start(); }, leave() { tr.stop(); syncBtn(); cur = -1; render(); lp.stop(); } };
+  };
+  G["nota-sureleri"] = [{ click: "=Dörtlük" }, { wait: 500 }, { click: "=Dörtlük" }, { wait: 500 }, { click: "=İkilik" }, { wait: 3200 }];
 })();

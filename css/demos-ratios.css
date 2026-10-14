@@ -46,3 +46,8 @@
 .tp-info > b { font-size: 1rem; }
 .tp-info span b { color: var(--ink); font-weight: 600; }
 @media (max-width: 860px) { #tamperaman .stage .fill { min-height: 380px; } .tp-info { flex-direction: column; gap: 2px; } }
+
+/* Makam seyri */
+.sy-info { font-size: 0.86rem; color: var(--ink-2); }
+.sy-note { font-size: 0.76rem; color: var(--muted); max-width: 32em; line-height: 1.35; }
+@media (max-width: 860px) { #makam-seyri .stage .fill { min-height: 440px; } .sy-note { max-width: none; } }

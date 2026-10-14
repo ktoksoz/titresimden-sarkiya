@@ -677,4 +677,169 @@
     return { enter() {}, leave() { stop(); } };
   };
   G.yuruyusler = [{ click: "=I–V–vi–IV" }, { wait: 500 }, { click: "=Çal" }, { wait: 5200 }];
+
+  /* ---------- Modülasyon: Do majörden başka bir tona geçmek ----------
+     Her senaryo bir akor dizisi: [kök pc, tür, roma rakamı, işlev, ton, açıklama, ortak akor mu].
+     Do majör gamında olmayan notalar (yeni tonun getirdiği değişiklikler) kırmızı işaretlenir. */
+  Demos.modulation = (stage) => {
+    const C_MAJ = [0, 2, 4, 5, 7, 9, 11];
+    const KEYS = {
+      do: { ad: "Do majör", kisa: "Do", let: "C", ring: "maj", idx: 0 },
+      sol: { ad: "Sol majör", kisa: "Sol", let: "G", ring: "maj", idx: 1 },
+      re: { ad: "Re majör", kisa: "Re", let: "D", ring: "maj", idx: 2 },
+      lam: { ad: "La minör", kisa: "Lam", let: "Am", ring: "min", idx: 0 },
+      dom: { ad: "Do minör", kisa: "Dom", let: "Cm", ring: "min", idx: 9 },
+    };
+    const HOME = [
+      [0, "maj", "I", "tonic", "do", "Do: I, ev."],
+      [5, "maj", "IV", "sub", "do", "Fa: IV, evden uzaklaşma."],
+      [7, "dom7", "V7", "dom", "do", "Sol7: V7, gerilim."],
+      [0, "maj", "I", "tonic", "do", "Do: I, eve dönüş."],
+    ];
+    const SC = {
+      home: { hedef: "do", seq: HOME },
+      sol: { hedef: "sol", seq: [
+        [0, "maj", "I", "tonic", "do", "Do: I, başlangıç tonu."],
+        [9, "min", "vi = ii", "sub", "do", "Lam: Do majörde vi, Sol majörde ii — ortak akor, iki tona da ait.", true],
+        [2, "dom7", "V7", "dom", "sol", "Re7: Sol majörün dominantı. Fa♯ yeni nota: artık Do majörde değiliz."],
+        [7, "maj", "I", "tonic", "sol", "Sol: yeni tonik. Modülasyon tamam."],
+        [0, "maj", "IV", "sub", "sol", "Do: Sol majörde IV — aynı akor, yeni görev."],
+        [2, "dom7", "V7", "dom", "sol", "Re7: V7, yeni tonu pekiştiren kadans."],
+        [7, "maj", "I", "tonic", "sol", "Sol: I, yeni ev."],
+      ] },
+      lam: { hedef: "lam", seq: [
+        [0, "maj", "I", "tonic", "do", "Do: I, başlangıç tonu."],
+        [4, "dom7", "V7", "dom", "lam", "Mi7: La minörün dominantı. Sol♯ yeni nota, La'ya çekilen yeden."],
+        [9, "min", "i", "tonic", "lam", "Lam: akraba minör. Aynı notalar, yeni merkez."],
+        [2, "min", "iv", "sub", "lam", "Rem: iv."],
+        [4, "dom7", "V7", "dom", "lam", "Mi7: V7, yine Sol♯."],
+        [9, "min", "i", "tonic", "lam", "Lam: i, minör ev."],
+      ] },
+      dom: { hedef: "dom", seq: [
+        [0, "maj", "I", "tonic", "do", "Do: I, majör."],
+        [5, "min", "iv", "sub", "dom", "Fam: La♭ gelir — ışık kısılmaya başlar."],
+        [7, "dom7", "V7", "dom", "dom", "Sol7: aynı dominant, iki tona da ait."],
+        [0, "min", "i", "tonic", "dom", "Dom: aynı tonik, minör. Mi♭ yeni nota."],
+        [5, "min", "iv", "sub", "dom", "Fam: iv."],
+        [7, "dom7", "V7", "dom", "dom", "Sol7: V7."],
+        [0, "min", "i", "tonic", "dom", "Dom: i. Do minör gamı Mi♭, La♭ ve Si♭ getirir; dominantta ise yeden Si korunur."],
+      ] },
+      re: { hedef: "re", seq: [
+        ...HOME.map((x) => [...x]),
+        [2, "maj", "I", "tonic", "re", "Re: hazırlıksız, bir tam ses yukarı! Aynı cümle yeni tonda.", false, true],
+        [7, "maj", "IV", "sub", "re", "Sol: Re majörde IV."],
+        [9, "dom7", "V7", "dom", "re", "La7: V7. Fa♯ ve Do♯ yeni notalar."],
+        [2, "maj", "I", "tonic", "re", "Re: I, enerji bir basamak yukarıda."],
+      ] },
+    };
+    const STEP = 1.05; // saniye
+
+    const top = h("div.md-top");
+    const svgWrap = h("div.md-circle");
+    const info = h("div.ch-info.md-info");
+    top.append(svgWrap, info);
+    const pianoBox = h("div.ch-piano");
+    stage.append(top, pianoBox);
+    const piano = Piano(pianoBox, { from: 48, to: 83, compact: true });
+
+    // beşliler çemberi: dışta majörler, içte akraba minörler
+    const W = 240, cx = 120, cy = 120, RO = 96, RI = 60;
+    const svg = sv("svg", { viewBox: `0 0 ${W} ${W}`, class: "md-svg", role: "img", "aria-label": "Beşliler çemberinde ton yolculuğu" });
+    svgWrap.append(svg);
+    const pos = (ring, idx) => { const a = -Math.PI / 2 + (idx * Math.PI * 2) / 12, r = ring === "maj" ? RO : RI; return [cx + r * Math.cos(a), cy + r * Math.sin(a)]; };
+    svg.append(sv("circle", { cx, cy, r: RO, fill: "none", stroke: rgba(C.ink, 0.12) }), sv("circle", { cx, cy, r: RI, fill: "none", stroke: rgba(C.ink, 0.12) }));
+    const path = sv("path", { class: "md-path", fill: "none", d: "" });
+    svg.append(path);
+    const nodes = {};
+    T.CIRCLE.forEach((k, i) => {
+      for (const ring of ["maj", "min"]) {
+        const [x, y] = pos(ring, i);
+        const lab = ring === "maj" ? (i === 6 ? "Fa♯" : k.label) : (i === 6 ? "Re♯m" : k.minor);
+        const g = sv("g", { class: "md-node " + ring });
+        g.append(sv("circle", { cx: x, cy: y, r: ring === "maj" ? 15 : 12 }), sv("text", { x, y: y + (ring === "maj" ? 4 : 3.5), "text-anchor": "middle" }, lab));
+        svg.append(g);
+        nodes[ring + i] = g;
+      }
+    });
+    function journey(from, to) {
+      if (!to || (from.ring === to.ring && from.idx === to.idx)) { path.setAttribute("d", ""); return; }
+      let [x1, y1] = pos(from.ring, from.idx), [x2, y2] = pos(to.ring, to.idx);
+      const mx = (x1 + x2) / 2, my = (y1 + y2) / 2, qx = cx + (mx - cx) * 0.35, qy = cy + (my - cy) * 0.35;
+      // ok düğümlerin kenarından başlayıp kenarında bitsin (yazıların üstünden geçmesin)
+      const trim = (x, y, r) => { const dx = qx - x, dy = qy - y, d = Math.hypot(dx, dy) || 1; return [x + (dx / d) * r, y + (dy / d) * r]; };
+      [x1, y1] = trim(x1, y1, from.ring === "maj" ? 17 : 14); [x2, y2] = trim(x2, y2, to.ring === "maj" ? 17 : 14);
+      path.setAttribute("d", `M${x1} ${y1} Q${qx} ${qy} ${x2} ${y2}`);
+    }
+    function lightKey(key) {
+      Object.values(nodes).forEach((g) => g.classList.remove("on", "home"));
+      nodes["maj0"].classList.add("home");
+      if (key) nodes[key.ring + key.idx].classList.add("on");
+    }
+
+    const keyLine = h("p.ch-sym.md-key");
+    const strip = h("div.md-strip");
+    const say = h("p.ch-desc.md-say", { "aria-live": "polite" });
+    info.append(keyLine, strip, say);
+
+    let timers = [], chips = [], cur = null;
+    const clear = () => { timers.forEach(clearTimeout); timers = []; };
+    function setKey(k) {
+      const K = KEYS[k];
+      keyLine.innerHTML = "";
+      keyLine.append(...acc(K.ad), h("small.ch-let", K.let));
+    }
+    function chordInfo(step) {
+      const [pc, type, , fn] = step;
+      const sp = spellChord(48 + pc, ROOTS[pc][1], type);
+      const name = sp[0].name + T.CHORDS[type].sym;
+      return { sp, name, fn, ms: voice(pc, T.CHORDS[type].iv, 55), bass: 48 + pc };
+    }
+    function buildStrip(seq) {
+      strip.innerHTML = "";
+      chips = seq.map((st) => {
+        const ci = chordInfo(st);
+        const K = KEYS[st[4]];
+        const c = h("span.md-chip.f-" + ci.fn + (st[6] ? ".pivot" : "") + (st[7] ? ".jump" : ""),
+          h("small.md-k", ...acc(K.kisa + ":")), h("b", st[2]), h("small", ...acc(`${ci.name} (${T.toLetter(ci.name)})`)));
+        strip.append(c); return c;
+      });
+    }
+    function show(st, i) {
+      const ci = chordInfo(st);
+      chips.forEach((c, k) => c.classList.toggle("on", k === i));
+      piano.clear();
+      const nameOf = {};
+      ci.sp.forEach((n) => { nameOf[T.pcOf(n.m)] = n.name; });
+      [ci.bass, ...ci.ms].forEach((m) => {
+        const outside = !C_MAJ.includes(T.pcOf(m));
+        piano.mark(m, outside ? "tension" : FN_CLS[ci.fn], outside ? nameOf[T.pcOf(m)] : m === ci.bass ? st[2].split(" ")[0] : "");
+      });
+      const K = KEYS[st[4]];
+      setKey(st[4]); lightKey(K);
+      say.innerHTML = "";
+      say.append(...acc(st[5]));
+      // ses: blok akor + bas
+      const c = Snd.ready();
+      if (c) { block(ci.ms, 0, STEP * 0.95, 0.28); Snd.pluck(T.mtof(ci.bass), { gain: 0.3, dur: STEP * 0.9 }); }
+    }
+    function run(name) {
+      clear();
+      cur = name;
+      btns.forEach(([k, b]) => b.classList.toggle("on", k === name));
+      const S = SC[name];
+      buildStrip(S.seq);
+      journey(KEYS.do, name === "home" ? null : KEYS[S.hedef]);
+      S.seq.forEach((st, i) => timers.push(setTimeout(() => show(st, i), i * STEP * 1000)));
+      timers.push(setTimeout(() => { chips.forEach((c) => c.classList.remove("on")); btns.forEach(([, b]) => b.classList.remove("on")); }, S.seq.length * STEP * 1000 + 300));
+    }
+    const TARGETS = [["home", "Do'da çal"], ["sol", "Komşu ton (Sol)"], ["lam", "Akraba minör (Lam)"], ["dom", "Paralel minör (Dom)"], ["re", "Bir basamak yukarı (Re)"]];
+    const btns = TARGETS.map(([k, lab]) => [k, h("button.btn" + (k === "home" ? ".primary" : ""), { type: "button", onclick: () => run(k) }, ...acc(lab))]);
+    stage.append(h("div.controls.md-controls", ...btns.map(([, b]) => b)));
+
+    // başlangıç görünümü
+    buildStrip(HOME); setKey("do"); lightKey(KEYS.do);
+    say.textContent = "Önce Do majördeki cümleyi dinleyin, sonra bir hedef seçin.";
+    return { enter() {}, leave() { clear(); piano.clear(); chips.forEach((c) => c.classList.remove("on")); btns.forEach(([, b]) => b.classList.remove("on")); } };
+  };
+  G.modulasyon = [{ click: "Do'da çal" }, { wait: 4400 }, { click: "Komşu ton" }];
 })();

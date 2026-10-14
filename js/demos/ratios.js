@@ -1093,4 +1093,204 @@
     return { enter() { lp.start(); }, leave() { lp.stop(); stopSeq(); } };
   };
   G.tamperaman = [{ click: "=Ortalama ton" }, { wait: 1800 }, { click: "Sırayla çal" }, { wait: 9800 }, { click: "=Eşit" }];
+
+  /* ================= Makam: dizi ve yol (seyir) =================
+     Üç makamın dizisi 53 komalık bir merdivende: durak altın, güçlü pas yeşili; her basamağın
+     yanında en yakın Batı notası ve cent sapması (lavanta). "Kısa seyir" durak–güçlü kurallarına
+     göre basit bir ezgi üretir ve merdivenin yanında zamana yayarak çizer. */
+  Demos.seyir = (stage) => {
+    const MAKAM = {
+      rast: { ad: "Rast", base: 67, letters: ["Sol", "La", "Si", "Do", "Re", "Mi", "Fa", "Sol"], nat: [0, 2, 4, 5, 7, 9, 10, 12],
+        k: [0, 9, 17, 22, 31, 40, 48, 53], names: ["Rast", "Dügâh", "Segâh", "Çârgâh", "Nevâ", "Hüseynî", "Eviç", "Gerdaniye"],
+        guclu: 4, seyir: "çıkıcı", durakAd: "Rast (Sol)" },
+      ussak: { ad: "Uşşak", base: 69, letters: ["La", "Si", "Do", "Re", "Mi", "Fa", "Sol", "La"], nat: [0, 2, 3, 5, 7, 8, 10, 12],
+        k: [0, 8, 13, 22, 31, 35, 44, 53], names: ["Dügâh", "Segâh", "Çârgâh", "Nevâ", "Hüseynî", "Acem", "Gerdaniye", "Muhayyer"],
+        guclu: 3, seyir: "çıkıcı", durakAd: "Dügâh (La)" },
+      hicaz: { ad: "Hicaz", base: 69, letters: ["La", "Si", "Do", "Re", "Mi", "Fa", "Sol", "La"], nat: [0, 2, 3, 5, 7, 8, 10, 12],
+        k: [0, 5, 17, 22, 31, 39, 44, 53], names: ["Dügâh", "Dik kürdî", "Nîm hicaz", "Nevâ", "Hüseynî", "Eviç", "Gerdaniye", "Muhayyer"],
+        guclu: 3, seyir: "inici-çıkıcı", durakAd: "Dügâh (La)" },
+    };
+    const ORDER = ["rast", "ussak", "hicaz"];
+    let key = "rast", mel = [], total = 0, t0 = 0, playing = false, label = "";
+    const tm = timers();
+    const M = () => MAKAM[key];
+    // basamak frekansı: durak (eşit tamperamanlı Sol4 / La4) × 2^(koma/53)
+    const freq = (i, mk = M()) => T.mtof(mk.base) * Math.pow(2, mk.k[i] / 53);
+    // en yakın Batı notası: basamağın harfi + en yakın değiştirici (♭, doğal, ♯)
+    function western(i, mk = M()) {
+      const c = (mk.k[i] * 1200) / 53;
+      let best = null;
+      for (const a of [-1, 0, 1]) {
+        const dev = c - (mk.nat[i] + a) * 100;
+        if (!best || Math.abs(dev) < Math.abs(best.dev)) best = { a, dev };
+      }
+      const oct = T.octaveOf(mk.base + mk.nat[i] + best.a);
+      return { name: mk.letters[i] + (best.a > 0 ? "♯" : best.a < 0 ? "♭" : "") + oct, dev: best.dev };
+    }
+    const stepLab = (d) => ({ 9: "T 9", 8: "K 8", 5: "S 5", 4: "B 4", 12: "A 12" })[d] || String(d);
+
+    const top = h("div.controls.top");
+    const info = h("span.readout.sy-info");
+    stage.append(top);
+    const { cv } = stageCanvas(stage, "Makam dizisi: 53 komalık merdivende perdeler, durak ve güçlü");
+    let st;
+
+    function geo() {
+      const { w, h: hh } = st;
+      const wide = w > 760, narrow = w < 520;
+      const top = 26, bot = hh - 26;
+      const ladX = narrow ? 92 : wide ? 150 : 130;
+      const compW = wide ? 170 : 0;
+      const plotX0 = ladX + (narrow ? 86 : 110), plotX1 = w - 16 - compW;
+      return { w, hh, wide, narrow, top, bot, ladX, compW, plotX0, plotX1, yOf: (k) => bot - (k / 53) * (bot - top) };
+    }
+    function draw() {
+      if (!st) return;
+      const g = geo(), ctx = st.ctx, mk = M();
+      ctx.clearRect(0, 0, g.w, g.hh);
+      const now = playing ? (performance.now() - t0) / 1000 : total;
+      let curI = -1;
+      mel.forEach((n) => { if (now >= n.t && now < n.t + n.d) curI = n.i; });
+      // koma çentikleri
+      ctx.strokeStyle = rgba(C.ink, 0.13); ctx.lineWidth = 1;
+      ctx.beginPath();
+      for (let k = 0; k <= 53; k++) { const y = Math.round(g.yOf(k)) + 0.5; ctx.moveTo(g.ladX - (k % 9 === 0 ? 7 : 4), y); ctx.lineTo(g.ladX + 4, y); }
+      ctx.stroke();
+      ctx.strokeStyle = rgba(C.ink, 0.35); ctx.beginPath(); ctx.moveTo(g.ladX + 0.5, g.yOf(0)); ctx.lineTo(g.ladX + 0.5, g.yOf(53)); ctx.stroke();
+      // basamaklar
+      mk.k.forEach((k, i) => {
+        const y = g.yOf(k), isD = i === 0 || i === 7, isG = i === mk.guclu;
+        const col = isD ? C.tonic : isG ? C.wave : C.ink;
+        const on = i === curI || (curI === 0 && i === 7 && false);
+        // ızgara: çizim alanına uzanan soluk çizgi
+        ctx.strokeStyle = rgba(isD ? C.tonic : isG ? C.wave : C.ink, isD || isG ? 0.22 : 0.08); ctx.lineWidth = 1;
+        ctx.beginPath(); ctx.moveTo(g.ladX + 8, y); ctx.lineTo(g.plotX1, y); ctx.stroke();
+        ctx.fillStyle = col;
+        ctx.save(); if (on) { ctx.shadowColor = col; ctx.shadowBlur = 14; }
+        ctx.beginPath(); ctx.arc(g.ladX, y, on ? 7 : isD || isG ? 5.5 : 4, 0, 7); ctx.fill(); ctx.restore();
+        text(ctx, mk.names[i], g.ladX - 12, y + 4, { size: g.narrow ? 11 : 13, align: "right", weight: isD || isG || on ? 700 : 500, color: on ? C.ink : isD ? C.tonic : isG ? C.wave : C.ink2 });
+        const wn = western(i);
+        text(ctx, wn.name, g.ladX + 12, y - 1, { size: g.narrow ? 10 : 11, color: C.ink2, weight: 600 });
+        text(ctx, Math.abs(wn.dev) < 0.5 ? "±0 c" : `${wn.dev > 0 ? "+" : "−"}${fmtNum(Math.abs(wn.dev), 1)} c`, g.ladX + 12, y + 11, { size: 10, color: C.comma });
+        if ((isD || isG) && !(i === 7 && g.narrow)) text(ctx, i === 7 ? "durak (oktav)" : isD ? "durak" : "güçlü", g.plotX1 - 4, y - 5, { size: 11, align: "right", weight: 700, color: col });
+      });
+      // basamak aralıkları (koma)
+      for (let i = 0; i < 7; i++) {
+        const d = mk.k[i + 1] - mk.k[i], y = (g.yOf(mk.k[i]) + g.yOf(mk.k[i + 1])) / 2;
+        if (!g.narrow) text(ctx, stepLab(d), g.ladX - (g.narrow ? 60 : 96), y + 4, { size: 10, color: d === 12 || d === 4 ? C.comma : C.muted, align: "right" });
+      }
+      // ezgi: zamana yayılmış yol
+      if (mel.length) {
+        const pw = g.plotX1 - g.plotX0 - 20;
+        const X = (t) => g.plotX0 + (t / total) * pw;
+        ctx.strokeStyle = rgba(C.ink, 0.35); ctx.lineWidth = 1.4;
+        ctx.beginPath();
+        let started = false;
+        mel.forEach((n) => {
+          if (n.t > now) return;
+          const y = g.yOf(mk.k[n.i]), x0 = X(n.t), x1 = X(Math.min(now, n.t + n.d));
+          started ? ctx.lineTo(x0, y) : ctx.moveTo(x0, y); started = true; ctx.lineTo(x1, y);
+        });
+        ctx.stroke();
+        mel.forEach((n) => {
+          if (n.t > now) return;
+          const y = g.yOf(mk.k[n.i]), isD = n.i === 0 || n.i === 7, isG = n.i === mk.guclu;
+          const col = isD ? C.tonic : isG ? C.wave : C.ink;
+          ctx.fillStyle = col; ctx.globalAlpha = 0.85;
+          ctx.fillRect(X(n.t), y - 3, Math.max(3, X(Math.min(now, n.t + n.d)) - X(n.t) - 2), 6);
+          ctx.globalAlpha = 1;
+        });
+        if (playing && curI >= 0) {
+          const x = X(now), y = g.yOf(mk.k[curI]);
+          ctx.save(); ctx.fillStyle = "#fff8e6"; ctx.shadowColor = C.tonic; ctx.shadowBlur = 14; ctx.beginPath(); ctx.arc(x, y, 5, 0, 7); ctx.fill(); ctx.restore();
+        }
+        text(ctx, label, g.plotX0, g.top - 8, { size: 11, color: C.muted });
+      } else {
+        text(ctx, "Diziyi çalın ya da kısa bir seyir dinleyin", (g.plotX0 + g.plotX1) / 2, (g.top + g.bot) / 2, { size: 13, color: C.muted, align: "center" });
+      }
+      // karşılaştırma: üç makam, duraktan koma
+      if (g.wide) {
+        const x0 = g.w - g.compW + 6, colW = (g.compW - 16) / 3;
+        text(ctx, "Duraktan koma", x0, g.top - 8, { size: 11, color: C.ink2, weight: 700 });
+        ORDER.forEach((id, c) => {
+          const m = MAKAM[id], cx = x0 + colW * c + colW / 2, cur = id === key;
+          ctx.strokeStyle = rgba(C.ink, cur ? 0.4 : 0.15); ctx.beginPath(); ctx.moveTo(cx, g.yOf(0)); ctx.lineTo(cx, g.yOf(53)); ctx.stroke();
+          m.k.forEach((k, i) => {
+            const isD = i === 0 || i === 7, isG = i === m.guclu;
+            ctx.fillStyle = isD ? C.tonic : isG ? C.wave : rgba(C.ink, cur ? 0.9 : 0.5);
+            ctx.beginPath(); ctx.arc(cx, g.yOf(k), isD || isG ? 4.5 : 3.2, 0, 7); ctx.fill();
+            if (cur && !isD) text(ctx, String(k), cx + 7, g.yOf(k) + 3, { size: 9, color: C.muted });
+          });
+          text(ctx, m.ad, cx, g.bot + 18, { size: 11, align: "center", weight: cur ? 700 : 500, color: cur ? C.ink : C.muted });
+        });
+      }
+    }
+    st = canvas(cv, () => draw());
+    const lp = loop(() => draw());
+
+    function stop() {
+      tm.clear();
+      if (playing) { playing = false; total = mel.length ? mel[mel.length - 1].t + mel[mel.length - 1].d : 0; }
+    }
+    function run(notes, lab) {
+      stop();
+      mel = []; let t = 0;
+      notes.forEach(([i, d]) => { mel.push({ i, t, d }); t += d; });
+      total = t; label = lab; playing = true; t0 = performance.now();
+      const mk = M();
+      mel.forEach((n) => tm.set(() => Snd.pluck(freq(n.i, mk), { dur: Math.max(0.25, n.d * 0.9), gain: 0.3 }), n.t * 1000));
+      tm.set(() => { playing = false; }, total * 1000 + 80);
+    }
+    const U = 0.3; // temel süre (sn)
+    function scale() {
+      const up = [0, 1, 2, 3, 4, 5, 6, 7].map((i) => [i, U]);
+      const down = [6, 5, 4, 3, 2, 1].map((i) => [i, U]);
+      run([...up, ...down, [0, U * 3]], "Dizi: çıkış ve durağa dönüş");
+    }
+    const pick = (a) => a[Math.floor(Math.random() * a.length)];
+    // güçlü çevresinde gezinme: komşu basamağa adım, aynı notada kalmadan
+    const wander = (cur, gc) => { let n; do n = clamp(cur + pick([-1, 1, 1, -1, 2]), gc - 1, Math.min(7, gc + 2)); while (n === cur); return n; };
+    function seyir() {
+      const mk = M(), gc = mk.guclu, out = [];
+      let cur;
+      const dur = () => (Math.random() < 0.3 ? U * 0.5 : U);
+      const step = (target) => { const d = Math.sign(target - cur); cur += Math.random() < 0.15 && Math.abs(target - cur) > 1 ? 2 * d : d; out.push([cur, dur()]); };
+      if (mk.seyir === "çıkıcı") {
+        // durak civarından başla, güçlüye çık, yarım karar, gezin, durağa in
+        cur = pick([0, 0, 1, 2]); out.push([cur, U]);
+        while (cur < gc) { if (Math.random() < 0.15 && cur > 0) { cur -= 1; out.push([cur, dur()]); } step(gc); }
+        out[out.length - 1][1] = U * 2;                                   // güçlüde yarım karar
+        const n = 3 + Math.floor(Math.random() * 3);
+        for (let k = 0; k < n; k++) { cur = wander(cur, gc); out.push([cur, dur()]); }
+        while (cur > 0) { if (Math.random() < 0.12 && cur < 6) { cur += 1; out.push([cur, dur()]); } step(0); }
+      } else {
+        // güçlü civarından başla, güçlüde dinlen, durağa in (inici-çıkıcı)
+        cur = pick([gc, gc + 1, gc + 2]); out.push([cur, U]);
+        const n = 2 + Math.floor(Math.random() * 3);
+        for (let k = 0; k < n; k++) { cur = wander(cur, gc); out.push([cur, dur()]); }
+        while (cur !== gc) step(gc);
+        out[out.length - 1][1] = U * 2;                                   // güçlüde yarım karar
+        while (cur > 0) { if (Math.random() < 0.15 && cur < gc) { cur += 1; out.push([cur, dur()]); } step(0); }
+      }
+      out[out.length - 1][1] = U * 3;                                     // durakta tam karar
+      // 12–16 nota arasında tut: kısaysa sona yakın bir komşu-nota süslemesi ekle (aynı notayı tekrarlamadan)
+      for (let j = out.length - 3; out.length < 12 && j >= 1; j -= 2) { const p = out[j][0]; if (p < 7) out.splice(j + 1, 0, [p + 1, U * 0.5], [p, U * 0.5]); }
+      if (out.length > 16) out.splice(1, out.length - 16);
+      run(out, `Kısa seyir: ${mk.seyir}`);
+    }
+    function upd() {
+      const mk = M();
+      info.textContent = `durak ${mk.durakAd} · güçlü Nevâ (Re) · seyir ${mk.seyir}`;
+    }
+    const segEl = seg(ORDER.map((id) => [id, MAKAM[id].ad]), key, (k) => { key = k; stop(); mel = []; upd(); draw(); }, "Makam");
+    top.append(segEl, h("span.spacer"), info);
+    stage.append(h("div.controls",
+      h("button.btn", { type: "button", onclick: scale }, "Diziyi çal"),
+      h("button.btn.primary", { type: "button", onclick: seyir }, "Kısa seyir"),
+      h("span.spacer"),
+      h("span.sy-note", "Basit bir yürüyüş; gerçek bir eser ya da taksim değil. Akort yüksekliği basitleştirildi (durak eşit tamperamanlı Sol4 / La4).")));
+    upd();
+    return { enter() { lp.start(); }, leave() { lp.stop(); stop(); } };
+  };
+  G["makam-seyri"] = [{ click: "=Rast" }, { click: "Kısa seyir" }, { wait: 6000 }, { click: "=Hicaz" }, { click: "Kısa seyir" }];
 })();
