@@ -985,4 +985,111 @@
     };
   };
   G.lissajous = [{ click: "=Oktav" }, { wait: 2200 }, { click: "=Beşli" }, { wait: 3200 }, { click: "=Küçük ikili" }];
+
+  /* ================= Tamperaman: komayı paylaştırmak =================
+     Beşliler çemberinde 12 majör ton. Her ton, majör akorunun saf hâlinden ne kadar saptığına göre
+     altından (temiz) kırmızıya (pürüzlü) boyanır; tonlar arasındaki yaylar beşlilerin saf beşliden
+     sapmasını (lavanta) gösterir. Komanın toplandığı "kurt" beşli kalın kırmızıdır. */
+  Demos.temperament = (stage) => {
+    const KEYS = ["Do", "Sol", "Re", "La", "Mi", "Si", "Fa♯", "Re♭", "La♭", "Mi♭", "Si♭", "Fa"];
+    const SYS = [["pythagorean", "Pisagor"], ["meantone", "Ortalama ton"], ["werckmeister", "İyi düzen"], ["equal", "Eşit"]];
+    const PURE5 = T.cents(3 / 2);
+    let sys = "meantone", sel = 0, seqOn = false, seqI = -1, glow = 0;
+    const tm = timers();
+
+    const badness = (d) => clamp(Math.max(Math.abs(d.third) / 28, Math.abs(d.fifth) / 14), 0, 1);
+    const isWolf = (f) => Math.abs(f - PURE5) > 15;
+    // seçilen akortta, Do4 tabanlı perde frekansı (oktav kaydırmasıyla)
+    function freq(pc, octUp = 0) {
+      const c = T.temperamentCents(sys)[((pc % 12) + 12) % 12];
+      return T.mtof(60) * Math.pow(2, (c + 1200 * octUp) / 1200);
+    }
+    function chordFreqs(i) {
+      const r = T.FIFTH_ORDER[i];
+      return [freq(r), freq(r + 4, r + 4 >= 12 ? 1 : 0), freq(r + 7, r + 7 >= 12 ? 1 : 0)];
+    }
+    function play(i) {
+      sel = i; glow = 1; upd();
+      chordFreqs(i).forEach((f) => Snd.note(f, { amps: HARM, dur: 1.5, gain: 0.16, attack: 0.03, release: 0.5 }));
+    }
+
+    const { cv } = stageCanvas(stage, "Beşliler çemberinde 12 majör tonun akort kalitesi; bir tona tıklayın");
+    cv.style.cursor = "pointer";
+    let st;
+    function geo() {
+      const { w, h: hh } = st;
+      const R = Math.min(w, hh) * 0.36;
+      return { w, hh, cx: w / 2, cy: hh / 2 + 4, R, nr: Math.max(17, R * 0.15) };
+    }
+    const nodeXY = (g, i) => { const a = -Math.PI / 2 + (i * Math.PI * 2) / 12; return [g.cx + g.R * Math.cos(a), g.cy + g.R * Math.sin(a), a]; };
+    function draw(dt) {
+      if (!st) return;
+      glow = Math.max(0, glow - dt * 0.8);
+      const g = geo(), ctx = st.ctx;
+      ctx.clearRect(0, 0, g.w, g.hh);
+      const fifths = T.TEMPERAMENTS[sys].fifths;
+      // beşli yayları: Do→Sol, Sol→Re, … Fa→Do
+      for (let i = 0; i < 12; i++) {
+        const a0 = -Math.PI / 2 + (i * Math.PI * 2) / 12, a1 = a0 + Math.PI * 2 / 12;
+        const dev = fifths[i] - PURE5, wolf = isWolf(fifths[i]);
+        ctx.strokeStyle = wolf ? C.tension : Math.abs(dev) < 0.05 ? rgba(C.ink, 0.25) : rgba(C.comma, 0.85);
+        ctx.lineWidth = wolf ? 7 : 2 + Math.min(4, Math.abs(dev) * 0.7);
+        ctx.beginPath(); ctx.arc(g.cx, g.cy, g.R, a0 + 0.17, a1 - 0.17); ctx.stroke();
+        const am = (a0 + a1) / 2, lr = g.R + g.nr + 16;
+        const lab = wolf ? `kurt ${dev > 0 ? "+" : "−"}${fmtNum(Math.abs(dev), 1)}` : Math.abs(dev) < 0.05 ? "saf" : `${dev > 0 ? "+" : "−"}${fmtNum(Math.abs(dev), 1)}`;
+        text(ctx, lab, g.cx + lr * Math.cos(am), g.cy + lr * Math.sin(am) + 4, { size: wolf ? 12 : 11, align: "center", weight: wolf ? 700 : 500, color: wolf ? C.tension : Math.abs(dev) < 0.05 ? C.muted : C.comma });
+      }
+      // ton düğümleri
+      for (let i = 0; i < 12; i++) {
+        const [x, y] = nodeXY(g, i);
+        const d = T.triadDeviation(sys, T.FIFTH_ORDER[i]);
+        const col = mix(C.tonic, C.tension, badness(d));
+        const on = i === sel, pl = i === seqI;
+        ctx.save();
+        if (on || pl) { ctx.shadowColor = col; ctx.shadowBlur = 16 + 18 * glow; }
+        ctx.fillStyle = col; ctx.globalAlpha = on || pl ? 1 : 0.82;
+        ctx.beginPath(); ctx.arc(x, y, g.nr * (on ? 1.12 : 1), 0, 7); ctx.fill();
+        ctx.restore();
+        if (on) { ctx.strokeStyle = C.ink; ctx.lineWidth = 2; ctx.beginPath(); ctx.arc(x, y, g.nr * 1.12 + 3, 0, 7); ctx.stroke(); }
+        text(ctx, KEYS[i], x, y + 1, { size: Math.round(g.nr * 0.62), align: "center", base: "middle", weight: 700, color: "#2a1608", font: FONT.display });
+        const td = d.third;
+        text(ctx, `${td > 0.05 ? "+" : td < -0.05 ? "−" : "±"}${fmtNum(Math.abs(td), 0)}`, x, y + g.nr * 0.62, { size: 10, align: "center", base: "middle", weight: 600, color: "rgba(42,22,8,0.75)" });
+      }
+      // merkez: sistemin adı ve açıklama
+      const tt = T.TEMPERAMENTS[sys];
+      text(ctx, tt.ad, g.cx, g.cy - 8, { size: Math.min(22, g.R * 0.15), align: "center", weight: 600, color: C.ink, font: FONT.display });
+      text(ctx, "düğümdeki sayı: üçlünün saftan sapması (cent)", g.cx, g.cy + 14, { size: 11, align: "center", color: C.muted });
+      text(ctx, "yay: beşlinin saftan sapması", g.cx, g.cy + 30, { size: 11, align: "center", color: C.comma });
+    }
+    st = canvas(cv, () => draw(0));
+    const lp = loop(draw);
+    pointer(cv, { down: (x, y) => {
+      const g = geo();
+      for (let i = 0; i < 12; i++) { const [nx, ny] = nodeXY(g, i); if (Math.hypot(x - nx, y - ny) < g.nr * 1.3) { stopSeq(); play(i); return; } }
+    } });
+
+    const info = h("div.tp-info", { "aria-live": "polite" });
+    function upd() {
+      const r = T.FIFTH_ORDER[sel], d = T.triadDeviation(sys, r), [f1, f3, f5] = chordFreqs(sel);
+      const b3 = Math.abs(4 * f3 - 5 * f1), b5 = Math.abs(2 * f5 - 3 * f1);
+      const wolf = Math.abs(d.fifth) > 15, bad = badness(d) > 0.7;
+      const sgn = (v) => (v > 0.05 ? "+" : v < -0.05 ? "−" : "±") + fmtNum(Math.abs(v), 1);
+      info.innerHTML = `<b class="${bad ? "c-tension" : "c-tonic"}">${KEYS[sel]} majör</b>` +
+        `<span>büyük üçlü <b>${sgn(d.third)} c</b> · saniyede ${fmtNum(b3, 1)} vuru</span>` +
+        `<span>beşli <b>${sgn(d.fifth)} c</b>${wolf ? ' <b class="c-tension">kurt!</b>' : ""} · saniyede ${fmtNum(b5, 1)} vuru</span>`;
+    }
+    function stopSeq() { seqOn = false; seqI = -1; tm.clear(); seqBtn.textContent = "Sırayla çal"; seqBtn.classList.remove("on"); }
+    const seqBtn = h("button.btn", { type: "button", onclick: () => {
+      if (seqOn) return stopSeq();
+      seqOn = true; seqBtn.textContent = "Durdur"; seqBtn.classList.add("on");
+      for (let k = 0; k < 12; k++) tm.set(() => { seqI = k; play(k); }, k * 1150);
+      tm.set(stopSeq, 12 * 1150 + 300);
+    } }, "Sırayla çal");
+    const segEl = seg(SYS, sys, (k) => { sys = k; upd(); play(sel); }, "Akort sistemi");
+    stage.append(h("div.controls.top", segEl),
+      h("div.controls", h("button.btn", { type: "button", onclick: () => play(sel) }, "Akoru çal"), seqBtn, h("span.spacer"), info));
+    upd();
+    return { enter() { lp.start(); }, leave() { lp.stop(); stopSeq(); } };
+  };
+  G.tamperaman = [{ click: "=Ortalama ton" }, { wait: 1800 }, { click: "Sırayla çal" }, { wait: 9800 }, { click: "=Eşit" }];
 })();

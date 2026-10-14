@@ -14,14 +14,14 @@ Hazırlayan: **Koray Toksöz**
 | --- | --- |
 | Giriş | Dokununca pentatonik notalar çalan parlayan teller |
 | 1. Ses nedir? | Sıkışan ve seyrelen hava molekülleri, osilatör ve osiloskop, duyma sınırı testi, çalgı tınıları, harmonik çubuklarıyla toplamsal sentez, titreşen telde harmonik dizisi |
-| 2. Oranlar ve akort | Sürüklenebilir köprülü monokord, vuru ve Plomp–Levelt pürüzlülük eğrisi, iki sesin Lissajous eğrisi (basit oranlar hızla kapanır), 3B perde sarmalı, Pisagor koması, Pisagor / saf / eşit tamperaman karşılaştırması, 53 komalık ızgarada Hicaz dizisi |
-| 3. Gamlar ve modlar | Aralıklar, T-T-Y-T-T-T-Y desenli majör gam, üç minör, döndürülebilir mod diski, pentatonik doğaçlama |
+| 2. Oranlar ve akort | Sürüklenebilir köprülü monokord, vuru ve Plomp–Levelt pürüzlülük eğrisi, iki sesin Lissajous eğrisi (basit oranlar hızla kapanır), 3B perde sarmalı, Pisagor koması, tamperaman (komanın Pisagor, ortalama ton, Werckmeister III ve eşit tamperamanda paylaştırılması, kurt beşli), Pisagor / saf / eşit tamperaman karşılaştırması, 53 komalık ızgarada Hicaz dizisi |
+| 3. Gamlar ve modlar | Nota adları (harf, solfej, Almanca, Türk müziği perdeleri; Guido d'Arezzo'nun ilahisi), piyano portesinde sol ve fa anahtarı (nota koyunca adı ve yeri, okuma alıştırması), aralıklar, T-T-Y-T-T-T-Y desenli majör gam, üç minör, döndürülebilir mod diski, pentatonik doğaçlama |
 | 4. Akorlar ve armoni | Üç sesliler, çevrimler ve yedili akorlar, V7 → I çözülmesi, dönen beşliler çemberi, I–V–vi–IV / ii–V–I / 12 ölçülük blues |
 | 5. Ritim ve zaman | Metronom, 16 adımlı davul sıralayıcısı, aksak usuller (9/8, 7/8, 5/8), senkop, 3'e karşı 2 poliritim |
 | 6. Hepsi bir arada | Akor yürüyüşü + davul + gama kilitli melodi ızgarasıyla mini beste, gamı seçilebilen teller |
 
 Ek olarak:
-- **Sesli anlatım:** 15 dakika, Türkçe.
+- **Sesli anlatım:** 18 dakika, Türkçe.
 - **Hayalet el:** Her deneyin ilk hamlesini gösterir.
 - **Tanım balonları:** Terimlerin üzerine gelince açılır.
 - **Sunucu notları.**
@@ -120,11 +120,18 @@ Betik önce `index.html` içindeki `?v=` sürüm etiketini yeniler, böylece tar
 - **Perde sarmalı:** R. N. Shepard, "Circularity in judgments of relative pitch", *JASA* 36 (1964), 2346–2353, [doi:10.1121/1.1919362](https://doi.org/10.1121/1.1919362).
 - **Komalar (değerler `js/theory.js` içinde hesaplanır):** [Pythagorean comma](https://en.wikipedia.org/wiki/Pythagorean_comma), [Holdrian comma](https://en.wikipedia.org/wiki/Holdrian_comma), [Syntonic comma](https://en.wikipedia.org/wiki/Syntonic_comma).
 - **Lissajous eğrileri (Lissajous 1857, Bowditch 1815):** [Lissajous curve (Wikipedia)](https://en.wikipedia.org/wiki/Lissajous_curve).
+- **Tamperamanlar ve kurt beşli:** [Musical temperament](https://en.wikipedia.org/wiki/Musical_temperament), [Quarter-comma meantone](https://en.wikipedia.org/wiki/Quarter-comma_meantone), [Werckmeister temperament](https://en.wikipedia.org/wiki/Werckmeister_temperament), [Wolf interval](https://en.wikipedia.org/wiki/Wolf_interval) (Wikipedia).
 - **Bach'ın klavyesi:** [The Well-Tempered Clavier (Wikipedia)](https://en.wikipedia.org/wiki/The_Well-Tempered_Clavier).
 
 **Türk müziği**
 - **Hicaz dörtlüsünün AEU rumuzu (SA12S):** MEB, *Türk Müziği Teori ve Uygulaması* ([tymm.meb.gov.tr](https://tymm.meb.gov.tr/muzik-okullari-turk-muzigi-teori-uygulamasi-dersi/unite/1112)).
 - **Hicaz makamının dizisi (hicaz dörtlüsü + nevâda rast beşlisi):** TDV İslâm Ansiklopedisi, [Hicaz](https://islamansiklopedisi.org.tr/hicaz--musiki).
+
+**Nota adları**
+- **Solfej ve Guido d'Arezzo (Ut queant laxis):** [Solfège](https://en.wikipedia.org/wiki/Solf%C3%A8ge), [Ut queant laxis](https://en.wikipedia.org/wiki/Ut_queant_laxis), [Guido of Arezzo](https://en.wikipedia.org/wiki/Guido_of_Arezzo) (Wikipedia).
+- **Porte ve anahtarlar:** [Clef](https://en.wikipedia.org/wiki/Clef), [Staff (music)](https://en.wikipedia.org/wiki/Staff_(music)), [Ledger line](https://en.wikipedia.org/wiki/Ledger_line) (Wikipedia).
+- **Almancada B ve H:** [B (musical note)](https://en.wikipedia.org/wiki/B_(musical_note)) (Wikipedia).
+- **Türk müziği perde adları:** MEB, [Kanun modülü](https://tymm.meb.gov.tr/muzik-okullari-bireysel-calgi-egitimi-dersi-kanun-modulu/unite/1273); TDV İslâm Ansiklopedisi, [Yegâh](https://islamansiklopedisi.org.tr/yegah).
 
 **Armoni ve ritim**
 - **Beşliler çemberinin tarihi (Diletsky, Heinichen):** [Circle of fifths (Wikipedia)](https://en.wikipedia.org/wiki/Circle_of_fifths).
@@ -147,6 +154,7 @@ Betik önce `index.html` içindeki `?v=` sürüm etiketini yeniler, böylece tar
 | Kaynak kod (`js/`, `css/`, `tools/`, `index.html` içindeki kod) | [MIT](LICENSE) |
 | İçerik: slayt metinleri, açıklamalar, sunucu notları, sözlük tanımları, anlatım metinleri ve sesleri (`audio/`) | [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/deed.tr) |
 | Yazı tipleri: Bodoni Moda, Hanken Grotesk (Google Fonts'tan yüklenir, depoda yok) | SIL OFL 1.1 |
+| Sol ve fa anahtarı şekilleri (Wikimedia Commons, GClef.svg ve Bass_clef.svg) | Kamu malı |
 | Creative Commons simgeleri (`img/`) | Creative Commons'ın basın kiti; CC ticari marka politikası |
 
 Anlatım sesleri ElevenLabs ücretli abonelikle "İrem" sesiyle üretildi. Belirli bir kişinin sesini taklit etmek ya da yanıltıcı amaçla kullanılamaz. Ayrıntılar [`LICENSE`](LICENSE) dosyasında.

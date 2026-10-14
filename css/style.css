@@ -265,7 +265,13 @@ input[type="range"]::-moz-range-thumb { width: 12px; height: 20px; border-radius
   position: relative;
   margin: 0 2px;
 }
-#progress .clef { flex: none; width: 16px; margin: calc(var(--g) * -1.6) 6px calc(var(--g) * -1.4) 2px; color: var(--ink-2); opacity: .75; }
+/* sol anahtarı: boyu 7,02 çizgi aralığı; üst çizgi şeklin tepesinden 1,39 aralık aşağıda,
+   böylece kıvrım alttan ikinci (Sol) çizgisine oturur */
+#progress .clef {
+  flex: none; align-self: flex-start;
+  height: calc(var(--g) * 7.024); width: calc(var(--g) * 7.024 * 15.186 / 40.768);
+  margin: calc(var(--g) * -1.392) 6px 0 2px; color: var(--ink-2); opacity: .8;
+}
 #progress .clef svg { width: 100%; height: 100%; display: block; }
 #progress .ch {
   display: flex; flex: var(--n) 1 0; min-width: 0;

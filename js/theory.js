@@ -68,6 +68,39 @@
   // Holdrian koması: oktavın 53'te biri
   const HOLDRIAN_COMMA = 1200 / 53;
 
+  /* ---- Tamperamanlar: Pisagor komasının beşlilere paylaştırılması ----
+     Beşliler çemberi sırasıyla (Do→Sol, Sol→Re, … Fa→Do) her beşlinin cent cinsinden büyüklüğü.
+     12 beşlinin toplamı her zaman 7 oktav = 8400 cent'tir; komayı nereye koyduğumuz sistemi belirler. */
+  const PURE5 = cents(3 / 2);
+  const FIFTH_ORDER = [0, 7, 2, 9, 4, 11, 6, 1, 8, 3, 10, 5]; // Do Sol Re La Mi Si Fa♯ Do♯ Sol♯ Re♯ La♯ Fa
+  function withWolf(size, wolfIndex) {
+    const f = Array(12).fill(size);
+    f[wolfIndex] = 8400 - size * 11; // kalan fark tek bir "kurt" beşliye düşer
+    return f;
+  }
+  const TEMPERAMENTS = {
+    // 11 saf beşli; koma Sol♯→Mi♭ beşlisinde toplanır (kurt ≈ 678,5 cent)
+    pythagorean: { ad: "Pisagor", fifths: withWolf(PURE5, 8) },
+    // ¼ sintonik koma ortalama ton: beşliler 81/80'in dörtte biri kadar dar, büyük üçlüler saf (kurt ≈ 737,6 cent)
+    meantone: { ad: "Ortalama ton", fifths: withWolf(PURE5 - SYNTONIC_COMMA / 4, 8) },
+    // Werckmeister III (1691): Do–Sol, Sol–Re, Re–La ve Si–Fa♯ beşlileri ¼ Pisagor koması dar, diğerleri saf
+    werckmeister: { ad: "İyi düzen (Werckmeister III)", fifths: FIFTH_ORDER.map((_, i) => ([0, 1, 2, 5].includes(i) ? PURE5 - PYTHAGOREAN_COMMA / 4 : PURE5)) },
+    equal: { ad: "Eşit tamperaman", fifths: Array(12).fill(700) },
+  };
+  // Do = 0 kabul edilerek her perde sınıfının cent değeri (0..1200)
+  function temperamentCents(name) {
+    const f = TEMPERAMENTS[name].fifths, out = new Array(12);
+    let c = 0;
+    FIFTH_ORDER.forEach((pc, i) => { out[pc] = ((c % 1200) + 1200) % 1200; c += f[i]; });
+    return out;
+  }
+  // Bir majör akorun saf hâlinden sapması (cent): üçlü 5/4'e, beşli 3/2'ye göre
+  function triadDeviation(name, root) {
+    const t = temperamentCents(name), at = (pc) => t[((pc % 12) + 12) % 12];
+    const span = (a, b) => (((at(b) - at(a)) % 1200) + 1200) % 1200;
+    return { third: span(root, root + 4) - cents(5 / 4), fifth: span(root, root + 7) - PURE5 };
+  }
+
   /* ---- Aralıklar ---- */
   const INTERVALS = [
     { s: 0, ad: "Tam birli", kisa: "1", oran: [1, 1] },
@@ -185,6 +218,7 @@
     INTERVALS, interval, SCALES, MODES, modeSteps, degrees, scaleNotes, inScale, rotate,
     CHORDS, chord, chordName, ROMAN, DEGREE_TYPE, DEGREE_TYPE7, diatonicChord, FUNCTION,
     CIRCLE, SHARP_ORDER, FLAT_ORDER, roughnessPair, roughness,
+    TEMPERAMENTS, FIFTH_ORDER, temperamentCents, triadDeviation,
   };
   if (typeof module !== "undefined" && module.exports) module.exports = api;
   else root.T = api;

@@ -367,4 +367,263 @@
     return { enter() { board.draw(); lp.start(); }, leave() { stopImp(); lp.stop(); } };
   };
   G.pentatonik = [{ click: 'css:.key[data-m="66"]' }, { click: 'css:.key[data-m="70"]' }, { click: 'css:.key[data-m="73"]' }, { click: "Doğaçla" }];
+
+  /* ---------- Notaların adları: C'den Do'ya ----------
+     Aynı tuşun dört adlandırma sistemindeki adı. Guido d'Arezzo'nun ilahisinde her dizenin ilk
+     hecesi bir basamak yukarıdan başlar: UT, RE, MI, FA, SOL, LA. */
+  const SOLFEGE = T.SHARP;
+  const LETTERS = T.LETTER;
+  const GERMAN = ["C", "Cis", "D", "Dis", "E", "F", "Fis", "G", "Gis", "A", "B", "H"];
+  // Türk müziği perde adları (Arel–Ezgi–Uzdilek yazımına göre portedeki yerleri; yalnız doğal perdeler)
+  const PERDE = { 60: "Kaba çârgâh", 62: "Yegâh", 64: "Hüseynîaşîran", 65: "Acemaşîran", 67: "Rast", 69: "Dügâh", 71: "Bûselik",
+    72: "Çârgâh", 74: "Nevâ", 76: "Hüseynî", 77: "Acem", 79: "Gerdaniye", 81: "Muhayyer", 83: "Tiz bûselik", 84: "Tiz çârgâh" };
+  const HYMN = [["UT", " queant laxis", 60], ["RE", "sonare fibris", 62], ["MI", "ra gestorum", 64], ["FA", "muli tuorum", 65], ["SOL", "ve polluti", 67], ["LA", "bii reatum", 69], ["S", "ancte ", null, "I", "ohannes"]];
+
+  Demos.notenames = (stage) => {
+    let sys = "solfej", cur = 67, playing = false;
+    const timersN = [];
+    const names = (m) => {
+      const pc = T.pcOf(m);
+      return {
+        solfej: T.name(m, { octave: false }) + (T.isBlack(m) ? " / " + T.name(m, { flats: true, octave: false }) : ""),
+        harf: LETTERS[pc] + (T.isBlack(m) ? " / " + ["", "D♭", "", "E♭", "", "", "G♭", "", "A♭", "", "B♭", ""][pc] : ""),
+        almanca: GERMAN[pc],
+        perde: PERDE[m] || null,
+      };
+    };
+    // üst kart: seçili tuşun bütün adları
+    const big = h("div.nn-big");
+    const rows = h("div.nn-rows");
+    const card = h("div.nn-card", big, rows);
+    const hymn = h("div.nn-hymn", { "aria-label": "Ut queant laxis ilahisinin ilk heceleri" },
+      HYMN.map((x, i) => h("span.nn-line", { "data-i": i },
+        x[2] === null ? [h("b", x[0]), x[1], h("b", x[3]), x[4]] : [h("b", x[0]), x[1]])));
+    const top = h("div.nn-top", card, hymn);
+    stage.append(top);
+    const pianoWrap = h("div.nn-piano");
+    stage.append(pianoWrap);
+    const piano = Piano(pianoWrap, { from: 60, to: 84, labels: "none", onplay: (m) => { cur = m; show(); } });
+
+    function label() {
+      piano.el.classList.toggle("nn-vertical", sys === "perde");
+      for (let m = 60; m <= 84; m++) {
+        const k = piano.keyEl(m); if (!k) continue;
+        const n = names(m), pc = T.pcOf(m);
+        let t = "";
+        if (sys === "solfej") t = T.isBlack(m) ? "" : SOLFEGE[pc];
+        else if (sys === "harf") t = T.isBlack(m) ? "" : LETTERS[pc];
+        else if (sys === "almanca") t = GERMAN[pc];
+        else t = n.perde || "";
+        k.querySelector(".kl").textContent = t;
+        k.classList.toggle("nn-cur", m === cur);
+      }
+    }
+    function show() {
+      const n = names(cur);
+      big.innerHTML = "";
+      big.append(h("span.nn-name", T.name(cur, { octave: false })), h("span.nn-oct", T.name(cur)));
+      const row = (k, lab, val, note) => h("div.nn-row" + (sys === k ? ".on" : ""), h("span", lab), h("b", val), note ? h("small", note) : null);
+      rows.innerHTML = "";
+      rows.append(
+        row("solfej", "Solfej", n.solfej),
+        row("harf", "Harf (İngilizce)", n.harf),
+        row("almanca", "Almanca", n.almanca, T.pcOf(cur) === 11 ? "Si'ye H denir" : T.pcOf(cur) === 10 ? "Si♭'ye B denir" : null),
+        row("perde", "Türk müziği perdesi", n.perde || "—", n.perde ? null : T.isBlack(cur) ? "aradaki perdelerin komalı birçok adı var (Kürdî, Segâh, Hicaz…)" : null));
+      label();
+    }
+    function stop() { timersN.forEach(clearTimeout); timersN.length = 0; playing = false; hymn.querySelectorAll(".on").forEach((e) => e.classList.remove("on")); btn.textContent = "İlahiyi dinle"; btn.classList.remove("on"); }
+    const btn = h("button.btn", { type: "button", onclick: () => {
+      if (playing) return stop();
+      playing = true; btn.textContent = "Durdur"; btn.classList.add("on");
+      HYMN.forEach((x, i) => timersN.push(setTimeout(() => {
+        hymn.querySelectorAll(".on").forEach((e) => e.classList.remove("on"));
+        hymn.querySelector(`[data-i="${i}"]`).classList.add("on");
+        if (x[2] != null) { piano.press(x[2], { dur: 0.9 }); cur = x[2]; show(); }
+        else { piano.press(71, { dur: 1.2 }); cur = 71; show(); }
+      }, 300 + i * 900)));
+      timersN.push(setTimeout(stop, 300 + HYMN.length * 900 + 600));
+    } }, "İlahiyi dinle");
+    const segEl = seg([["solfej", "Solfej"], ["harf", "Harf"], ["almanca", "Almanca"], ["perde", "Türk perdeleri"]], sys, (k) => { sys = k; show(); }, "Adlandırma sistemi");
+    stage.append(h("div.controls", segEl, h("span.spacer"), btn));
+    show();
+    return { leave: stop };
+  };
+  G["nota-adlari"] = [{ click: "İlahiyi dinle" }, { wait: 6800 }, { click: "=Harf" }, { wait: 900 }, { click: "=Almanca" }, { wait: 900 }, { click: "=Türk perdeleri" }];
+
+  /* ---------- Nota yazısı: piyano portesi, sol ve fa anahtarları ----------
+     Porteye tıklayınca nota en yakın çizgiye/aralığa oturur; adı ve yeri yazılır, piyanoda tuşu yanar.
+     Piyanoda basılan tuş da porteye yazılır (orta Do ve üstü sol anahtarı, altı fa anahtarı).
+     Anahtar şekilleri Wikimedia Commons'tan, kamu malı: GClef.svg ve Bass_clef.svg. */
+  const G_CLEF_D = "m12.049 3.5296c0.305 3.1263-2.019 5.6563-4.0772 7.7014-0.9349 0.897-0.155 0.148-0.6437 0.594-0.1022-0.479-0.2986-1.731-0.2802-2.11 0.1304-2.6939 2.3198-6.5875 4.2381-8.0236 0.309 0.5767 0.563 0.6231 0.763 1.8382zm0.651 16.142c-1.232-0.906-2.85-1.144-4.3336-0.885-0.1913-1.255-0.3827-2.51-0.574-3.764 2.3506-2.329 4.9066-5.0322 5.0406-8.5394 0.059-2.232-0.276-4.6714-1.678-6.4836-1.7004 0.12823-2.8995 2.156-3.8019 3.4165-1.4889 2.6705-1.1414 5.9169-0.57 8.7965-0.8094 0.952-1.9296 1.743-2.7274 2.734-2.3561 2.308-4.4085 5.43-4.0046 8.878 0.18332 3.334 2.5894 6.434 5.8702 7.227 1.2457 0.315 2.5639 0.346 3.8241 0.099 0.2199 2.25 1.0266 4.629 0.0925 6.813-0.7007 1.598-2.7875 3.004-4.3325 2.192-0.5994-0.316-0.1137-0.051-0.478-0.252 1.0698-0.257 1.9996-1.036 2.26-1.565 0.8378-1.464-0.3998-3.639-2.1554-3.358-2.262 0.046-3.1904 3.14-1.7356 4.685 1.3468 1.52 3.833 1.312 5.4301 0.318 1.8125-1.18 2.0395-3.544 1.8325-5.562-0.07-0.678-0.403-2.67-0.444-3.387 0.697-0.249 0.209-0.059 1.193-0.449 2.66-1.053 4.357-4.259 3.594-7.122-0.318-1.469-1.044-2.914-2.302-3.792zm0.561 5.757c0.214 1.991-1.053 4.321-3.079 4.96-0.136-0.795-0.172-1.011-0.2626-1.475-0.4822-2.46-0.744-4.987-1.116-7.481 1.6246-0.168 3.4576 0.543 4.0226 2.184 0.244 0.577 0.343 1.197 0.435 1.812zm-5.1486 5.196c-2.5441 0.141-4.9995-1.595-5.6343-4.081-0.749-2.153-0.5283-4.63 0.8207-6.504 1.1151-1.702 2.6065-3.105 4.0286-4.543 0.183 1.127 0.366 2.254 0.549 3.382-2.9906 0.782-5.0046 4.725-3.215 7.451 0.5324 0.764 1.9765 2.223 2.7655 1.634-1.102-0.683-2.0033-1.859-1.8095-3.227-0.0821-1.282 1.3699-2.911 2.6513-3.198 0.4384 2.869 0.9413 6.073 1.3797 8.943-0.5054 0.1-1.0211 0.143-1.536 0.143z";
+  const F_CLEF_D = "M 1239,8245 C 1397,8138 1515,8057 1591,8001 C 1667,7946 1747,7877 1829,7795 C 1911,7713 1980,7620 2036,7517 C 2080,7441 2118,7353 2149,7253 C 2180,7154 2196,7058 2199,6967 C 2199,6882 2188,6801 2165,6725 C 2143,6648 2105,6585 2051,6534 C 1997,6484 1927,6459 1840,6459 C 1756,6459 1677,6476 1603,6509 C 1530,6543 1478,6597 1449,6673 C 1449,6680 1445,6689 1439,6702 C 1441,6718 1449,6730 1464,6739 C 1479,6748 1492,6752 1504,6752 C 1510,6752 1527,6749 1553,6743 C 1580,6737 1602,6733 1620,6733 C 1673,6733 1720,6752 1763,6789 C 1805,6826 1826,6871 1826,6924 C 1826,6962 1815,6998 1794,7031 C 1773,7064 1744,7091 1707,7110 C 1670,7130 1629,7139 1585,7139 C 1505,7139 1437,7115 1381,7066 C 1326,7016 1298,6953 1298,6874 C 1298,6773 1329,6686 1390,6612 C 1452,6538 1530,6483 1626,6446 C 1721,6408 1817,6390 1915,6390 C 2022,6390 2124,6417 2219,6472 C 2315,6526 2390,6601 2446,6694 C 2502,6788 2531,6888 2531,6996 C 2531,7188 2467,7366 2339,7531 C 2211,7696 2053,7839 1864,7961 C 1738,8044 1534,8156 1253,8297 L 1239,8245 z M 2628,6698 C 2628,6662 2641,6632 2667,6608 C 2692,6583 2723,6571 2760,6571 C 2792,6571 2822,6585 2849,6612 C 2876,6638 2889,6669 2889,6703 C 2889,6739 2875,6770 2849,6795 C 2821,6819 2790,6831 2755,6831 C 2718,6831 2688,6819 2664,6792 C 2640,6766 2628,6735 2628,6698 z M 2628,7222 C 2628,7186 2641,7155 2665,7131 C 2690,7106 2721,7094 2760,7094 C 2792,7094 2821,7107 2849,7134 C 2875,7161 2889,7190 2889,7222 C 2889,7261 2876,7292 2851,7317 C 2825,7342 2795,7355 2760,7355 C 2721,7355 2690,7342 2665,7318 C 2641,7294 2628,7262 2628,7222 z ";
+  const DIA = [0, 2, 4, 5, 7, 9, 11];               // Do Re Mi Fa Sol La Si
+  const LET = ["C", "D", "E", "F", "G", "A", "B"];
+  // diatonik sıra n = oktav·7 + harf (Do4 = 28)
+  const midiOf = (n, acc) => 12 * (Math.floor(n / 7) + 1) + DIA[((n % 7) + 7) % 7] + acc;
+  Demos.notation = (stage) => {
+    const S = 10;                                    // çizgi aralığı (svg birimi)
+    const STAFF = {
+      treble: { top: 40, bottom: 80, idx: 30, min: 26, max: 42, ad: "Sol anahtarı", el: "sağ el" },  // alt çizgi Mi4
+      bass: { top: 140, bottom: 180, idx: 18, min: 14, max: 30, ad: "Fa anahtarı", el: "sol el" },    // alt çizgi Sol2
+    };
+    const W = 520, H = 222, X0 = 92, X1 = W - 18, SLOTS = 8;
+    let notes = [], acc = 0, quiz = null, score = [0, 0];
+    const txt = (g, attrs, t) => { const e = svg("text", attrs); e.textContent = t; g.append(e); return e; };
+    const yOf = (st, n) => STAFF[st].bottom - (n - STAFF[st].idx) * (S / 2);
+
+    const root = h("div.nt-wrap");
+    const sv = svg("svg", { viewBox: `0 0 ${W} ${H}`, class: "nt-svg", role: "img", "aria-label": "Piyano portesi: nota koymak için tıklayın" });
+    const info = h("div.nt-info", { "aria-live": "polite" });
+    root.append(h("div.nt-staff", sv), info);
+    stage.append(root);
+    const pianoWrap = h("div.nt-piano");
+    stage.append(pianoWrap);
+    const piano = Piano(pianoWrap, { from: 36, to: 84, labels: "c", compact: true, onplay: fromKey });
+
+    // sabit katman: porteler, anahtarlar, akolad, ipuçları
+    const base = svg("g"), dyn = svg("g"), ghost = svg("g", { opacity: 0.45 });
+    sv.append(base, dyn, ghost);
+    (function drawBase() {
+      for (const k of ["treble", "bass"]) {
+        const st = STAFF[k];
+        for (let i = 0; i < 5; i++) base.append(svg("line", { x1: 30, x2: W - 8, y1: st.top + i * S, y2: st.top + i * S, class: "nt-line" }));
+        txt(base, { x: 66, y: st.top - 8, class: "nt-hand" }, st.ad + " · " + st.el);
+      }
+      base.append(svg("line", { x1: 30, x2: 30, y1: 40, y2: 180, class: "nt-bar" }), svg("line", { x1: W - 8, x2: W - 8, y1: 40, y2: 180, class: "nt-bar" }));
+      // akolad: iki porteyi birleştiren süslü parantez
+      base.append(svg("path", { d: "M24 40 C 12 52, 22 92, 13 110 C 22 128, 12 168, 24 180 C 18 160, 26 128, 17 110 C 26 92, 18 60, 24 40 Z", class: "nt-brace" }));
+      // sol anahtarı: boyu 7,024 aralık, üst çizgi tepeden 1,392 aralık aşağıda (kıvrım Sol4 çizgisinde)
+      const gH = 7.024 * S, gK = gH / 40.768;
+      base.append(svg("path", { d: G_CLEF_D, class: "nt-clef", transform: `translate(38 ${40 - 1.392 * S}) scale(${gK})` }));
+      // fa anahtarı: kaynak dosyadaki porte çizgileri y=6378…8740 (aralık 590,5); noktalar Fa3 çizgisini çevreler
+      const fK = S / 590.5;
+      base.append(svg("path", { d: F_CLEF_D, class: "nt-clef", transform: `translate(${40 - 1239 * fK} ${140 - 6378 * fK}) scale(${fK})` }));
+      // ipuçları: Sol4 ve Fa3 çizgileri, orta Do
+      txt(base, { x: W - 12, y: yOf("treble", 32) - 2, class: "nt-tip", "text-anchor": "end" }, "Sol4 çizgisi");
+      txt(base, { x: W - 12, y: yOf("bass", 24) - 2, class: "nt-tip", "text-anchor": "end" }, "Fa3 çizgisi");
+      txt(base, { x: W - 12, y: 113, class: "nt-tip mid", "text-anchor": "end" }, "Orta Do (Do4) iki portenin arasında");
+    })();
+
+    function notehead(g, x, y, cls) {
+      g.append(svg("ellipse", { cx: x, cy: y, rx: 6.3, ry: 4.5, transform: `rotate(-20 ${x} ${y})`, class: cls }));
+    }
+    function ledgers(g, st, n, x) {
+      const s = STAFF[st];
+      for (let k = s.idx - 2; k >= n; k -= 2) g.append(svg("line", { x1: x - 10, x2: x + 10, y1: yOf(st, k), y2: yOf(st, k), class: "nt-ledger" }));
+      for (let k = s.idx + 10; k <= n; k += 2) g.append(svg("line", { x1: x - 10, x2: x + 10, y1: yOf(st, k), y2: yOf(st, k), class: "nt-ledger" }));
+    }
+    const ACC = { 1: "♯", "-1": "♭", 0: "" };
+    function drawNote(g, nt, x, cls) {
+      const y = yOf(nt.st, nt.n);
+      ledgers(g, nt.st, nt.n, x);
+      if (nt.acc) txt(g, { x: x - 11, y: y + 4.5, class: "nt-acc " + cls, "text-anchor": "end" }, ACC[nt.acc]);
+      notehead(g, x, y, "nt-head " + cls);
+      const mid = STAFF[nt.st].idx + 4, up = nt.n < mid;    // orta çizginin altındakiler yukarı saplı
+      g.append(svg("line", Object.assign(up ? { x1: x + 5.7, x2: x + 5.7, y1: y - 1, y2: y - 34 } : { x1: x - 5.7, x2: x - 5.7, y1: y + 1, y2: y + 34 }, { class: "nt-stem " + cls })));
+    }
+    function render() {
+      while (dyn.firstChild) dyn.firstChild.remove();
+      const step = (X1 - X0) / SLOTS;
+      if (quiz) drawNote(dyn, quiz, X0 + step * 3.5, "q");
+      else notes.forEach((nt, i) => drawNote(dyn, nt, X0 + step * (i + 0.5), i === notes.length - 1 ? "cur" : ""));
+    }
+    function place(nt) {
+      const s = STAFF[nt.st], off = nt.n - s.idx;
+      if (nt.st === "treble" && nt.n === 28 || nt.st === "bass" && nt.n === 28) return "Orta Do: iki porte arasındaki ek çizgi";
+      if (off >= 0 && off <= 8) return off % 2 === 0 ? `${s.ad}nda alttan ${off / 2 + 1}. çizgi` : `${s.ad}nda alttan ${(off + 1) / 2}. aralık`;
+      if (off < 0) return off % 2 === 0 ? `portenin altında ${-off / 2}. ek çizgi` : `portenin altında, ${(-off - 1) / 2 ? (-off - 1) / 2 + ". ek çizginin altı" : "ilk aralık"}`;
+      const o = off - 8;
+      return o % 2 === 0 ? `portenin üstünde ${o / 2}. ek çizgi` : `portenin üstünde, ${(o - 1) / 2 ? (o - 1) / 2 + ". ek çizginin üstü" : "ilk aralık"}`;
+    }
+    function nameOf(nt) {
+      const m = midiOf(nt.n, nt.acc), L_ = LET[((nt.n % 7) + 7) % 7] + ACC[nt.acc], oct = Math.floor(nt.n / 7);
+      return { m, tr: T.name(m, { flats: nt.acc < 0, octave: false }), full: T.name(m, { flats: nt.acc < 0 }), letter: L_ + oct };
+    }
+    function showInfo(nt, msg, cls) {
+      info.innerHTML = "";
+      if (!nt) { info.append(h("p.nt-hint", "Porteye tıklayarak nota koyun ya da piyanoda bir tuşa basın.")); return; }
+      const nm = nameOf(nt);
+      info.append(h("div.nt-name" + (cls ? "." + cls : ""), nm.tr),
+        h("div.nt-det", h("div.nt-sub", nm.full + " · " + nm.letter + " · " + fmtNum(T.mtof(nm.m), 1) + " Hz"), h("div.nt-pos", place(nt)),
+          msg ? h("div.nt-msg" + (cls ? "." + cls : ""), msg) : null));
+    }
+    function add(nt) {
+      notes.push(nt); if (notes.length > SLOTS) notes.shift();
+      const m = midiOf(nt.n, nt.acc);
+      piano.clear(); piano.mark(m, "tonic", "");
+      Snd.pluck(T.mtof(m), { gain: 0.3, dur: 1 });
+      render(); showInfo(nt);
+    }
+    // svg koordinatı
+    function svgPt(e) { const pt = sv.createSVGPoint(); pt.x = e.clientX; pt.y = e.clientY; return pt.matrixTransform(sv.getScreenCTM().inverse()); }
+    function noteAt(p) {
+      const st = p.y < 110 ? "treble" : "bass", s = STAFF[st];
+      const n = clamp(Math.round(s.idx + (s.bottom - p.y) / (S / 2)), s.min, s.max);
+      return { st, n, acc };
+    }
+    sv.addEventListener("pointermove", (e) => {
+      while (ghost.firstChild) ghost.firstChild.remove();
+      if (quiz) return;
+      const p = svgPt(e); if (p.x < 60) return;
+      const step = (X1 - X0) / SLOTS, i = Math.min(notes.length, SLOTS - 1);
+      drawNote(ghost, noteAt(p), X0 + step * (i + 0.5), "ghost");
+    });
+    sv.addEventListener("pointerleave", () => { while (ghost.firstChild) ghost.firstChild.remove(); });
+    sv.addEventListener("pointerdown", (e) => { if (quiz) return; const p = svgPt(e); if (p.x < 60) return; add(noteAt(p)); });
+
+    // piyanodan porteye: orta Do ve üstü sol anahtarı, altı fa anahtarı; siyah tuşlar seçili işarete göre yazılır
+    function spell(m) {
+      const pc = T.pcOf(m), oct = Math.floor(m / 12) - 1;
+      if (!T.isBlack(m)) return { n: oct * 7 + DIA.indexOf(pc), acc: 0 };
+      if (acc < 0) { const up = m + 1, o2 = Math.floor(up / 12) - 1; return { n: o2 * 7 + DIA.indexOf(T.pcOf(up)), acc: -1 }; }
+      const dn = m - 1, o3 = Math.floor(dn / 12) - 1; return { n: o3 * 7 + DIA.indexOf(T.pcOf(dn)), acc: 1 };
+    }
+    function fromKey(m) {
+      if (quiz) return answer(m);
+      const sp = spell(m), st = m >= 60 ? "treble" : "bass";
+      if (sp.n < STAFF[st].min || sp.n > STAFF[st].max) return;
+      notes.push({ st, n: sp.n, acc: sp.acc }); if (notes.length > SLOTS) notes.shift();
+      piano.clear(); piano.mark(m, "tonic", "");
+      render(); showInfo(notes[notes.length - 1]);
+    }
+    // okuma alıştırması
+    function nextQuiz() {
+      const st = Math.random() < 0.5 ? "treble" : "bass", s = STAFF[st];
+      let n;
+      do { n = s.idx - 2 + Math.floor(Math.random() * 13); } while (quiz && n === quiz.n && st === quiz.st);
+      quiz = { st, n, acc: 0 };
+      piano.clear(); render(); showInfo(null);
+      info.innerHTML = "";
+      info.append(h("div.nt-name.q", "?"), h("div.nt-det", h("div.nt-pos", `Bu hangi nota? Piyanoda bulun. (${score[0]}/${score[1]})`)));
+    }
+    function answer(m) {
+      const target = midiOf(quiz.n, 0);
+      score[1]++;
+      if (m === target) {
+        score[0]++;
+        piano.mark(m, "tonic", "");
+        showInfo(quiz, `Doğru! (${score[0]}/${score[1]})`, "ok");
+        setTimeout(() => { if (quiz) nextQuiz(); }, 1100);
+      } else {
+        piano.mark(m, "tension", "");
+        info.querySelector(".nt-pos").textContent = `O ${T.name(m)}. Tekrar deneyin. (${score[0]}/${score[1]})`;
+      }
+    }
+    const quizBtn = h("button.btn", { type: "button", onclick: () => {
+      if (quiz) { quiz = null; quizBtn.textContent = "Nota oku"; quizBtn.classList.remove("on"); piano.clear(); render(); showInfo(notes[notes.length - 1]); }
+      else { score = [0, 0]; quizBtn.textContent = "Alıştırmayı bitir"; quizBtn.classList.add("on"); nextQuiz(); }
+    } }, "Nota oku");
+    const accSeg = seg([[0, "♮ Doğal"], [1, "♯ Diyez"], [-1, "♭ Bemol"]], 0, (v) => { acc = v; }, "Değiştirici işaret");
+    const playBtn = h("button.btn", { type: "button", onclick: () => {
+      const c = Snd.ready(); const t0 = c ? c.currentTime + 0.05 : 0;
+      notes.forEach((nt, i) => { if (c) Snd.pluck(T.mtof(midiOf(nt.n, nt.acc)), { gain: 0.28, dur: 0.6, when: t0 + i * 0.45 }); });
+    } }, "Çal");
+    const clearBtn = h("button.btn", { type: "button", onclick: () => { notes = []; piano.clear(); render(); showInfo(null); } }, "Temizle");
+    stage.append(h("div.controls", accSeg, playBtn, clearBtn, h("span.spacer"), quizBtn));
+    // başlangıç: sol anahtarının Sol4'ü ve fa anahtarının Fa3'ü
+    notes = [{ st: "treble", n: 32, acc: 0 }, { st: "bass", n: 24, acc: 0 }, { st: "treble", n: 28, acc: 0 }];
+    render(); showInfo(notes[2]);
+    return { leave() { if (quiz) quizBtn.click(); } };
+  };
+  G["nota-yazisi"] = [{ click: 'css:.key[data-m="67"]' }, { wait: 900 }, { click: 'css:.key[data-m="53"]' }, { wait: 900 }, { click: 'css:.key[data-m="60"]' }, { wait: 900 }, { click: "Nota oku" }];
 })();

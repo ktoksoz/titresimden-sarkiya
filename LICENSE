@@ -68,6 +68,12 @@ Yazı tipleri (Google Fonts üzerinden yüklenir, depoda bulunmaz):
   Bodoni Moda (Owen Earl / indestructible type*), Hanken Grotesk (Hanken
   Design Co.) — SIL Open Font License 1.1.
 
+Sol ve fa anahtarı şekilleri (js/app.js içindeki CLEF, js/demos/scales.js içindeki
+G_CLEF_D ve F_CLEF_D):
+  Wikimedia Commons, "GClef.svg" (https://commons.wikimedia.org/wiki/File:GClef.svg)
+  ve "Bass clef.svg" (https://commons.wikimedia.org/wiki/File:Bass_clef.svg),
+  kamu malı (public domain).
+
 Creative Commons simgeleri (img/cc-cc.svg, img/cc-by.svg):
   Creative Commons'ın resmî basın kitinden alınmıştır
   (https://mirrors.creativecommons.org/presskit/icons/) ve değiştirilmeden

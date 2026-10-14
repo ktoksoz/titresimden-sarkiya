@@ -10,13 +10,13 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..900;1,6..96,400..900&family=Hanken+Grotesk:ital,wght@0,400..700;1,400..700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/style.css?v=202610141843">
-<link rel="stylesheet" href="css/demos-sound.css?v=202610141843">
-<link rel="stylesheet" href="css/demos-ratios.css?v=202610141843">
-<link rel="stylesheet" href="css/demos-scales.css?v=202610141843">
-<link rel="stylesheet" href="css/demos-chords.css?v=202610141843">
-<link rel="stylesheet" href="css/demos-rhythm.css?v=202610141843">
-<link rel="stylesheet" href="css/demos-finale.css?v=202610141843">
+<link rel="stylesheet" href="css/style.css?v=202610141906">
+<link rel="stylesheet" href="css/demos-sound.css?v=202610141906">
+<link rel="stylesheet" href="css/demos-ratios.css?v=202610141906">
+<link rel="stylesheet" href="css/demos-scales.css?v=202610141906">
+<link rel="stylesheet" href="css/demos-chords.css?v=202610141906">
+<link rel="stylesheet" href="css/demos-rhythm.css?v=202610141906">
+<link rel="stylesheet" href="css/demos-finale.css?v=202610141906">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cellipse cx='14' cy='22' rx='7' ry='5' transform='rotate(-22 14 22)' fill='%23f2be4b'/%3E%3Cpath d='M20 21V4' stroke='%23f2be4b' stroke-width='2.4'/%3E%3C/svg%3E">
 </head>
 <body>
@@ -37,7 +37,7 @@
       </button>
       <button class="btn big ghost" type="button" onclick="Snd.unlock(); Deck.next()">Kendi hızımda gez</button>
     </div>
-    <p class="hint">Tellerin üzerinde gezinin ya da dokunun. Kulaklık ya da hoparlör açık olsun. Anlatımlı tur yaklaşık 15 dakika sürer ve slaytlar kendiliğinden ilerler; istediğiniz an durup deneylerle oynayabilirsiniz. Kendi hızınızda gezerken <kbd>→</kbd> ile ilerleyin.</p>
+    <p class="hint">Tellerin üzerinde gezinin ya da dokunun. Kulaklık ya da hoparlör açık olsun. Anlatımlı tur yaklaşık 18 dakika sürer ve slaytlar kendiliğinden ilerler; istediğiniz an durup deneylerle oynayabilirsiniz. Kendi hızınızda gezerken <kbd>→</kbd> ile ilerleyin.</p>
     <div class="cover-meta">
       <a class="gh-link" href="https://github.com/ktoksoz/titresimden-sarkiya" target="_blank" rel="noopener"><svg viewBox="0 0 16 16" aria-hidden="true"><path fill="currentColor" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg><span>Kaynak kodu GitHub'da</span></a>
       <a class="lic" href="https://creativecommons.org/licenses/by/4.0/deed.tr" target="_blank" rel="license noopener" title="İçerik: Creative Commons Atıf 4.0">
@@ -239,6 +239,29 @@
   </ul></aside>
 </section>
 
+<section class="slide" data-chapter="2" data-demo="temperament" id="tamperaman">
+  <div class="text">
+    <h2>Tamperaman: komayı paylaştırmak</h2>
+    <p class="lead">Pisagor koması bir yere sığmak zorunda. Tamperaman, bu fazlalığı aralıklara bilerek paylaştırma sanatıdır.</p>
+    <p>Kelime Latince <em>temperare</em>, yani "ölçülü kılmak, yumuşatmak" fiilinden gelir. Tamperamanlı bir akortta bazı aralıklar saf oranlarından birkaç cent daraltılır ya da genişletilir, böylece on iki perdenin çemberi kapanır. Soru, komanın nereye konacağıdır:</p>
+    <ul>
+      <li><strong>Pisagor:</strong> on bir beşli saf kalır, bütün koma tek bir beşlide toplanır. Bu bozuk beşliye, uluma gibi duyulduğu için <strong class="c-tension">kurt beşli</strong> denir.</li>
+      <li><strong>Ortalama ton</strong> (16.–17. yüzyıl): her beşli biraz daraltılır ki büyük üçlüler saf olsun. Yakın tonlar çok tatlı duyulur, ama kurt hâlâ vardır ve uzak tonlar çalınamaz.</li>
+      <li><strong>İyi düzen</strong> (örneğin Werckmeister III, 1691): koma birkaç beşliye dağıtılır. Her ton çalınabilir, ama her tonun rengi biraz farklıdır.</li>
+      <li><strong>Eşit tamperaman:</strong> koma on iki beşliye eşit dağıtılır. Her beşli yaklaşık 2 cent dar, her büyük üçlü yaklaşık 14 cent geniştir; hiçbir aralık saf değildir, ama bütün tonlar aynıdır.</li>
+    </ul>
+    <p>Eşit tamperaman, 19. yüzyıldan beri piyanonun, gitar perdelerinin ve bugün neredeyse bütün elektronik çalgıların akordudur. Kulağımız onun hafif vurularına o kadar alıştı ki artık onları duymuyoruz.</p>
+    <p class="try">Bir akort sistemi seçin ve "Sırayla çal"a basın. Ortalama tonda Do majör pürüzsüz, La♭ majör ise kurt yüzünden ulur; eşit tamperamanda bütün tonlar aynı renkte.</p>
+  </div>
+  <div class="stage"></div>
+  <aside class="notes"><ul>
+    <li>Çemberdeki 12 beşlinin toplamı her sistemde 7 oktav = 8400 cent. Değişen tek şey, 23,46 centlik komanın hangi beşlilere dağıtıldığı.</li>
+    <li>¼ sintonik koma ortalama tonu Pietro Aron 1523'te tarif etti. Kurt beşlisi ~737,6 cent, yani saf beşliden ~36 cent geniş.</li>
+    <li>Werckmeister III'te Do–Sol, Sol–Re, Re–La ve Si–Fa♯ beşlileri Pisagor komasının dörtte biri kadar dar; diğerleri saf. Do majör tatlı, Re♭ majör sert.</li>
+    <li>Kurt beşlinin adı, çalınca kurt ulumasına benzeyen vurusundan gelir.</li>
+  </ul></aside>
+</section>
+
 <section class="slide" data-chapter="2" data-demo="tuning" id="akort-sistemleri">
   <div class="text">
     <h2>Üç akort, bir akor</h2>
@@ -279,6 +302,43 @@
 </section>
 
 <!-- ================= 3. GAMLAR VE MODLAR ================= -->
+<section class="slide" data-chapter="3" data-demo="notenames" id="nota-adlari">
+  <div class="text">
+    <h2>Notaların adları: C'den Do'ya</h2>
+    <p class="lead">Aynı tuşa İngilizler C, İtalyanlar ve biz Do deriz. Türk müziğinde ise o perdenin Çârgâh gibi kendine ait bir adı vardır.</p>
+    <p><strong>Harfle adlandırma</strong> en eskisi: Orta Çağ kuramcıları sesleri en pesten başlayarak A, B, C… diye sıraladı. Bu yüzden bugün en tanıdık gam alfabenin ortasından, C'den başlar. İngilizce konuşulan ülkeler ve Almanya harfleri kullanır; akor sembolleri de (C, Am, G7) dünyanın her yerinde harflerle yazılır.</p>
+    <p><strong>Do, Re, Mi</strong> ise bir öğretmenin buluşu. İtalyan keşiş <strong>Guido d'Arezzo</strong> 11. yüzyılda öğrencilerine ezgi öğretmek için Vaftizci Yahya'ya yazılmış <em>Ut queant laxis</em> ilahisini kullandı. İlahinin her dizesi bir basamak yukarıdan başlıyordu ve ilk heceler Ut, Re, Mi, Fa, Sol, La'yı verdi. Yedinci nota Si sonradan, son dizedeki <em>Sancte Iohannes</em>'in baş harflerinden eklendi; söylemesi zor Ut de 17. yüzyılda İtalya'da Do'ya dönüştü.</p>
+    <p>Almancada bir tuhaflık var: Si'ye <strong>H</strong>, Si bemole <strong>B</strong> denir. Orta Çağ'da B'nin iki yazımı vardı, yuvarlak b ve köşeli b; köşeli olan zamanla h harfine benzetildi. Bemol (♭) ve bekar (♮) işaretleri de bu iki b'den gelir.</p>
+    <p>Türk müziğinde her <strong>perde</strong>nin kendi adı vardır: Rast, Dügâh, Bûselik, Çârgâh, Nevâ… Adların çoğu Farsçadır: <em>dügâh</em> "ikinci yer", <em>çârgâh</em> "dördüncü yer" demektir. Oktavda on ikiden fazla perde olduğu için aradaki komalı perdelerin de (Segâh, Kürdî, Hicaz…) ayrı adları vardır.</p>
+    <p class="try">Bir tuşa basın ve dört sistemdeki adını görün. "İlahiyi dinle" ile hecelerin basamak basamak nasıl yükseldiğini duyun, sonra adlandırma sistemini değiştirin.</p>
+  </div>
+  <div class="stage"></div>
+  <aside class="notes"><ul>
+    <li>Türkiye'de "sabit Do" kullanılır: Do her zaman aynı perdedir. Bazı ülkelerde "gezici Do" (Kodály yöntemi) kullanılır: her tonun toniği Do diye söylenir.</li>
+    <li>Arel–Ezgi–Uzdilek yazımında Rast perdesi portede Sol olarak yazılır; çalgının ahengine (akort yüksekliğine) göre duyulan ses farklı olabilir.</li>
+    <li>İlahinin sözleri Paulus Diaconus'a (8. yüzyıl) atfedilir. Ut → Do değişikliği genellikle Giovanni Battista Doni'ye atfedilir.</li>
+    <li>Fransa'da Ut bugün de bazen kullanılır (ör. "symphonie en ut majeur").</li>
+  </ul></aside>
+</section>
+
+<section class="slide" data-chapter="3" data-demo="notation" id="nota-yazisi">
+  <div class="text">
+    <h2>Nota yazısı: porte ve anahtarlar</h2>
+    <p class="lead">Notalar beş çizgili bir merdivene yazılır: <strong>porte</strong>. Çizgiler ve aralar sırayla birer basamaktır; nota yukarı çıktıkça ses incelir.</p>
+    <p>Hangi çizginin hangi nota olduğunu portenin başındaki <strong>anahtar</strong> söyler. <strong>Sol anahtarı</strong>nın kıvrımı alttan ikinci çizgiyi sarar ve orayı Sol4 yapar; şekli zaten süslenmiş bir G harfidir. <strong>Fa anahtarı</strong>nın iki noktası yukarıdan ikinci çizgiyi çevreler ve orayı Fa3 yapar; o da bir F harfinden doğmuştur.</p>
+    <p>Piyano için iki porte bir parantezle birleştirilir: üstteki sol anahtarlı porte genellikle <strong>sağ el</strong>, alttaki fa anahtarlı porte <strong>sol el</strong> içindir. Tam ortada, iki portenin arasındaki kısa <strong>ek çizgi</strong>de <strong class="c-tonic">orta Do</strong> durur. Porteye sığmayan notalar için de böyle ek çizgiler eklenir.</p>
+    <p>Notanın önüne konan <strong>diyez</strong> (♯) onu yarım ses yükseltir, <strong>bemol</strong> (♭) yarım ses alçaltır, <strong>natürel</strong> (♮) işareti kaldırır.</p>
+    <p class="try">Porteye tıklayarak nota koyun ya da piyanoda bir tuşa basın; adı ve yeri yazılır. Sonra "Nota oku" ile alıştırma yapın: porteye çıkan notayı piyanoda bulun.</p>
+  </div>
+  <div class="stage"></div>
+  <aside class="notes"><ul>
+    <li>Ezber ipucu (sol anahtarı): çizgiler alttan Mi–Sol–Si–Re–Fa, aralıklar Fa–La–Do–Mi.</li>
+    <li>Fa anahtarında çizgiler alttan Sol–Si–Re–Fa–La, aralıklar La–Do–Mi–Sol.</li>
+    <li>Orta Do, sol anahtarında alttaki ilk ek çizgi, fa anahtarında üstteki ilk ek çizgidir: iki porteden de aynı tuşa ulaşılır.</li>
+    <li>Anahtar şekilleri Orta Çağ'da porteye yazılan G ve F harflerinin zamanla süslenmesinden doğdu. Viyola gibi çalgılar için bir de Do anahtarı vardır.</li>
+  </ul></aside>
+</section>
+
 <section class="slide" data-chapter="3" data-demo="intervals" id="araliklar">
   <div class="text">
     <h2>Aralıklar</h2>
@@ -595,19 +655,19 @@
   <button class="iconbtn" id="btn-overview" aria-label="Tüm slaytlar (O)" title="Tüm slaytlar (O)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="4" width="7" height="7"/><rect x="13" y="4" width="7" height="7"/><rect x="4" y="13" width="7" height="7"/><rect x="13" y="13" width="7" height="7"/></svg></button>
 </nav>
 
-<script src="js/theory.js?v=202610141843"></script>
-<script src="js/lib.js?v=202610141843"></script>
-<script src="js/audio.js?v=202610141843"></script>
-<script src="js/piano.js?v=202610141843"></script>
-<script src="js/demos/sound.js?v=202610141843"></script>
-<script src="js/demos/ratios.js?v=202610141843"></script>
-<script src="js/demos/scales.js?v=202610141843"></script>
-<script src="js/demos/chords.js?v=202610141843"></script>
-<script src="js/demos/rhythm.js?v=202610141843"></script>
-<script src="js/demos/finale.js?v=202610141843"></script>
-<script src="js/glossary.js?v=202610141843"></script>
-<script src="js/app.js?v=202610141843"></script>
-<script src="js/narrator.js?v=202610141843"></script>
-<script src="js/guide.js?v=202610141843"></script>
+<script src="js/theory.js?v=202610141906"></script>
+<script src="js/lib.js?v=202610141906"></script>
+<script src="js/audio.js?v=202610141906"></script>
+<script src="js/piano.js?v=202610141906"></script>
+<script src="js/demos/sound.js?v=202610141906"></script>
+<script src="js/demos/ratios.js?v=202610141906"></script>
+<script src="js/demos/scales.js?v=202610141906"></script>
+<script src="js/demos/chords.js?v=202610141906"></script>
+<script src="js/demos/rhythm.js?v=202610141906"></script>
+<script src="js/demos/finale.js?v=202610141906"></script>
+<script src="js/glossary.js?v=202610141906"></script>
+<script src="js/app.js?v=202610141906"></script>
+<script src="js/narrator.js?v=202610141906"></script>
+<script src="js/guide.js?v=202610141906"></script>
 </body>
 </html>

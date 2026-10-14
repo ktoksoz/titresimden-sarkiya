@@ -82,5 +82,19 @@ eq("Unison, çevresindeki en pürüzsüz nokta", r(0) < r(0.3) && r(0) < r(1), t
 eq("7. harmonik −31,2 cent", T.nearest(T.mtof(36) * 7).cents, -31.17, 0.01);
 eq("5. harmonik −13,7 cent", T.nearest(T.mtof(36) * 5).cents, -13.69, 0.01);
 
+// Tamperamanlar
+Object.entries(T.TEMPERAMENTS).forEach(([k, t]) => eq(`${t.ad}: 12 beşli = 7 oktav (8400 c)`, t.fifths.reduce((a, b) => a + b), 8400, 1e-9));
+eq("Pisagor kurt beşlisi ≈ 678,49 c", T.TEMPERAMENTS.pythagorean.fifths[8], 678.495, 1e-3);
+eq("Ortalama ton beşlisi ≈ 696,58 c", T.TEMPERAMENTS.meantone.fifths[0], 696.578, 1e-3);
+eq("Ortalama ton kurt beşlisi ≈ 737,64 c", T.TEMPERAMENTS.meantone.fifths[8], 737.637, 1e-3);
+eq("Ortalama tonda Do–Mi saf büyük üçlü", T.triadDeviation("meantone", 0).third, 0, 1e-9);
+eq("Ortalama tonda La♭ majörün beşlisi kurt (+35,7 c)", T.triadDeviation("meantone", 8).fifth, 35.68, 0.01);
+eq("Eşit tamperamanda her üçlü +13,69 c", T.triadDeviation("equal", 6).third, 13.686, 1e-3);
+eq("Eşit tamperamanda her beşli −1,955 c", T.triadDeviation("equal", 3).fifth, -1.955, 1e-3);
+eq("Pisagor Do majör üçlüsü +21,5 c (81/64)", T.triadDeviation("pythagorean", 0).third, 21.506, 1e-3);
+eq("Eşit tamperaman perdeleri 100'ün katları", T.temperamentCents("equal"), [0, 100, 200, 300, 400, 500, 600, 700, 800, 900, 1000, 1100]);
+eq("Werckmeister: Do–Mi üçlüsü ≈ +3,9 c", T.triadDeviation("werckmeister", 0).third, 3.91, 0.01);
+eq("Werckmeister: Re♭ majör üçlüsü ≈ +21,5 c", T.triadDeviation("werckmeister", 1).third, 21.51, 0.01);
+
 console.log(`\n${n - fail}/${n} test geçti`);
 process.exit(fail ? 1 : 0);
