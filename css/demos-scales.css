@@ -120,3 +120,14 @@
   .nt-wrap { padding: 8px 6px 4px; }
   .nt-piano .kl { font-size: .5rem; }
 }
+
+/* pentatonik: 12 ölçülük blues kalıbı */
+.pt-form { display: grid; grid-template-columns: repeat(12, 1fr); gap: 3px; padding: 10px 16px 0; }
+.pt-form.off { display: none; }
+.pt-bar { display: flex; flex-direction: column; align-items: center; padding: 4px 0 3px; border-top: 3px solid var(--fc); background: rgba(239,228,204,.04); transition: background .12s; }
+.pt-bar b { font-family: var(--f-display); font-size: .92rem; color: var(--ink); line-height: 1.1; }
+.pt-bar small { font-size: .7rem; color: var(--muted); }
+.pt-bar.f-tonic { --fc: var(--tonic); } .pt-bar.f-sub { --fc: var(--wave); } .pt-bar.f-dom { --fc: var(--tension); }
+.pt-bar.on { background: color-mix(in srgb, var(--fc) 30%, transparent); }
+.pt-bar.on b { color: var(--fc); }
+@media (max-width: 860px) { .pt-form { grid-template-columns: repeat(6, 1fr); padding: 8px 8px 0; } }

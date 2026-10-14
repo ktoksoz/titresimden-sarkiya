@@ -61,7 +61,7 @@
     { k: ["mod"], only: ["modlar", "pentatonik", "major-gam"], t: "Mod", d: "Aynı nota kümesinin farklı bir notadan başlatılmasıyla elde edilen dizi. Kilise modlarının adları Antik Yunan bölgelerinden gelir.", u: trw("Mod (müzik)") },
     { k: ["pentatonik"], t: "Pentatonik gam", d: "Oktavda beş perdesi olan gam. Yarım ses içermeyen biçimi dünyanın pek çok halk müziğinde görülür.", u: trw("Pentatonik gam") },
     { k: ["triton"], t: "Triton", d: "Üç tam sesten oluşan aralık (artık dörtlü ya da eksik beşli). Oktavı tam ortadan böler; güçlü bir gerilim taşır.", u: trw("Triton") },
-    { k: ["akor"], only: ["uc-sesliler", "yedililer"], t: "Akor", d: "Aynı anda çalınan üç ya da daha fazla nota. Batı armonisinde genellikle üçlü aralıklarla üst üste kurulur.", u: trw("Akor") },
+    { k: ["akor"], only: ["uc-sesliler", "yedililer", "cevrimler"], t: "Akor", d: "Aynı anda çalınan üç ya da daha fazla nota. Batı armonisinde genellikle üçlü aralıklarla üst üste kurulur.", u: trw("Akor") },
     { k: ["üç sesli"], t: "Üç sesli (triad)", d: "Kök, üçlü ve beşliden oluşan akor. Üçlü ve beşlinin büyüklüğü akorun majör, minör, artık ya da eksik olmasını belirler.", u: enw("Triad_(music)") },
     { k: ["çevrim"], t: "Çevrim", d: "Akorun kökü dışında bir notasının en alta alınması. Notalar aynı kalır, renk ve ses yürüyüşü değişir.", u: enw("Inversion_(music)") },
     { k: ["dominant"], t: "Dominant", d: "Tonun beşinci derecesi ve onun üzerine kurulan akor (V). Toniğe dönme isteği en güçlü akordur.", u: trw("Dominant") },

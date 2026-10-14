@@ -308,39 +308,121 @@
 
   /* ---------- Pentatonik ---------- */
   Demos.pentatonic = (stage) => {
+    // Siyah tuşlar: Fa♯ majör pentatonik = Mi♭ minör pentatonik (aynı beş nota)
     const PENTA = []; for (let m = 61; m <= 82; m++) if (T.isBlack(m)) PENTA.push(m);
     const top = h("div.controls.top");
+    const form = h("div.pt-form", { "aria-label": "12 ölçülük blues kalıbı" });
     const trailWrap = h("div.sc-trail");
     const cv = h("canvas", { "aria-label": "Çalınan notaların izi" });
     trailWrap.append(cv);
-    const main = h("div.fill.sc-main", trailWrap);
+    const main = h("div.fill.sc-main", form, trailWrap);
     stage.append(top, main);
     const trail = []; // {m, t}
-    let st, now = 0;
+    let st, now = 0, mode = "blues";
+    const tonicPc = () => (mode === "blues" ? 3 : 6);  // blues: Mi♭, serbest: Fa♯
     const board = Board(main, { from: 60, to: 84, onplay: (m) => trail.push({ m, t: now, black: T.isBlack(m) }) });
-    for (let m = 60; m <= 84; m++) board.piano.mark(m, T.isBlack(m) ? (T.pcOf(m) === 6 ? "tonic" : "in") : "dim", T.isBlack(m) ? noteName(m) : "");
-    board.setNotes(PENTA.filter((m) => m >= 66 && m <= 78), null, { 2: "T", 3: "k3" });
-    let timer = 0, on = false, cur = 3;
-    const btn = h("button.btn.primary", { type: "button", onclick: () => (on ? stopImp() : startImp()) }, "Doğaçla");
-    top.append(btn, h("span.spacer"), h("span.sc-lab", "Siyah tuşlar: Fa♯ – Sol♯ – La♯ – Do♯ – Re♯"));
-    const RHY = [1, 1, 1, 0.5, 0.5, 2, 1.5];
-    let count = 0;
-    function stepImp() {
-      if (!on) return;
-      // adım adım yürüyüşe eğilimli rastgele ezgi; her 8 notada bir Fa♯'ye dönerek cümle biter
-      count++;
-      if (count > 40) { stopImp(); return; } // yaklaşık 10 saniyelik doğaçlamadan sonra kendiliğinden durur
-      let d = [-1, -1, 1, 1, 0, -2, 2, 1, -1][Math.floor(Math.random() * 9)];
-      cur = clamp(cur + d, 0, PENTA.length - 1);
-      if (count % 8 === 0) cur = PENTA.indexOf(66) >= 0 && Math.random() < 0.5 ? PENTA.indexOf(66) : PENTA.indexOf(78);
-      const m = PENTA[cur];
-      const r = count % 8 === 0 ? 2 : RHY[Math.floor(Math.random() * RHY.length)];
-      board.piano.press(m, { dur: 0.3 * r + 0.2 });
-      board.lit(m, 260 * r);
-      timer = setTimeout(stepImp, 260 * r);
+    function markKeys() {
+      for (let m = 60; m <= 84; m++) board.piano.mark(m, T.isBlack(m) ? (T.pcOf(m) === tonicPc() ? "tonic" : "in") : "dim", T.isBlack(m) ? noteName(m, mode === "blues") : "");
+      board.setNotes(mode === "blues" ? [63, 66, 68, 70, 73, 75] : [66, 68, 70, 73, 75, 78], null, { 2: "T", 3: "k3" });
     }
-    function startImp() { on = true; btn.textContent = "Durdur"; btn.classList.remove("primary"); btn.classList.add("on"); count = 0; stepImp(); }
-    function stopImp() { on = false; clearTimeout(timer); btn.textContent = "Doğaçla"; btn.classList.add("primary"); btn.classList.remove("on"); }
+
+    /* ---- 12 ölçülük blues, Mi♭'de: Mi♭7 La♭7 Si♭7; sallantılı (shuffle) sekizlikler ---- */
+    const BPM = 92;
+    const FORM = [0, 0, 0, 0, 1, 1, 0, 0, 2, 1, 0, 2];          // I I I I IV IV I I V IV I V
+    const CH = [{ root: 51, ad: "Mi♭7", let: "E♭7", rn: "I7", fn: "tonic" }, { root: 56, ad: "La♭7", let: "A♭7", rn: "IV7", fn: "sub" }, { root: 46, ad: "Si♭7", let: "B♭7", rn: "V7", fn: "dom" }];
+    // akora göre hedef notalar (siyah tuşlardan): Mi♭7 → Mi♭ Sol♭ Si♭, La♭7 → La♭ Mi♭ Sol♭, Si♭7 → Si♭ Re♭ La♭
+    const TARGET = [[3, 6, 10], [8, 3, 6], [10, 1, 8]];
+    const cells = FORM.map((c, b) => h("span.pt-bar.f-" + CH[c].fn, { "data-b": b }, h("b", CH[c].rn), h("small", CH[c].ad)));
+    form.append(...cells);
+    // adım = üçleme sekizliği (vuruşun üçte biri); ölçü = 12 adım
+    let idx = 4, hold = 0, rest = 0, plan = null;
+    function chooseNote(bar, strong) {
+      const tg = TARGET[FORM[bar % 12]];
+      if (strong && Math.random() < 0.6) {
+        // güçlü zamanda yakındaki bir akor notasına yaslan (aynı notayı üst üste tekrarlamadan)
+        const near = PENTA.map((m, k) => k).filter((k) => PENTA[k] >= 63 && PENTA[k] <= 80 && tg.includes(T.pcOf(PENTA[k])) && Math.abs(k - idx) <= 3 && k !== idx);
+        if (near.length) idx = near[Math.floor(Math.random() * near.length)];
+      } else {
+        idx = clamp(idx + [-1, -1, 1, 1, -2, 2, 0, -1][Math.floor(Math.random() * 8)], 1, PENTA.length - 2);
+      }
+      return PENTA[idx];
+    }
+    function bluesStep(i, t) {
+      const bar = Math.floor(i / 12), s = i % 12, beat = Math.floor(s / 3), sub = s % 3;
+      const chord = CH[FORM[bar % 12]];
+      if (bar >= 24) { tr.stop(); syncBtn(); return; }          // iki tur (24 ölçü) sonra durur
+      if (s === 0) visual(t, () => cells.forEach((c, k) => c.classList.toggle("on", k === bar % 12)));
+      // davul: vuruşta ve sallantılı "ve"de hi-hat; 1–3 bas davul, 2–4 trampet
+      if (sub === 0 || sub === 2) Snd.drum("hat", t, sub === 0 ? 0.55 : 0.35);
+      if (sub === 0 && (beat === 0 || beat === 2)) Snd.drum("kick", t, 0.9);
+      if (sub === 2 && beat === 1) Snd.drum("kick", t, 0.45);
+      if (sub === 0 && (beat === 1 || beat === 3)) Snd.drum("snare", t, 0.6);
+      // boogie bas: kök, üçlü, beşli, altılı, küçük yedili, altılı, beşli, üçlü (sallantılı sekizlikler)
+      if (sub === 0 || sub === 2) {
+        const k = beat * 2 + (sub === 2 ? 1 : 0);
+        // bas, küçük hoparlörlerde de duyulsun diye Si♭2–La♭3 bölgesinde (117–208 Hz kök)
+        Snd.note(T.mtof(chord.root + [0, 4, 7, 9, 10, 9, 7, 4][k]), { type: "triangle", dur: sub === 0 ? 0.24 : 0.12, gain: 0.32, attack: 0.005, release: 0.08, when: t, cutoff: 900 });
+      }
+      // akor vurgusu: 2. ve 4. vuruşun "ve"sinde kısa dominant yedili (3. ve küçük 7.)
+      if (sub === 2 && (beat === 1 || beat === 3)) [4, 10, 14].forEach((iv) => Snd.note(T.mtof(chord.root + iv), { amps: [1, 0.4, 0.2], dur: 0.1, gain: 0.08, attack: 0.004, release: 0.1, when: t }));
+      // melodi: iki ölçülük soru–cevap; ilk ölçü konuşur, ikinci ölçü akor notasına iner ve susar
+      if (sub === 1) return;                                     // sallantılı sekizlikler yalnız 0 ve 2. adımlarda
+      if (hold > 0) { hold--; return; }
+      const answer = bar % 2 === 1;
+      if (answer) {
+        // cevap ölçüsü: akor notasına in, uzat; son vuruşta bir sonraki cümleye küçük bir giriş
+        if (s === 0) { playMel(chooseNote(bar, true), t, 1.1); hold = 3; }
+        else if (beat === 3 && Math.random() < 0.6) playMel(chooseNote(bar, false), t, 0.2);
+        return;
+      }
+      const p = beat === 0 && sub === 0 ? 0.95 : sub === 0 ? 0.85 : 0.65;
+      if (Math.random() > p) return;
+      const m = chooseNote(bar, sub === 0);
+      const long = Math.random() < 0.18;
+      playMel(m, t, long ? 0.55 : 0.22);
+      if (long) hold = 1;
+    }
+    function playMel(m, t, dur) {
+      Snd.pluck(T.mtof(m), { when: t, dur, gain: 0.3 });
+      visual(t, () => { board.piano.press(m, { silent: true }); board.lit(m, dur * 1000 + 120); trail.push({ m, t: now, black: true }); });
+    }
+
+    /* ---- serbest doğaçlama (eşliksiz) ---- */
+    const RHY = [3, 3, 3, 2, 2, 6, 4];                           // adım cinsinden süreler
+    let wait = 0, count = 0;
+    function freeStep(i, t) {
+      if (wait > 0) { wait--; return; }
+      count++;
+      if (count > 40) { tr.stop(); syncBtn(); return; }
+      idx = clamp(idx + [-1, -1, 1, 1, 0, -2, 2, 1, -1][Math.floor(Math.random() * 9)], 0, PENTA.length - 1);
+      if (count % 8 === 0) idx = Math.random() < 0.5 ? PENTA.indexOf(66) : PENTA.indexOf(78);
+      const r = count % 8 === 0 ? 6 : RHY[Math.floor(Math.random() * RHY.length)];
+      wait = r - 1;
+      playMel(PENTA[idx], t, 0.09 * r + 0.15);
+    }
+
+    const tr = Transport({ interval: () => 60 / BPM / 3, step: (i, t) => (mode === "blues" ? bluesStep(i, t) : freeStep(i, t)) });
+    // görseli sesin çalacağı ana kaydır
+    function visual(t, fn) {
+      const nowT = Snd.running() ? Snd.now() : performance.now() / 1000;
+      setTimeout(fn, Math.max(0, (t - nowT) * 1000));
+    }
+    const btn = h("button.btn.primary", { type: "button", onclick: () => { if (tr.on) { tr.stop(); } else { idx = 4; hold = 0; count = 0; wait = 0; tr.start(); } syncBtn(); } }, "Doğaçla");
+    function syncBtn() {
+      btn.textContent = tr.on ? "Durdur" : "Doğaçla";
+      btn.classList.toggle("primary", !tr.on); btn.classList.toggle("on", tr.on);
+      if (!tr.on) cells.forEach((c) => c.classList.remove("on"));
+    }
+    const lab = h("span.sc-lab");
+    const modeSeg = seg([["blues", "Blues eşliği"], ["serbest", "Serbest"]], mode, (k) => {
+      mode = k; form.classList.toggle("off", k !== "blues"); markKeys();
+      lab.textContent = k === "blues" ? "Siyah tuşlar = Mi♭ minör pentatonik (E♭): Mi♭7, La♭7, Si♭7 üzerinde 12 ölçülük blues" : "Siyah tuşlar = Fa♯ majör pentatonik (F♯): Fa♯ – Sol♯ – La♯ – Do♯ – Re♯";
+      if (tr.on) { tr.stop(); idx = 4; hold = 0; count = 0; tr.start(); syncBtn(); }
+    }, "Doğaçlama türü");
+    top.append(btn, modeSeg, h("span.spacer"), lab);
+    lab.textContent = "Siyah tuşlar = Mi♭ minör pentatonik (E♭): Mi♭7, La♭7, Si♭7 üzerinde 12 ölçülük blues";
+    markKeys();
+
     function draw(dt) {
       now += dt;
       if (!st) return;
@@ -353,7 +435,7 @@
       trail.forEach((p) => {
         const x = w - 30 - ((now - p.t) / span) * (w - 40);
         const y = hh - 16 - ((p.m - lo) / (hi - lo)) * (hh - 32);
-        const col = !p.black ? C.muted : T.pcOf(p.m) === 6 ? C.tonic : C.wave;
+        const col = !p.black ? C.muted : T.pcOf(p.m) === tonicPc() ? C.tonic : C.wave;
         if (prev && p.t - prev.t < 1.2) { ctx.strokeStyle = rgba(C.wave, 0.25); ctx.lineWidth = 1.2; ctx.beginPath(); ctx.moveTo(prev.x, prev.y); ctx.lineTo(x, y); ctx.stroke(); }
         const age = (now - p.t);
         ctx.save(); ctx.fillStyle = col; ctx.shadowColor = col; ctx.shadowBlur = Math.max(0, 14 - age * 10);
@@ -364,9 +446,9 @@
     }
     st = canvas(cv, () => draw(0));
     const lp = loop(draw);
-    return { enter() { board.draw(); lp.start(); }, leave() { stopImp(); lp.stop(); } };
+    return { enter() { board.draw(); lp.start(); }, leave() { tr.stop(); syncBtn(); lp.stop(); } };
   };
-  G.pentatonik = [{ click: 'css:.key[data-m="66"]' }, { click: 'css:.key[data-m="70"]' }, { click: 'css:.key[data-m="73"]' }, { click: "Doğaçla" }];
+  G.pentatonik = [{ click: 'css:.key[data-m="63"]' }, { click: 'css:.key[data-m="66"]' }, { click: 'css:.key[data-m="70"]' }, { click: "Doğaçla" }];
 
   /* ---------- Notaların adları: C'den Do'ya ----------
      Aynı tuşun dört adlandırma sistemindeki adı. Guido d'Arezzo'nun ilahisinde her dizenin ilk
@@ -454,7 +536,6 @@
      Porteye tıklayınca nota en yakın çizgiye/aralığa oturur; adı ve yeri yazılır, piyanoda tuşu yanar.
      Piyanoda basılan tuş da porteye yazılır (orta Do ve üstü sol anahtarı, altı fa anahtarı).
      Anahtar şekilleri Wikimedia Commons'tan, kamu malı: GClef.svg ve Bass_clef.svg. */
-  const G_CLEF_D = "m12.049 3.5296c0.305 3.1263-2.019 5.6563-4.0772 7.7014-0.9349 0.897-0.155 0.148-0.6437 0.594-0.1022-0.479-0.2986-1.731-0.2802-2.11 0.1304-2.6939 2.3198-6.5875 4.2381-8.0236 0.309 0.5767 0.563 0.6231 0.763 1.8382zm0.651 16.142c-1.232-0.906-2.85-1.144-4.3336-0.885-0.1913-1.255-0.3827-2.51-0.574-3.764 2.3506-2.329 4.9066-5.0322 5.0406-8.5394 0.059-2.232-0.276-4.6714-1.678-6.4836-1.7004 0.12823-2.8995 2.156-3.8019 3.4165-1.4889 2.6705-1.1414 5.9169-0.57 8.7965-0.8094 0.952-1.9296 1.743-2.7274 2.734-2.3561 2.308-4.4085 5.43-4.0046 8.878 0.18332 3.334 2.5894 6.434 5.8702 7.227 1.2457 0.315 2.5639 0.346 3.8241 0.099 0.2199 2.25 1.0266 4.629 0.0925 6.813-0.7007 1.598-2.7875 3.004-4.3325 2.192-0.5994-0.316-0.1137-0.051-0.478-0.252 1.0698-0.257 1.9996-1.036 2.26-1.565 0.8378-1.464-0.3998-3.639-2.1554-3.358-2.262 0.046-3.1904 3.14-1.7356 4.685 1.3468 1.52 3.833 1.312 5.4301 0.318 1.8125-1.18 2.0395-3.544 1.8325-5.562-0.07-0.678-0.403-2.67-0.444-3.387 0.697-0.249 0.209-0.059 1.193-0.449 2.66-1.053 4.357-4.259 3.594-7.122-0.318-1.469-1.044-2.914-2.302-3.792zm0.561 5.757c0.214 1.991-1.053 4.321-3.079 4.96-0.136-0.795-0.172-1.011-0.2626-1.475-0.4822-2.46-0.744-4.987-1.116-7.481 1.6246-0.168 3.4576 0.543 4.0226 2.184 0.244 0.577 0.343 1.197 0.435 1.812zm-5.1486 5.196c-2.5441 0.141-4.9995-1.595-5.6343-4.081-0.749-2.153-0.5283-4.63 0.8207-6.504 1.1151-1.702 2.6065-3.105 4.0286-4.543 0.183 1.127 0.366 2.254 0.549 3.382-2.9906 0.782-5.0046 4.725-3.215 7.451 0.5324 0.764 1.9765 2.223 2.7655 1.634-1.102-0.683-2.0033-1.859-1.8095-3.227-0.0821-1.282 1.3699-2.911 2.6513-3.198 0.4384 2.869 0.9413 6.073 1.3797 8.943-0.5054 0.1-1.0211 0.143-1.536 0.143z";
   const F_CLEF_D = "M 1239,8245 C 1397,8138 1515,8057 1591,8001 C 1667,7946 1747,7877 1829,7795 C 1911,7713 1980,7620 2036,7517 C 2080,7441 2118,7353 2149,7253 C 2180,7154 2196,7058 2199,6967 C 2199,6882 2188,6801 2165,6725 C 2143,6648 2105,6585 2051,6534 C 1997,6484 1927,6459 1840,6459 C 1756,6459 1677,6476 1603,6509 C 1530,6543 1478,6597 1449,6673 C 1449,6680 1445,6689 1439,6702 C 1441,6718 1449,6730 1464,6739 C 1479,6748 1492,6752 1504,6752 C 1510,6752 1527,6749 1553,6743 C 1580,6737 1602,6733 1620,6733 C 1673,6733 1720,6752 1763,6789 C 1805,6826 1826,6871 1826,6924 C 1826,6962 1815,6998 1794,7031 C 1773,7064 1744,7091 1707,7110 C 1670,7130 1629,7139 1585,7139 C 1505,7139 1437,7115 1381,7066 C 1326,7016 1298,6953 1298,6874 C 1298,6773 1329,6686 1390,6612 C 1452,6538 1530,6483 1626,6446 C 1721,6408 1817,6390 1915,6390 C 2022,6390 2124,6417 2219,6472 C 2315,6526 2390,6601 2446,6694 C 2502,6788 2531,6888 2531,6996 C 2531,7188 2467,7366 2339,7531 C 2211,7696 2053,7839 1864,7961 C 1738,8044 1534,8156 1253,8297 L 1239,8245 z M 2628,6698 C 2628,6662 2641,6632 2667,6608 C 2692,6583 2723,6571 2760,6571 C 2792,6571 2822,6585 2849,6612 C 2876,6638 2889,6669 2889,6703 C 2889,6739 2875,6770 2849,6795 C 2821,6819 2790,6831 2755,6831 C 2718,6831 2688,6819 2664,6792 C 2640,6766 2628,6735 2628,6698 z M 2628,7222 C 2628,7186 2641,7155 2665,7131 C 2690,7106 2721,7094 2760,7094 C 2792,7094 2821,7107 2849,7134 C 2875,7161 2889,7190 2889,7222 C 2889,7261 2876,7292 2851,7317 C 2825,7342 2795,7355 2760,7355 C 2721,7355 2690,7342 2665,7318 C 2641,7294 2628,7262 2628,7222 z ";
   const DIA = [0, 2, 4, 5, 7, 9, 11];               // Do Re Mi Fa Sol La Si
   const LET = ["C", "D", "E", "F", "G", "A", "B"];
@@ -493,8 +574,7 @@
       // akolad: iki porteyi birleştiren süslü parantez
       base.append(svg("path", { d: "M24 40 C 12 52, 22 92, 13 110 C 22 128, 12 168, 24 180 C 18 160, 26 128, 17 110 C 26 92, 18 60, 24 40 Z", class: "nt-brace" }));
       // sol anahtarı: boyu 7,024 aralık, üst çizgi tepeden 1,392 aralık aşağıda (kıvrım Sol4 çizgisinde)
-      const gH = 7.024 * S, gK = gH / 40.768;
-      base.append(svg("path", { d: G_CLEF_D, class: "nt-clef", transform: `translate(38 ${40 - 1.392 * S}) scale(${gK})` }));
+      base.append(svg("path", { d: L.GCLEF_D, class: "nt-clef", transform: L.gclefTransform(38, 40, S) }));
       // fa anahtarı: kaynak dosyadaki porte çizgileri y=6378…8740 (aralık 590,5); noktalar Fa3 çizgisini çevreler
       const fK = S / 590.5;
       base.append(svg("path", { d: F_CLEF_D, class: "nt-clef", transform: `translate(${40 - 1239 * fK} ${140 - 6378 * fK}) scale(${fK})` }));

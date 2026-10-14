@@ -50,7 +50,6 @@
   }
 
   /* --- Küçük porte (SVG): sol anahtarı + nota başları --- */
-  const CLEF_PATH = "M11.5 46c-3 1-6-1-5.5-4 .4-2.3 3.6-2.6 4.3-.5.6 1.8-1 3-2.4 2.6M10.6 44.5 8.2 5.6c-.2-3 1.3-5 3-5 2 0 3 2.6 2.4 5.8-.8 4.6-6.5 8.8-8.6 13-2.6 5.2-.6 11 4.8 11.6 4.6.5 7.6-3.4 6.6-7.2-.9-3.5-5.2-4.6-7.6-2.2-2.2 2.2-1 5.7 1.6 6";
   const E4 = 4 * 7 + 2; // sol anahtarında alt çizgi
   function Staff(container, { width = 220, gap = 12 } = {}) {
     const H = gap * 12, base = gap * 8.5; // alt çizginin y'si
@@ -60,8 +59,7 @@
     function render(notes, colors = [], labels = []) {
       svg.innerHTML = "";
       for (let i = 0; i < 5; i++) svg.append(sv("line", { x1: 4, x2: width - 4, y1: yOf(i * 2), y2: yOf(i * 2), stroke: rgba(C.ink, 0.45), "stroke-width": 1 }));
-      const clef = sv("path", { d: CLEF_PATH, fill: "none", stroke: rgba(C.ink, 0.8), "stroke-width": 1.6, "stroke-linecap": "round",
-        transform: `translate(8 ${yOf(10.6)}) scale(${(gap * 6.6) / 48})` });
+      const clef = sv("path", { d: L.GCLEF_D, fill: rgba(C.ink, 0.85), transform: L.gclefTransform(8, yOf(8), gap) });
       svg.append(clef);
       const cx = width * 0.58, hw = gap * 0.66;
       const sorted = notes.map((n, i) => ({ ...n, col: colors[i] || C.ink, lab: labels[i] })).sort((a, b) => a.d - b.d);
@@ -158,6 +156,90 @@
     hdim7: "Eksik akor + küçük yedili. Minör tonun ii akoru.",
     dim7: "Üst üste dört küçük üçlü: oktavı eşit böler, tamamen simetrik ve gergin.",
   };
+  /* ---------- Çevrimler: kök seç, sonra kök konumu / 1. / 2. çevrim ---------- */
+  Demos.inversions = (stage) => {
+    let root = 0, type = "maj", inv = 0, linkT = [];
+    const FIG = [["5/3", "basın üstünde üçlü ve beşli"], ["6/3", "basın üstünde üçlü ve altılı"], ["6/4", "basın üstünde dörtlü ve altılı"]];
+    const ROLE = ["kök", "üçlü", "beşli"];
+    const top = h("div.ci-top");
+    const staffs = h("div.ci-staffs");
+    const info = h("div.ch-info.ci-info");
+    top.append(staffs, info);
+    const pianoBox = h("div.ch-piano");
+    stage.append(top, pianoBox);
+    const piano = Piano(pianoBox, { from: 48, to: 83, compact: true });
+    // üç konum: her biri küçük bir porte; tıklayınca seçilir ve çalar
+    const posBtns = [0, 1, 2].map((k) => {
+      const b = h("button.ci-pos", { type: "button", "aria-label": INV_AD[k], onclick: () => { inv = k; stopLink(); render(); play(); } });
+      const box = h("div.ci-staff");
+      b.append(box, h("span.ci-poslab", INV_AD[k]), h("small.ci-fig", FIG[k][0]));
+      staffs.append(b);
+      return { b, staff: Staff(box, { width: 150, gap: 11 }) };
+    });
+    const roots = h("div.seg.ch-roots", { role: "group", "aria-label": "Kök nota" });
+    const rootBtns = ROOTS.map(([pc, , ad]) => {
+      const b = h("button", { type: "button", onclick: () => { root = pc; stopLink(); render(); play(); } }, ad);
+      roots.append(b); return b;
+    });
+    const types = seg([["maj", "Majör"], ["min", "Minör"], ["dim", "Eksik"]], type, (k) => { type = k; stopLink(); render(); play(); }, "Akor türü");
+    const invSeg = seg([[0, "Kök konumu"], [1, "1. çevrim"], [2, "2. çevrim"]], inv, (k) => { inv = k; stopLink(); render(); play(); }, "Çevrim");
+    const linkBtn = h("button.btn", { type: "button", onclick: () => (linkT.length ? stopLink() : link()) }, "Çevrimle bağla");
+    stage.append(h("div.controls", h("span.ch-lab", "Kök"), roots, h("span.ch-lab", "Tür"), types),
+      h("div.controls", invSeg, h("span.spacer"), linkBtn));
+
+    // kök konumu Do4–Fa♯4 köklerde 4. oktavda, Sol–Si köklerde 3. oktavda başlar (piyanoya sığsın)
+    const base = () => (root <= 6 ? 60 : 48) + root;
+    function voicing(k) {
+      const sp = spellChord(base(), ROOTS[root][1], type).map((n, i) => ({ ...n, role: i }));
+      for (let j = 0; j < k; j++) { const n = sp.shift(); sp.push({ ...spell(n.m + 12, n.letter), role: n.role }); }
+      return sp;
+    }
+    const colOf = (role) => (role === 0 ? C.tonic : type === "dim" && role === 2 ? C.tension : C.ink);
+    const clsOf = (role) => (role === 0 ? "tonic" : type === "dim" && role === 2 ? "tension" : "in");
+    function render() {
+      rootBtns.forEach((b, i) => { b.classList.toggle("on", i === root); b.setAttribute("aria-pressed", i === root); });
+      invSeg.set(inv);
+      posBtns.forEach(({ b, staff }, k) => {
+        const sp = voicing(k);
+        staff.render(sp, sp.map((n) => colOf(n.role)), sp.map(() => ""));
+        b.classList.toggle("on", k === inv);
+      });
+      const sp = voicing(inv);
+      piano.clear();
+      sp.forEach((n, i) => piano.mark(n.m, clsOf(n.role), i === 0 ? "bas" : n.role === 0 ? "kök" : ""));
+      const sym = sp.find((n) => n.role === 0).name + T.CHORDS[type].sym + (inv ? "/" + sp[0].name : "");
+      const iv = (a, b) => T.interval(b.m - a.m).ad.toLocaleLowerCase("tr");
+      info.innerHTML = "";
+      info.append(
+        h("p.ch-sym", acc(sym), h("small.ch-let", acc(T.toLetter(sym)))),
+        h("p.ch-full", acc(`${INV_AD[inv]} · basta ${ROLE[sp[0].role]} (${sp[0].name})`)),
+        h("p.ch-notes", acc(`Alttan üste: ${sp.map((n) => `${n.name} (${T.toLetter(n.name)})`).join(", ")}`)),
+        h("p.ch-desc", `${FIG[inv][0]}: ${FIG[inv][1]}. Bastan aralıklar: ${iv(sp[0], sp[1])} ve ${iv(sp[0], sp[2])}.`),
+        h("p.ch-desc", inv === 0 ? "En sağlam, en kararlı konum: kök en altta." : inv === 1 ? "Daha hafif ve akıcı; bas çizgisini yumuşatmak için sık kullanılır." : "En az kararlı konum; çoğunlukla geçişlerde ve kadanslarda görülür."));
+    }
+    function play() { strumThenBlock(voicing(inv).map((n) => n.m), 0.12); }
+    // I – IV (2. çevrim) – V (1. çevrim) – I: notalar en az yer değiştirir
+    function link() {
+      const c = Snd.ready();
+      const b0 = base(), minor = type !== "maj";
+      const I = T.chord(b0, minor ? "min" : "maj");
+      const IV = [b0, b0 + (minor ? 5 : 5), b0 + (minor ? 8 : 9)];            // IV'ün 2. çevrimi: kök ortak ses
+      const V = [b0 - 1, b0 + 2, b0 + 7];                                       // V'in 1. çevrimi: yeden basta
+      const seq = [[I, "I"], [IV, "IV (2. çevrim)"], [V, "V (1. çevrim)"], [I, "I"]];
+      linkBtn.textContent = "Durdur"; linkBtn.classList.add("on");
+      seq.forEach(([ns, lab], k) => linkT.push(setTimeout(() => {
+        piano.clear(); ns.forEach((m, i) => piano.mark(m, k === 2 ? "tension" : k === 1 ? "wave" : "tonic", i === 0 ? lab.split(" ")[0] : ""));
+        info.querySelector(".ch-full").textContent = `${lab}: ${ns.map((m) => T.name(m, { octave: false, flats: [1, 3, 8, 10].includes(T.pcOf(m)) })).join(", ")}`;
+        if (c) block(ns, 0, 0.9, 0.3);
+      }, k * 900)));
+      linkT.push(setTimeout(() => { stopLink(); render(); }, seq.length * 900 + 400));
+    }
+    function stopLink() { linkT.forEach(clearTimeout); linkT = []; linkBtn.textContent = "Çevrimle bağla"; linkBtn.classList.remove("on"); }
+    render();
+    return { enter() {}, leave() { stopLink(); } };
+  };
+  G.cevrimler = [{ click: "=Re" }, { wait: 1200 }, { click: "=1. çevrim" }, { wait: 1400 }, { click: "=2. çevrim" }, { wait: 1400 }, { click: "Çevrimle bağla" }];
+
   Demos.sevenths = (stage) => {
     let type = "maj7", inv = 0;
     const top = h("div.ch-top.ch-top-sev");
@@ -406,7 +488,7 @@
       const W = 150, gap = 9, base = gap * 7.2;
       const s = sv("svg", { class: "ch-sig", viewBox: `0 0 ${W} ${gap * 9}`, "aria-hidden": "true" });
       for (let i = 0; i < 5; i++) s.append(sv("line", { x1: 2, x2: W - 2, y1: base - i * gap, y2: base - i * gap, stroke: rgba(C.ink, 0.45) }));
-      s.append(sv("path", { d: CLEF_PATH, fill: "none", stroke: rgba(C.ink, 0.75), "stroke-width": 1.6, "stroke-linecap": "round", transform: `translate(4 ${base - gap * 5.3}) scale(${(gap * 6.6) / 48})` }));
+      s.append(sv("path", { d: L.GCLEF_D, fill: rgba(C.ink, 0.8), transform: L.gclefTransform(4, base - 4 * gap, gap) }));
       const n = Math.abs(acc), sharp = acc > 0;
       for (let i = 0; i < n; i++) {
         const p = (sharp ? SHARP_POS : FLAT_POS)[i];

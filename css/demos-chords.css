@@ -180,3 +180,24 @@
 
 .ch-sym .acc, .ch-full .acc { font-family: var(--f-body); font-style: normal; font-weight: 500; font-size: 0.62em; vertical-align: 0.42em; margin-left: 0.02em; }
 .ch-full .acc { font-size: 0.8em; vertical-align: 0.15em; }
+
+/* ---------- Çevrimler ---------- */
+.ci-top { flex: 1; min-height: 0; display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(220px, 1fr); gap: 18px 24px; padding: 18px 20px 8px; align-items: center; }
+.ci-staffs { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.ci-pos {
+  display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 6px 4px 8px; cursor: pointer;
+  background: rgba(239,228,204,.03); border: 1px solid var(--line-soft); border-radius: var(--r-sm); color: var(--ink-2);
+  transition: border-color .15s, background .15s;
+}
+.ci-pos:hover { border-color: var(--brass); }
+.ci-pos.on { border-color: var(--tonic); background: rgba(242,190,75,.08); color: var(--ink); }
+.ci-staff { width: 100%; }
+.ci-staff .ch-staff { width: 100%; height: auto; display: block; }
+.ci-poslab { font-weight: 600; font-size: .86rem; }
+.ci-pos.on .ci-poslab { color: var(--tonic); }
+.ci-fig { font-family: var(--f-display); font-style: italic; font-size: .9rem; color: var(--muted); }
+.ci-info .ch-desc + .ch-desc { margin-top: 2px; }
+@media (max-width: 860px) {
+  .ci-top { grid-template-columns: 1fr; padding: 14px 10px 6px; }
+  .ci-poslab { font-size: .76rem; }
+}
