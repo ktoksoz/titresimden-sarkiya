@@ -39,3 +39,4 @@
 .cons-badge.dis { border-left-color: var(--tension); background: rgba(216, 70, 94, 0.1); }
 .cons-badge.dis b { color: var(--tension); }
 @media (max-width: 860px) { .cons-badge { min-width: 0; flex: 1 1 100%; } }
+@media (max-width: 860px) { #lissajous .stage .fill { min-height: 380px; } }

@@ -802,6 +802,13 @@
       if (d2) d2.setFreq(F1 * ratio);
       upd();
     }
+    // ikinci sesin adı: en yakın nota, eşit tamperamandan sapma 0,5 cent'i aşarsa cent olarak
+    function note2() {
+      const nn = T.nearest(F1 * ratio);
+      // Do'nun üstünde küçük ikili, küçük üçlü, küçük altılı ve küçük yedili bemolle yazılır (Re♭, Mi♭, La♭, Si♭)
+      const nm = T.name(nn.midi, { flats: [1, 3, 8, 10].includes(nn.pc) });
+      return Math.abs(nn.cents) < 0.5 ? nm : `${nm} ${nn.cents > 0 ? "+" : "−"}${fmtNum(Math.abs(nn.cents), 1)} c`;
+    }
     const difficulty = (q) => (q === Infinity ? 1 : clamp(Math.log2(q) / 5, 0, 1));
     const curveColor = () => mix(C.tonic, C.tension, difficulty(close));
     const X = (t) => Math.sin(2 * Math.PI * t);
@@ -811,7 +818,8 @@
     function geo() {
       const { w, h: hh } = st;
       const wide = w > 760;
-      const side = Math.min(wide ? w * 0.52 : w - 90, hh - 110);
+      // kare + alttaki dalga şeridi (kare boyunun 0,2'si) + etiket sığsın
+      const side = Math.min(wide ? w * 0.52 : w - 90, (hh - 30 - 44) / 1.2);
       const strip = Math.min(72, side * 0.2);
       const sx = wide ? 24 + strip + 18 : (w - side + strip + 12) / 2;
       const sy = 30;
@@ -874,7 +882,7 @@
       ctx.fillStyle = "#fff8e6"; ctx.shadowColor = col; ctx.shadowBlur = 14; ctx.beginPath(); ctx.arc(px, py, 4.5, 0, 7); ctx.fill(); ctx.shadowBlur = 0;
       text(ctx, "1. ses (Do4)", g.cx, g.sy + g.side + g.strip + 26, { size: 12, color: C.tonic, align: "center", weight: 600 });
       ctx.save(); ctx.translate(g.sx - g.strip - 20, g.cy); ctx.rotate(-Math.PI / 2);
-      text(ctx, "2. ses", 0, 0, { size: 12, color: C.wave, align: "center", weight: 600 }); ctx.restore();
+      text(ctx, `2. ses (${note2()})`, 0, 0, { size: 12, color: C.wave, align: "center", weight: 600 }); ctx.restore();
       // tur sayacı
       const turns = Math.floor(close === Infinity ? tau : Math.min(tau, close));
       const yTurns = Math.floor((close === Infinity ? tau : Math.min(tau, close)) * ratio + 1e-6);
@@ -934,7 +942,7 @@
     function upd() {
       const name = cur ? PRESETS.find((p) => p.k === cur).ad : null;
       const nm = name || (just ? just.ad : null);
-      readout.innerHTML = `<b>${hz(F1)}</b> ve <b>${hz(F1 * ratio)}</b> · oran ${just ? just.n + ":" + just.d : "≈ " + fmtNum(ratio, 4)}${nm ? " · " + nm : ""}`;
+      readout.innerHTML = `Do4 <b>${hz(F1)}</b> ve ${note2()} <b>${hz(F1 * ratio)}</b> · oran ${just ? just.n + ":" + just.d : "≈ " + fmtNum(ratio, 4)}${nm ? " · " + nm : ""}`;
       badge();
     }
     const listen = h("button.btn", { type: "button", onclick: () => {
