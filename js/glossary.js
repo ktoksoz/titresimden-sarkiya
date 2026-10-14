@@ -29,6 +29,7 @@
     { k: ["vuru"], t: "Vuru (beat)", d: "Frekansları birbirine çok yakın iki ses birlikte çalınınca ses şiddetinin farkları kadar hızla dalgalanması.", u: enw("Beat_(acoustics)") },
     { k: ["plomp"], t: "Plomp–Levelt eğrisi", d: "1965'te Reinier Plomp ve Willem Levelt'in ölçtüğü, iki saf tonun frekans farkına göre ne kadar pürüzlü duyulduğunu gösteren eğri.", u: enw("Consonance_and_dissonance#Physiological_basis_of_consonance") },
     { k: ["sethares"], t: "William Sethares", d: "Tını ile akort arasındaki ilişkiyi inceleyen Amerikalı mühendis ve müzisyen. Plomp–Levelt eğrisini harmonikli seslere genelleştirdi.", u: enw("William_Sethares") },
+    { k: ["lissajous"], t: "Lissajous eğrisi", d: "Birbirine dik iki salınımın birleşimiyle çizilen eğri. Frekans oranı basit bir kesirse eğri kapanır; Jules Antoine Lissajous 1857'de diyapazonlarla inceledi.", u: trw("Lissajous eğrisi") },
     { k: ["kroma", "chroma"], t: "Kroma (perde sınıfı)", d: "Oktavdan bağımsız nota kimliği: bütün Do'lar aynı kromaya sahiptir. 12 perde sınıfı bir çember üzerinde gösterilir.", u: enw("Pitch_class") },
     { k: ["cent"], t: "Cent", d: "Eşit tamperamanlı yarım sesin yüzde biri; oktav 1200 cent. İki frekansın oranından 1200·log₂(f₂/f₁) ile hesaplanır.", u: trw("Sent (müzik)") },
     { k: ["koma"], t: "Koma", d: "İki farklı yoldan ulaşılan neredeyse aynı perde arasındaki küçük fark. Türk müziğinde ayrıca oktavın 53'te biri olan ölçü birimi.", u: trw("Koma (müzik)") },

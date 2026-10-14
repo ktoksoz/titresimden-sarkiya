@@ -10,13 +10,13 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..900;1,6..96,400..900&family=Hanken+Grotesk:ital,wght@0,400..700;1,400..700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/style.css?v=202610141803">
-<link rel="stylesheet" href="css/demos-sound.css?v=202610141803">
-<link rel="stylesheet" href="css/demos-ratios.css?v=202610141803">
-<link rel="stylesheet" href="css/demos-scales.css?v=202610141803">
-<link rel="stylesheet" href="css/demos-chords.css?v=202610141803">
-<link rel="stylesheet" href="css/demos-rhythm.css?v=202610141803">
-<link rel="stylesheet" href="css/demos-finale.css?v=202610141803">
+<link rel="stylesheet" href="css/style.css?v=202610141834">
+<link rel="stylesheet" href="css/demos-sound.css?v=202610141834">
+<link rel="stylesheet" href="css/demos-ratios.css?v=202610141834">
+<link rel="stylesheet" href="css/demos-scales.css?v=202610141834">
+<link rel="stylesheet" href="css/demos-chords.css?v=202610141834">
+<link rel="stylesheet" href="css/demos-rhythm.css?v=202610141834">
+<link rel="stylesheet" href="css/demos-finale.css?v=202610141834">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cellipse cx='14' cy='22' rx='7' ry='5' transform='rotate(-22 14 22)' fill='%23f2be4b'/%3E%3Cpath d='M20 21V4' stroke='%23f2be4b' stroke-width='2.4'/%3E%3C/svg%3E">
 </head>
 <body>
@@ -188,6 +188,24 @@
   <aside class="notes"><ul>
     <li>Konsonans kısmen kültürel de: Batı'da yüzyıllarca üçlüler dissonans sayıldı, bugün ise en tatlı aralıklardan.</li>
     <li>Eğri, harmonik genlikleri 0,88ⁿ ile azalan altı harmonikli sesler için hesaplandı (Sethares modeli).</li>
+  </ul></aside>
+</section>
+
+<section class="slide" data-chapter="2" data-demo="lissajous" id="lissajous">
+  <div class="text">
+    <h2>İki titreşimin dansı</h2>
+    <p class="lead">İki notayı birlikte çalıp birinciyi yatay, ikinciyi dikey eksene koyalım. Ortadaki nokta ikisinin birleşimini çizer ve şekil, iki titreşimin ne kadar iyi anlaştığını gösterir.</p>
+    <p>Bu şekillere, 1857'de diyapazonlara tutturduğu aynalarla onları perdeye yansıtan Fransız fizikçinin adıyla <strong>Lissajous</strong> eğrileri denir. Bugün bir <strong>osiloskop</strong>un XY modunda aynı şekilleri görebilirsiniz.</p>
+    <p>Frekanslar basit bir oranda ise eğri kısa sürede kendi üzerine kapanır. <strong class="c-tonic">Oktavda</strong> (2:1) birinci ses tek tur atınca, <strong class="c-tonic">beşlide</strong> (3:2) iki turda kapanır. Oran karmaşıklaştıkça yol uzar ve düğümlenir: <strong class="c-tension">küçük ikili</strong> (16:15) için on beş tur, triton (45:32) için otuz iki tur gerekir.</p>
+    <p>Eşit tamperamanlı beşli hiçbir basit orana tam denk gelmediği için <strong class="c-tension">hiç kapanmaz</strong>: 3:2'den yaklaşık 2 cent pes olduğundan şekil her turda biraz kayar. Bu yavaş kayma, iki sesin harmonikleri arasındaki vurunun görsel karşılığıdır.</p>
+    <p class="try">Bir aralık seçin ve eğrinin kaç turda kapandığını izleyin. Sonra "Eşit beşli"yi ya da kaydırıcıyla bir ara değeri deneyin, "Dinle" ile iki sesi birlikte duyun.</p>
+  </div>
+  <div class="stage"></div>
+  <aside class="notes"><ul>
+    <li>Oran sade kesir hâlinde p:q ise eğri, birinci ses q tur, ikinci ses p tur atınca kapanır. Kapanma süresi = q / f₁; bu, iki sesin ortak periyodudur.</li>
+    <li>Animasyon çok yavaşlatılmış: gerçekte Do4 ile Sol4'ün şekli saniyede yaklaşık 131 kez kapanır (261,6 Hz / 2).</li>
+    <li>Lissajous'dan önce Nathaniel Bowditch 1815'te sarkaçlarla aynı eğrileri incelemişti.</li>
+    <li>Kaydırıcı basit bir orana 3 cent yaklaşınca ona oturur; arada kalan değerlerde şekil kayar.</li>
   </ul></aside>
 </section>
 
@@ -577,19 +595,19 @@
   <button class="iconbtn" id="btn-overview" aria-label="Tüm slaytlar (O)" title="Tüm slaytlar (O)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="4" width="7" height="7"/><rect x="13" y="4" width="7" height="7"/><rect x="4" y="13" width="7" height="7"/><rect x="13" y="13" width="7" height="7"/></svg></button>
 </nav>
 
-<script src="js/theory.js?v=202610141803"></script>
-<script src="js/lib.js?v=202610141803"></script>
-<script src="js/audio.js?v=202610141803"></script>
-<script src="js/piano.js?v=202610141803"></script>
-<script src="js/demos/sound.js?v=202610141803"></script>
-<script src="js/demos/ratios.js?v=202610141803"></script>
-<script src="js/demos/scales.js?v=202610141803"></script>
-<script src="js/demos/chords.js?v=202610141803"></script>
-<script src="js/demos/rhythm.js?v=202610141803"></script>
-<script src="js/demos/finale.js?v=202610141803"></script>
-<script src="js/glossary.js?v=202610141803"></script>
-<script src="js/app.js?v=202610141803"></script>
-<script src="js/narrator.js?v=202610141803"></script>
-<script src="js/guide.js?v=202610141803"></script>
+<script src="js/theory.js?v=202610141834"></script>
+<script src="js/lib.js?v=202610141834"></script>
+<script src="js/audio.js?v=202610141834"></script>
+<script src="js/piano.js?v=202610141834"></script>
+<script src="js/demos/sound.js?v=202610141834"></script>
+<script src="js/demos/ratios.js?v=202610141834"></script>
+<script src="js/demos/scales.js?v=202610141834"></script>
+<script src="js/demos/chords.js?v=202610141834"></script>
+<script src="js/demos/rhythm.js?v=202610141834"></script>
+<script src="js/demos/finale.js?v=202610141834"></script>
+<script src="js/glossary.js?v=202610141834"></script>
+<script src="js/app.js?v=202610141834"></script>
+<script src="js/narrator.js?v=202610141834"></script>
+<script src="js/guide.js?v=202610141834"></script>
 </body>
 </html>

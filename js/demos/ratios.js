@@ -767,4 +767,184 @@
     return { enter() { lp.start(); }, leave() { lp.stop(); tm.clear(); hl = null; } };
   };
   G["turk-muzigi"] = [{ click: "Hicaz dizisini çal" }, { wait: 4400 }, { click: "Batı karşılığını çal" }];
+
+  /* ================= Lissajous: iki titreşimin dansı =================
+     Birinci ses yatayda (x), ikinci ses dikeyde (y) salınır; nokta ikisinin birleşimini çizer.
+     Oran p:q (en sade hâliyle) ise eğri, birinci ses q tur attığında kendi üzerine kapanır.
+     Eşit tamperamanlı aralıklar basit bir orana denk gelmediği için hiç kapanmaz, yavaşça kayar. */
+  Demos.lissajous = (stage) => {
+    const { cv } = stageCanvas(stage, "Lissajous eğrisi: yatayda birinci ses, dikeyde ikinci ses");
+    const F1 = T.mtof(60);
+    const PHI = Math.PI / 4;           // başlangıç faz farkı: şekiller düz çizgiye dönüşmesin
+    const MAXTURNS = 40;               // kapanmayan eğrilerde gösterilen son tur sayısı
+    const PRESETS = [
+      { k: "oktav", ad: "Oktav", n: 2, d: 1 },
+      { k: "besli", ad: "Beşli", n: 3, d: 2 },
+      { k: "dortlu", ad: "Dörtlü", n: 4, d: 3 },
+      { k: "b3", ad: "Büyük üçlü", n: 5, d: 4 },
+      { k: "k3", ad: "Küçük üçlü", n: 6, d: 5 },
+      { k: "k2", ad: "Küçük ikili", n: 16, d: 15 },
+      { k: "triton", ad: "Triton", n: 45, d: 32 },
+      { k: "et5", ad: "Eşit beşli", n: null, d: null, cents: 700 },
+    ];
+    let ratio = 1.5, close = 2, cur = "besli", tau = 0, speed = 1, closedAt = -1, playing = false, d1 = null, d2 = null;
+
+    // yalnızca listedeki sade oranlar kapanır (birinci ses payda kadar tur atınca);
+    // kaydırıcıdaki ara değerler basit bir orana denk gelmez ve eğri kayar
+    function setRatio(r, key) {
+      ratio = r; cur = key || null;
+      const p = PRESETS.find((x) => x.k === key);
+      close = p && p.n ? p.d : Infinity;
+      tau = 0; closedAt = -1;
+      if (d2) d2.setFreq(F1 * ratio);
+      upd();
+    }
+    const difficulty = (q) => (q === Infinity ? 1 : clamp(Math.log2(q) / 5, 0, 1));
+    const curveColor = () => mix(C.tonic, C.tension, difficulty(close));
+    const X = (t) => Math.sin(2 * Math.PI * t);
+    const Y = (t) => Math.sin(2 * Math.PI * ratio * t + PHI);
+
+    let st;
+    function geo() {
+      const { w, h: hh } = st;
+      const wide = w > 760;
+      const side = Math.min(wide ? w * 0.52 : w - 90, hh - 110);
+      const strip = Math.min(72, side * 0.2);
+      const sx = wide ? 24 + strip + 18 : (w - side + strip + 12) / 2;
+      const sy = 30;
+      return { w, hh, wide, side, strip, sx, sy, R: side / 2 - 12, cx: sx + side / 2, cy: sy + side / 2 };
+    }
+    function draw(dt) {
+      if (!st) return;
+      tau += dt * speed;
+      if (close !== Infinity && tau >= close && closedAt < 0) closedAt = performance.now();
+      const g = geo(), { ctx, w, hh } = { ctx: st.ctx, w: g.w, hh: g.hh };
+      ctx.clearRect(0, 0, w, hh);
+      // çerçeve ve eksenler
+      ctx.strokeStyle = rgba(C.ink, 0.12); ctx.lineWidth = 1;
+      ctx.strokeRect(g.sx + 0.5, g.sy + 0.5, g.side, g.side);
+      ctx.beginPath(); ctx.moveTo(g.sx, g.cy); ctx.lineTo(g.sx + g.side, g.cy); ctx.moveTo(g.cx, g.sy); ctx.lineTo(g.cx, g.sy + g.side); ctx.stroke();
+      const P = (t) => [g.cx + g.R * X(t), g.cy - g.R * Y(t)];
+      // eğri: kapanana kadar çizilen yol (kapanmayanlarda son MAXTURNS tur)
+      const end = close === Infinity ? tau : Math.min(tau, close);
+      const start = close === Infinity ? Math.max(0, tau - MAXTURNS) : 0;
+      const col = curveColor();
+      const steps = Math.max(2, Math.ceil((end - start) * 260));
+      ctx.save();
+      ctx.lineJoin = "round";
+      ctx.strokeStyle = col; ctx.globalAlpha = closedAt >= 0 ? 0.9 : 0.5; ctx.lineWidth = closedAt >= 0 ? 1.8 : 1.2;
+      if (closedAt >= 0) { ctx.shadowColor = col; ctx.shadowBlur = 10; }
+      ctx.beginPath();
+      for (let i = 0; i <= steps; i++) { const [x, y] = P(start + ((end - start) * i) / steps); i ? ctx.lineTo(x, y) : ctx.moveTo(x, y); }
+      ctx.stroke();
+      // son tur parlak iz
+      ctx.globalAlpha = 1; ctx.shadowColor = col; ctx.shadowBlur = 12; ctx.lineWidth = 2.4;
+      ctx.beginPath();
+      const t0 = Math.max(0, tau - 0.35);
+      for (let i = 0; i <= 60; i++) { const [x, y] = P(t0 + ((tau - t0) * i) / 60); i ? ctx.lineTo(x, y) : ctx.moveTo(x, y); }
+      ctx.stroke();
+      ctx.restore();
+      // kapanma parlaması
+      if (closedAt >= 0) {
+        const a = clamp(1 - (performance.now() - closedAt) / 1400, 0, 1);
+        if (a > 0) { ctx.strokeStyle = rgba(C.tonic, a); ctx.lineWidth = 3; ctx.strokeRect(g.sx + 0.5, g.sy + 0.5, g.side, g.side); }
+      }
+      // basitleştirilmiş titreşimler: altta birinci ses (zaman aşağı akar), solda ikinci ses (zaman sola akar)
+      const [px, py] = P(tau);
+      const span = 1.5, n = 120;
+      ctx.save();
+      ctx.lineWidth = 1.8; ctx.strokeStyle = C.tonic; ctx.shadowColor = C.tonic; ctx.shadowBlur = 6;
+      ctx.beginPath();
+      for (let i = 0; i <= n; i++) { const t = tau - (span * i) / n; const x = g.cx + g.R * X(t), y = g.sy + g.side + 10 + (g.strip * i) / n; i ? ctx.lineTo(x, y) : ctx.moveTo(x, y); }
+      ctx.stroke();
+      ctx.strokeStyle = C.wave; ctx.shadowColor = C.wave;
+      ctx.beginPath();
+      for (let i = 0; i <= n; i++) { const t = tau - (span * i) / n; const y = g.cy - g.R * Y(t), x = g.sx - 10 - (g.strip * i) / n; i ? ctx.lineTo(x, y) : ctx.moveTo(x, y); }
+      ctx.stroke();
+      ctx.restore();
+      // izdüşüm çizgileri ve nokta
+      ctx.setLineDash([3, 4]); ctx.strokeStyle = rgba(C.ink, 0.3); ctx.lineWidth = 1;
+      ctx.beginPath(); ctx.moveTo(px, py); ctx.lineTo(px, g.sy + g.side + 10); ctx.moveTo(px, py); ctx.lineTo(g.sx - 10, py); ctx.stroke();
+      ctx.setLineDash([]);
+      ctx.fillStyle = C.tonic; ctx.beginPath(); ctx.arc(px, g.sy + g.side + 10, 4, 0, 7); ctx.fill();
+      ctx.fillStyle = C.wave; ctx.beginPath(); ctx.arc(g.sx - 10, py, 4, 0, 7); ctx.fill();
+      ctx.fillStyle = "#fff8e6"; ctx.shadowColor = col; ctx.shadowBlur = 14; ctx.beginPath(); ctx.arc(px, py, 4.5, 0, 7); ctx.fill(); ctx.shadowBlur = 0;
+      text(ctx, "1. ses (Do4)", g.cx, g.sy + g.side + g.strip + 26, { size: 12, color: C.tonic, align: "center", weight: 600 });
+      ctx.save(); ctx.translate(g.sx - g.strip - 20, g.cy); ctx.rotate(-Math.PI / 2);
+      text(ctx, "2. ses", 0, 0, { size: 12, color: C.wave, align: "center", weight: 600 }); ctx.restore();
+      // tur sayacı
+      const turns = Math.floor(close === Infinity ? tau : Math.min(tau, close));
+      const yTurns = Math.floor((close === Infinity ? tau : Math.min(tau, close)) * ratio + 1e-6);
+      text(ctx, `1. ses ${turns} tur · 2. ses ${yTurns} tur`, g.sx + 6, g.sy - 10, { size: 13, color: C.ink2, weight: 600 });
+      let msg, mc;
+      if (close === Infinity) { msg = "Kapanmıyor: eğri her turda biraz kayıyor"; mc = C.tension; }
+      else if (closedAt >= 0) { msg = `Kapandı: ${close} turda`; mc = mix(C.tonic, C.tension, difficulty(close)); }
+      else { msg = `${close} turda kapanacak`; mc = C.ink2; }
+      text(ctx, msg, g.sx + g.side - 6, g.sy - 10, { size: 13, color: mc, weight: 700, align: "right" });
+      // sağda: kapanmak için gereken tur sayısı (log ölçek)
+      if (g.wide) {
+        const x0 = g.sx + g.side + 40, x1 = w - 24, bw = x1 - x0 - 150;
+        let y = g.sy + 16;
+        text(ctx, "Kapanmak için gereken tur", x0, y, { size: 13, color: C.ink, weight: 700 });
+        y += 22;
+        const maxL = Math.log2(64);
+        PRESETS.forEach((p) => {
+          const q = p.d || Infinity, on = p.k === cur;
+          const len = q === Infinity ? bw : Math.max(6, (Math.log2(q) / maxL) * bw * 0.92 + 6);
+          text(ctx, p.ad, x0, y + 11, { size: 12, color: on ? C.ink : C.ink2, weight: on ? 700 : 500 });
+          text(ctx, p.n ? `${p.n}:${p.d}` : "700 c", x0 + 88, y + 11, { size: 11, color: C.muted });
+          ctx.globalAlpha = on ? 1 : 0.55;
+          ctx.fillStyle = mix(C.tonic, C.tension, difficulty(q));
+          ctx.fillRect(x0 + 150, y + 2, q === Infinity ? bw : len, 10);
+          ctx.globalAlpha = 1;
+          text(ctx, q === Infinity ? "∞" : String(q), x0 + 150 + (q === Infinity ? bw : len) + 6, y + 11, { size: 12, color: on ? C.ink : C.muted, weight: 700 });
+          y += 24;
+        });
+        y += 10;
+        const lines = ["Basit oran → kısa sürede kapanan,", "sakin bir şekil (konsonans).", "Karmaşık oran → uzun, düğümlü yol;", "kapanmayan oran → durmadan kayan", "şekil (vuru, pürüz)."];
+        lines.forEach((l, i) => text(ctx, l, x0, y + i * 17, { size: 12, color: C.muted }));
+      }
+    }
+    st = canvas(cv, () => draw(0));
+    const lp = loop(draw);
+
+    const segEl = seg(PRESETS.map((p) => [p.k, p.ad]), cur, (k) => {
+      const p = PRESETS.find((x) => x.k === k);
+      const r = p.n ? p.n / p.d : Math.pow(2, p.cents / 1200);
+      sl.set(T.cents(r));
+      setRatio(r, k);
+    }, "Aralık");
+    const sl = slider({ label: "İkinci ses", min: 0, max: 1200, step: 1, value: 702, fmt: (v) => fmtNum(v, 0) + " c",
+      oninput: (v) => {
+        // basit bir orana 3 cent yakınsa ona otur
+        let r = Math.pow(2, v / 1200), key = null;
+        for (const p of PRESETS) if (p.n && Math.abs(v - T.cents(p.n / p.d)) < 3) { r = p.n / p.d; key = p.k; }
+        segEl.set(key);
+        setRatio(r, key);
+      } });
+    const spd = seg([[0.5, "Yavaş"], [1, "Orta"], [3, "Hızlı"]], 1, (v) => { speed = v; }, "Hız");
+    const readout = h("span.readout");
+    function upd() {
+      const name = cur ? PRESETS.find((p) => p.k === cur).ad : null;
+      const p = PRESETS.find((x) => x.k === cur);
+      readout.innerHTML = `<b>${hz(F1)}</b> ve <b>${hz(F1 * ratio)}</b> · oran ${p && p.n ? p.n + ":" + p.d : "≈ " + fmtNum(ratio, 4)}${name ? " · " + name : ""}`;
+    }
+    const listen = h("button.btn", { type: "button", onclick: () => {
+      if (playing) { d1 && d1.stop(); d2 && d2.stop(); d1 = d2 = null; playing = false; }
+      else {
+        d1 = Snd.own(Snd.drone({ amps: HARM, freq: F1, gain: 0.12 }));
+        d2 = Snd.own(Snd.drone({ amps: HARM, freq: F1 * ratio, gain: 0.12 }));
+        playing = !!d1;
+      }
+      listen.textContent = playing ? "Sesi durdur" : "Dinle"; listen.classList.toggle("on", playing);
+    } }, "Dinle");
+    const restart = h("button.btn", { type: "button", onclick: () => { tau = 0; closedAt = -1; } }, "Baştan çiz");
+    stage.append(h("div.controls.top", segEl), h("div.controls", sl, listen, restart, spd, h("span.spacer"), readout));
+    upd();
+    return {
+      enter() { lp.start(); },
+      leave() { lp.stop(); if (d1) d1.stop(); if (d2) d2.stop(); d1 = d2 = null; playing = false; listen.textContent = "Dinle"; listen.classList.remove("on"); },
+    };
+  };
+  G.lissajous = [{ click: "=Oktav" }, { wait: 2200 }, { click: "=Beşli" }, { wait: 3200 }, { click: "=Küçük ikili" }];
 })();

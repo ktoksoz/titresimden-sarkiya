@@ -14,7 +14,7 @@ Hazırlayan: **Koray Toksöz**
 | --- | --- |
 | Giriş | Dokununca pentatonik notalar çalan parlayan teller |
 | 1. Ses nedir? | Sıkışan ve seyrelen hava molekülleri, osilatör ve osiloskop, duyma sınırı testi, çalgı tınıları, harmonik çubuklarıyla toplamsal sentez, titreşen telde harmonik dizisi |
-| 2. Oranlar ve akort | Sürüklenebilir köprülü monokord, vuru ve Plomp–Levelt pürüzlülük eğrisi, 3B perde sarmalı, Pisagor koması, Pisagor / saf / eşit tamperaman karşılaştırması, 53 komalık ızgarada Hicaz dizisi |
+| 2. Oranlar ve akort | Sürüklenebilir köprülü monokord, vuru ve Plomp–Levelt pürüzlülük eğrisi, iki sesin Lissajous eğrisi (basit oranlar hızla kapanır), 3B perde sarmalı, Pisagor koması, Pisagor / saf / eşit tamperaman karşılaştırması, 53 komalık ızgarada Hicaz dizisi |
 | 3. Gamlar ve modlar | Aralıklar, T-T-Y-T-T-T-Y desenli majör gam, üç minör, döndürülebilir mod diski, pentatonik doğaçlama |
 | 4. Akorlar ve armoni | Üç sesliler, çevrimler ve yedili akorlar, V7 → I çözülmesi, dönen beşliler çemberi, I–V–vi–IV / ii–V–I / 12 ölçülük blues |
 | 5. Ritim ve zaman | Metronom, 16 adımlı davul sıralayıcısı, aksak usuller (9/8, 7/8, 5/8), senkop, 3'e karşı 2 poliritim |
@@ -119,6 +119,7 @@ Betik önce `index.html` içindeki `?v=` sürüm etiketini yeniler, böylece tar
 - **Harmonikli sesler için pürüzlülük modeli (`js/theory.js`):** W. A. Sethares, *Tuning, Timbre, Spectrum, Scale*, 2. baskı, Springer (2005), [yazarın sayfası](https://sethares.engr.wisc.edu/ttss.html).
 - **Perde sarmalı:** R. N. Shepard, "Circularity in judgments of relative pitch", *JASA* 36 (1964), 2346–2353, [doi:10.1121/1.1919362](https://doi.org/10.1121/1.1919362).
 - **Komalar (değerler `js/theory.js` içinde hesaplanır):** [Pythagorean comma](https://en.wikipedia.org/wiki/Pythagorean_comma), [Holdrian comma](https://en.wikipedia.org/wiki/Holdrian_comma), [Syntonic comma](https://en.wikipedia.org/wiki/Syntonic_comma).
+- **Lissajous eğrileri (Lissajous 1857, Bowditch 1815):** [Lissajous curve (Wikipedia)](https://en.wikipedia.org/wiki/Lissajous_curve).
 - **Bach'ın klavyesi:** [The Well-Tempered Clavier (Wikipedia)](https://en.wikipedia.org/wiki/The_Well-Tempered_Clavier).
 
 **Türk müziği**
