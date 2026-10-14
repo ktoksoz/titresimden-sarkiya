@@ -442,12 +442,15 @@
       if (/[♯♭]/.test(lab)) t1.append(sv("tspan", { class: "acc" }, lab.match(/[♯♭]/)[0]));
       const t2 = sv("text", { class: "lab-min", "text-anchor": "middle", "dominant-baseline": "central" }, K.minor);
       const t3 = sv("text", { class: "lab-acc", "text-anchor": "middle", "dominant-baseline": "central" }, K.acc === 0 ? "" : K.acc > 0 ? K.acc + "♯" : -K.acc + "♭");
+      // harf karşılıkları: majör tonun altında C, minörün altında Am
+      const t4 = sv("text", { class: "lab-let", "text-anchor": "middle", "dominant-baseline": "central" }, T.toLetter(lab));
+      const t5 = sv("text", { class: "lab-let lab-let-min", "text-anchor": "middle", "dominant-baseline": "central" }, T.toLetter(K.minor));
       [outer, inner].forEach((el) => {
         el.addEventListener("click", () => choose(k));
       });
       outer.addEventListener("keydown", (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); e.stopPropagation(); choose(k); } });
-      rimG.append(outer, inner, t1, t2, t3);
-      segs.push({ outer, inner, t1, t2, t3 });
+      rimG.append(outer, inner, t1, t2, t3, t4, t5);
+      segs.push({ outer, inner, t1, t2, t3, t4, t5 });
     }
     const center = sv("g", { class: "coc-center" });
     const cName = sv("text", { class: "c-name", "text-anchor": "middle", y: -6 });
@@ -461,9 +464,12 @@
         s.outer.setAttribute("d", arc(124, 186, a - w + 0.01, a + w - 0.01));
         s.inner.setAttribute("d", arc(72, 122, a - w + 0.01, a + w - 0.01));
         const pos = (r) => [r * Math.cos(a), r * Math.sin(a)];
-        const [x1, y1] = pos(162), [x2, y2] = pos(97), [x3, y3] = pos(135);
-        s.t1.setAttribute("x", x1); s.t1.setAttribute("y", y1);
-        s.t2.setAttribute("x", x2); s.t2.setAttribute("y", y2);
+        // harf karşılığı, çemberin her yönünde ton adının hemen altında durur
+        const [x1, y1] = pos(161), [x2, y2] = pos(99), [x3, y3] = pos(133);
+        s.t1.setAttribute("x", x1); s.t1.setAttribute("y", y1 - 5);
+        s.t4.setAttribute("x", x1); s.t4.setAttribute("y", y1 + 11);
+        s.t2.setAttribute("x", x2); s.t2.setAttribute("y", y2 - 4);
+        s.t5.setAttribute("x", x2); s.t5.setAttribute("y", y2 + 8);
         s.t3.setAttribute("x", x3); s.t3.setAttribute("y", y3);
         const rel = (k - sel + 12) % 12;
         const role = rel === 0 ? "tonic" : rel === 1 ? "dom" : rel === 11 ? "sub" : "";
@@ -482,7 +488,7 @@
       const K = T.CIRCLE[k], flats = K.acc < 0;
       const I = K.pc, IV = T.CIRCLE[(k + 11) % 12].pc, V = T.CIRCLE[(k + 1) % 12].pc;
       const nm = (pc) => T.name(pc, { flats, octave: false });
-      return [["I", I, "tonic"], ["IV", IV, "sub"], ["V", V, "dom"]].map(([r, pc, fn]) => ({ r, pc, fn, name: nm(pc) }));
+      return [["I", I, "tonic"], ["IV", IV, "sub"], ["V", V, "dom"]].map(([r, pc, fn]) => ({ r, pc, fn, name: `${nm(pc)} (${T.letter(pc, { flats, octave: false })})` }));
     }
     function sigStaff(acc) {
       const W = 150, gap = 9, base = gap * 7.2;
@@ -502,14 +508,14 @@
       const nm = sel === 6 ? "Fa♯" : K.label;
       cName.textContent = nm.replace(/[♯♭]/, "");
       if (/[♯♭]/.test(nm)) cName.append(sv("tspan", { class: "acc" }, nm.match(/[♯♭]/)[0]));
-      cSub.textContent = "majör";
+      cSub.textContent = "majör · " + T.toLetter(nm);
       panel.innerHTML = "";
       panel.append(h("p.ch-sym", acc(name + " majör"), h("small.ch-let", acc(T.toLetter(name)))), h("p.ch-full", acc("Akraba minör: " + K.minor.replace(/m$/, "") + " minör (" + T.toLetter(K.minor) + ")")));
       let sigText;
       if (K.acc === 0) sigText = "Donanım yok: diyez de bemol de yok.";
       else if (sel === 6) sigText = "6 diyez (Fa♯ majör) ya da 6 bemol (Sol♭ majör). Eşit tamperamanda aynı tuşlar.";
-      else if (K.acc > 0) sigText = `${K.acc} diyez: ${T.SHARP_ORDER.slice(0, K.acc).map((x) => x + "♯").join(", ")}`;
-      else sigText = `${-K.acc} bemol: ${T.FLAT_ORDER.slice(0, -K.acc).map((x) => x + "♭").join(", ")}`;
+      else if (K.acc > 0) sigText = `${K.acc} diyez: ${T.SHARP_ORDER.slice(0, K.acc).map((x) => `${x}♯ (${T.toLetter(x)}♯)`).join(", ")}`;
+      else sigText = `${-K.acc} bemol: ${T.FLAT_ORDER.slice(0, -K.acc).map((x) => `${x}♭ (${T.toLetter(x)}♭)`).join(", ")}`;
       panel.append(h("div.ch-sigrow", sigStaff(K.acc), h("p.ch-desc", sigText)));
       const row = h("div.ch-ivrow");
       chordsOf(sel).forEach((c) => {
@@ -585,7 +591,7 @@
       ring.append(g);
       nodes[deg] = { g, x, y };
     });
-    ring.append(sv("text", { class: "ch-ringcap", "text-anchor": "middle", y: 4 }, "Do majör"));
+    ring.append(sv("text", { class: "ch-ringcap", "text-anchor": "middle", y: 4 }, "Do majör (C)"));
 
     // vuruş → akor indeksi
     let beats = [];
@@ -756,7 +762,9 @@
         const [x, y] = pos(ring, i);
         const lab = ring === "maj" ? (i === 6 ? "Fa♯" : k.label) : (i === 6 ? "Re♯m" : k.minor);
         const g = sv("g", { class: "md-node " + ring });
-        g.append(sv("circle", { cx: x, cy: y, r: ring === "maj" ? 15 : 12 }), sv("text", { x, y: y + (ring === "maj" ? 4 : 3.5), "text-anchor": "middle" }, lab));
+        // düğümde solfej adı ve altında küçük harf karşılığı (Do / C, Lam / Am)
+        g.append(sv("circle", { cx: x, cy: y, r: ring === "maj" ? 15 : 12 }), sv("text", { x, y: y + (ring === "maj" ? 0.5 : 0.5), "text-anchor": "middle" }, lab),
+          sv("text", { x, y: y + (ring === "maj" ? 8.5 : 7), "text-anchor": "middle", class: "md-let" }, T.toLetter(lab)));
         svg.append(g);
         nodes[ring + i] = g;
       }

@@ -242,3 +242,9 @@
   .md-chip { min-width: 54px; padding: 4px 6px 5px; }
   .md-controls .btn { white-space: normal; }
 }
+/* beşliler çemberi: harf karşılıkları */
+.coc .lab-let { fill: var(--ink-2); font-size: 11px; font-weight: 600; opacity: .7; }
+.coc .lab-let-min { font-size: 9.5px; }
+.md-node text.md-let { font-size: 6.5px; font-weight: 600; fill: var(--muted); }
+.md-node.min text.md-let { font-size: 5.5px; }
+.md-node.on text.md-let { fill: #2a1608; }
