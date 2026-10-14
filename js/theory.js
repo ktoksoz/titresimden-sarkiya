@@ -19,6 +19,17 @@
     const n = (flats ? FLAT : SHARP)[pcOf(m)];
     return octave ? n + octaveOf(m) : n;
   }
+  // Harf adı (uluslararası yazım): C, C♯/D♭ … B; oktav numarası aynı (La4 = A4)
+  const LETTER_FLAT = ["C", "D♭", "D", "E♭", "E", "F", "G♭", "G", "A♭", "A", "B♭", "B"];
+  function letter(m, { flats = false, octave = true } = {}) {
+    const n = (flats ? LETTER_FLAT : LETTER)[pcOf(m)];
+    return octave ? n + octaveOf(m) : n;
+  }
+  // Metindeki solfej adlarını harfe çevir: "Lam" → "Am", "Si♭4" → "B♭4", "Do/Mi" → "C/E"
+  const SOLF = { Do: "C", Re: "D", Mi: "E", Fa: "F", Sol: "G", La: "A", Si: "B" };
+  const toLetter = (str) => String(str).replace(/(^|[\s,/(·→–-])(Sol|Do|Re|Mi|Fa|La|Si)/g, (_, pre, x) => pre + SOLF[x]);
+  // "La4 (A4)" biçiminde solfej + harf
+  const withLetter = (m, opts = {}) => `${name(m, opts)} (${letter(m, opts)})`;
   // frekansa en yakın nota ve sapma (cent)
   function nearest(f, a4 = A4) {
     const m = ftom(f, a4), r = Math.round(m);
@@ -172,6 +183,9 @@
     return notes;
   }
   const chordName = (root, type, flats = false) => name(root, { flats, octave: false }) + CHORDS[type].sym;
+  // akor sembolünün harfli yazımı: Lam → Am, Sol7 → G7
+  const chordLetter = (root, type, flats = false) => letter(root, { flats, octave: false }) + CHORDS[type].sym;
+  const chordBoth = (root, type, flats = false) => `${chordName(root, type, flats)} (${chordLetter(root, type, flats)})`;
   // majör tonda dereceler: I ii iii IV V vi vii°
   const ROMAN = ["I", "ii", "iii", "IV", "V", "vi", "vii°"];
   const DEGREE_TYPE = ["maj", "min", "min", "maj", "maj", "min", "dim"];
@@ -213,10 +227,10 @@
   }
 
   const api = {
-    A4, SHARP, FLAT, LETTER, isBlack, pcOf, mtof, ftom, cents, centsBetween, octaveOf, name, nearest, fraction, gcd,
+    A4, SHARP, FLAT, LETTER, LETTER_FLAT, letter, withLetter, toLetter, isBlack, pcOf, mtof, ftom, cents, centsBetween, octaveOf, name, nearest, fraction, gcd,
     TUNINGS, JUST_FRAC, tunedFreq, pythagoreanRatios, PYTHAGOREAN_COMMA, SYNTONIC_COMMA, HOLDRIAN_COMMA,
     INTERVALS, interval, SCALES, MODES, modeSteps, degrees, scaleNotes, inScale, rotate,
-    CHORDS, chord, chordName, ROMAN, DEGREE_TYPE, DEGREE_TYPE7, diatonicChord, FUNCTION,
+    CHORDS, chord, chordName, chordLetter, chordBoth, ROMAN, DEGREE_TYPE, DEGREE_TYPE7, diatonicChord, FUNCTION,
     CIRCLE, SHARP_ORDER, FLAT_ORDER, roughnessPair, roughness,
     TEMPERAMENTS, FIFTH_ORDER, temperamentCents, triadDeviation,
   };

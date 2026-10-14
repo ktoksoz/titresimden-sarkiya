@@ -277,7 +277,12 @@
       text(ctx, r.name, pad + wHz + 22, 48, { size: 22, color: C.tonic, font: FONT.display, weight: 600 });
       ctx.font = `600 22px ${FONT.display}`;
       const wN = ctx.measureText(r.name).width;
-      text(ctx, r.cents, pad + wHz + 22 + wN + 10, 47, { size: 13, color: C.comma, weight: 600 });
+      // harf adı: La4 → A4
+      const lt = r.name === "—" ? "" : T.toLetter(r.name);
+      text(ctx, lt, pad + wHz + 22 + wN + 8, 47, { size: 15, color: C.ink2, weight: 600 });
+      ctx.font = `600 15px ${FONT.body}`;
+      const wL = lt ? ctx.measureText(lt).width + 10 : 0;
+      text(ctx, r.cents, pad + wHz + 22 + wN + 8 + wL, 47, { size: 13, color: C.comma, weight: 600 });
       text(ctx, fmtNum(db) + " dB", w - pad, 48, { size: 18, color: C.ink2, align: "right", weight: 600 });
       // logaritmik cetvel
       const ay = hh - 30;
@@ -694,9 +699,10 @@
       const rr = hi.red[0] === 1 ? "" : `  ·  oktava indirgenince ${hi.red[0]}:${hi.red[1]}`;
       text(ctx, `${hi.iv}${rr}`, sx0, iy + 48, { size: 14, color: C.ink2 });
       // nota + cent
-      text(ctx, "en yakın nota: " + hi.name, sx0, iy + 74, { size: 14, color: n === 1 ? C.tonic : C.wave, weight: 600 });
+      const nlab = `en yakın nota: ${hi.name} (${T.toLetter(hi.name)})`;
+      text(ctx, nlab, sx0, iy + 74, { size: 14, color: n === 1 ? C.tonic : C.wave, weight: 600 });
       ctx.font = `600 14px ${FONT.body}`;
-      const nw = ctx.measureText("en yakın nota: " + hi.name).width;
+      const nw = ctx.measureText(nlab).width;
       const c = hi.cents;
       text(ctx, Math.abs(c) < 0.5 ? "tam" : L.fmtCents(c), sx0 + nw + 12, iy + 74, { size: 14, color: C.comma, weight: 600 });
       // merdiven: 8 harmonik

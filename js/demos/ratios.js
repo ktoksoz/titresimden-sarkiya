@@ -636,7 +636,7 @@
         const semis = m - 60, r = T.TUNINGS[sys][semis], f = fr(m, sys);
         const dev = T.cents(r) - semis * 100;
         tbody.append(h("tr",
-          h("td", nm), h("td", ratioText(r, sys, semis)), h("td", fmtNum(f, 2) + " Hz"),
+          h("td", `${nm} (${T.toLetter(nm)})`), h("td", ratioText(r, sys, semis)), h("td", fmtNum(f, 2) + " Hz"),
           h("td", { class: Math.abs(dev) > 0.05 ? "c-comma" : "" }, Math.abs(dev) < 0.05 ? "0" : fmtCents(dev, 1))));
       });
       const b5 = beat5(sys);
@@ -807,7 +807,8 @@
       const nn = T.nearest(F1 * ratio);
       // Do'nun üstünde küçük ikili, küçük üçlü, küçük altılı ve küçük yedili bemolle yazılır (Re♭, Mi♭, La♭, Si♭)
       const nm = T.name(nn.midi, { flats: [1, 3, 8, 10].includes(nn.pc) });
-      return Math.abs(nn.cents) < 0.5 ? nm : `${nm} ${nn.cents > 0 ? "+" : "−"}${fmtNum(Math.abs(nn.cents), 1)} c`;
+      const both = `${nm} (${T.toLetter(nm)})`;
+      return Math.abs(nn.cents) < 0.5 ? both : `${both} ${nn.cents > 0 ? "+" : "−"}${fmtNum(Math.abs(nn.cents), 1)} c`;
     }
     const difficulty = (q) => (q === Infinity ? 1 : clamp(Math.log2(q) / 5, 0, 1));
     const curveColor = () => mix(C.tonic, C.tension, difficulty(close));
@@ -1074,7 +1075,7 @@
       const b3 = Math.abs(4 * f3 - 5 * f1), b5 = Math.abs(2 * f5 - 3 * f1);
       const wolf = Math.abs(d.fifth) > 15, bad = badness(d) > 0.7;
       const sgn = (v) => (v > 0.05 ? "+" : v < -0.05 ? "−" : "±") + fmtNum(Math.abs(v), 1);
-      info.innerHTML = `<b class="${bad ? "c-tension" : "c-tonic"}">${KEYS[sel]} majör</b>` +
+      info.innerHTML = `<b class="${bad ? "c-tension" : "c-tonic"}">${KEYS[sel]} majör (${T.toLetter(KEYS[sel])})</b>` +
         `<span>büyük üçlü <b>${sgn(d.third)} c</b> · saniyede ${fmtNum(b3, 1)} vuru</span>` +
         `<span>beşli <b>${sgn(d.fifth)} c</b>${wolf ? ' <b class="c-tension">kurt!</b>' : ""} · saniyede ${fmtNum(b5, 1)} vuru</span>`;
     }

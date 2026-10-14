@@ -93,7 +93,7 @@
       }
       board.piano.mark(a, "tonic", noteName(a));
       if (b == null) {
-        info.append(h("p.sc-big", noteName(a)), h("p.sc-sub", "Şimdi ikinci tuşa basın."));
+        info.append(h("p.sc-big", noteName(a), h("small.sc-let", T.toLetter(noteName(a)))), h("p.sc-sub", "Şimdi ikinci tuşa basın."));
         board.setNotes([]); return;
       }
       const s = Math.abs(b - a), iv = T.interval(s);
@@ -109,7 +109,7 @@
           h("div", h("b", `${iv.oran[0] * (s > 12 ? 2 : 1)}:${iv.oran[1]}`), h("span", "saf oran")),
           h("div", h("b", fmtNum(s * 100) + " c"), h("span", "eşit tamperaman")),
           h("div", h("b.c-comma", fmtNum(T.cents(ratio), 1) + " c"), h("span", "saf aralık"))),
-        h("p.sc-sub", `${noteName(a)} → ${noteName(b)}` + (tri ? " · triton: oktavın tam ortası" : "")));
+        h("p.sc-sub", `${noteName(a)} → ${noteName(b)} (${T.toLetter(noteName(a))} → ${T.toLetter(noteName(b))})` + (tri ? " · triton: oktavın tam ortası" : "")));
       chips.querySelectorAll(".sc-chip").forEach((c, i) => c.classList.toggle("on", i + 1 === s));
     }
     render();
@@ -139,7 +139,7 @@
       const acc = n.slice(0, 7).filter((m) => T.isBlack(m));
       info.innerHTML = "";
       info.append(
-        h("p.sc-big", noteName(tonic, flats) + " majör"),
+        h("p.sc-big", noteName(tonic, flats) + " majör", h("small.sc-let", T.toLetter(noteName(tonic, flats)))),
         h("p.sc-pattern", T.SCALES.major.steps.map((s) => h("span" + (s === 1 ? ".c-tension" : ""), STEP_LABEL[s]))),
         h("p.sc-sub", acc.length ? `Deseni korumak için ${acc.length} siyah tuş gerekiyor: ${acc.map((m) => noteName(m, flats)).join(", ")}` : "Yalnız beyaz tuşlar: hiç diyez ya da bemol yok."),
         h("p.sc-legend", h("i.c-tonic", "■"), " tonik  ", h("i.c-tension", "■"), " yeden (7.)  ", h("i.c-tension", "Y"), " yarım ses  ", h("i", "T"), " tam ses"));
@@ -280,7 +280,7 @@
         h("p.sc-big", m.ad, m.alt ? h("small", m.alt) : null),
         h("p.sc-pattern", T.modeSteps(k).map((s) => h("span" + (s === 1 ? ".c-tension" : ""), STEP_LABEL[s]))),
         h("p.sc-sub", `${NAMES[k]}'dan ${NAMES[k]}'ya beyaz tuşlar. Karakter: ${m.his}.`),
-        h("p.sc-char", "Ayırt edici nota: ", h("b" + (ct ? ".c-tension" : ".c-wave"), noteName(n[ci])), ` (${charIv.ad.toLocaleLowerCase("tr")})`));
+        h("p.sc-char", "Ayırt edici nota: ", h("b" + (ct ? ".c-tension" : ".c-wave"), `${noteName(n[ci])} (${T.toLetter(noteName(n[ci]))})`), `, ${charIv.ad.toLocaleLowerCase("tr")}`));
     }
     function play() {
       const n = notes();
@@ -606,7 +606,7 @@
         setTimeout(() => { if (quiz) nextQuiz(); }, 1100);
       } else {
         piano.mark(m, "tension", "");
-        info.querySelector(".nt-pos").textContent = `O ${T.name(m)}. Tekrar deneyin. (${score[0]}/${score[1]})`;
+        info.querySelector(".nt-pos").textContent = `O ${T.withLetter(m)}. Tekrar deneyin. (${score[0]}/${score[1]})`;
       }
     }
     const quizBtn = h("button.btn", { type: "button", onclick: () => {

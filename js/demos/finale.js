@@ -59,7 +59,7 @@
       for (let b = 0; b < 4; b++) {
         const c = chordAt(b * PER_BAR);
         head.append(h("span.cp-chord", { style: { "--c": `var(--${FN_COLOR[T.FUNCTION[c.deg]]})` }, "data-bar": b },
-          h("b", c.name), h("small", c.roman)));
+          h("b", c.name), h("small", c.roman + " · " + T.toLetter(c.name))));
       }
       grid.innerHTML = "";
       cells = [];

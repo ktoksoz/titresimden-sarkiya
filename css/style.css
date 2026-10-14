@@ -622,3 +622,8 @@ body.narrating #deck { bottom: calc(var(--bar-h) + 58px); transition: bottom .2s
 .text .cover-meta a { color: var(--muted); }
 .license { font-size: .78rem; color: var(--muted); margin: .7rem 0 0; }
 .text p.license { color: var(--muted); }
+/* piyano tuşu etiketi: solfej + altında harf adı */
+.piano .kl { display: flex; flex-direction: column; align-items: center; line-height: 1.15; }
+.piano .kl small { font-size: .82em; font-weight: 500; opacity: .62; }
+/* solfej adının yanında harf adı (C, Am…) */
+.ch-let, .sc-let { margin-left: .4em; font-size: .5em; font-weight: 500; color: var(--ink-2); font-family: var(--f-body); letter-spacing: 0; }

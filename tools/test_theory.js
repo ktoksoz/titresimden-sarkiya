@@ -82,6 +82,14 @@ eq("Unison, çevresindeki en pürüzsüz nokta", r(0) < r(0.3) && r(0) < r(1), t
 eq("7. harmonik −31,2 cent", T.nearest(T.mtof(36) * 7).cents, -31.17, 0.01);
 eq("5. harmonik −13,7 cent", T.nearest(T.mtof(36) * 5).cents, -13.69, 0.01);
 
+// Harf adları
+eq("La4 harfle A4", T.letter(69), "A4");
+eq("Si♭4 harfle B♭4", T.letter(70, { flats: true }), "B♭4");
+eq("Orta Do: Do4 (C4)", T.withLetter(60), "Do4 (C4)");
+eq("Lam akoru harfle Am", T.chordLetter(57, "min"), "Am");
+eq("Sol7 (G7)", T.chordBoth(67, "dom7"), "Sol7 (G7)");
+eq("Metinde harfe çevirme", T.toLetter("Do7/Mi, Si♭♭ ve Lam"), "C7/E, B♭♭ ve Am");
+
 // Tamperamanlar
 Object.entries(T.TEMPERAMENTS).forEach(([k, t]) => eq(`${t.ad}: 12 beşli = 7 oktav (8400 c)`, t.fifths.reduce((a, b) => a + b), 8400, 1e-9));
 eq("Pisagor kurt beşlisi ≈ 678,49 c", T.TEMPERAMENTS.pythagorean.fifths[8], 678.495, 1e-3);

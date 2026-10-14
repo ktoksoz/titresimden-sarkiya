@@ -138,8 +138,8 @@
         h("div.ch-brace" + (fifthTense ? ".tense" : ""), h("span", inf.fi[0]), h("small", inf.fi[1] + " yarım ses")));
       const chName = sp[0].name + T.CHORDS[type].sym;
       info.innerHTML = "";
-      info.append(h("p.ch-sym", acc(chName)), h("p.ch-full", acc(`${sp[0].name} ${T.CHORDS[type].ad.toLocaleLowerCase("tr")}`)),
-        h("p.ch-notes", sp.map((n) => n.name).join(", ")), h("p.ch-desc", inf.d));
+      info.append(h("p.ch-sym", acc(chName), h("small.ch-let", acc(T.toLetter(chName)))), h("p.ch-full", acc(`${sp[0].name} ${T.CHORDS[type].ad.toLocaleLowerCase("tr")}`)),
+        h("p.ch-notes", acc(sp.map((n) => `${n.name} (${T.toLetter(n.name)})`).join(", "))), h("p.ch-desc", inf.d));
     }
     function play() { strumThenBlock(notes()); }
     render();
@@ -195,8 +195,8 @@
       invLab.append(h("b", INV_AD[inv]), ` · basta ${INV_BASS[sp[0].role]}`);
       info.innerHTML = "";
       const sym = "Do" + T.CHORDS[type].sym + (inv ? "/" + sp[0].name : "");
-      info.append(h("p.ch-sym", acc(sym)), h("p.ch-full", T.CHORDS[type].ad + (inv ? ", " + INV_AD[inv].toLocaleLowerCase("tr") : "")),
-        h("p.ch-notes", sp.map((n) => n.name).join(", ")), h("p.ch-desc", SEV_INFO[type]));
+      info.append(h("p.ch-sym", acc(sym), h("small.ch-let", acc(T.toLetter(sym)))), h("p.ch-full", T.CHORDS[type].ad + (inv ? ", " + INV_AD[inv].toLocaleLowerCase("tr") : "")),
+        h("p.ch-notes", acc(sp.map((n) => `${n.name} (${T.toLetter(n.name)})`).join(", "))), h("p.ch-desc", SEV_INFO[type]));
       if (type === "dom7") info.append(h("p.ch-desc.c-tension", "Mi ile Si♭ arasındaki triton kırmızıyla işaretli."));
     }
     function play() { strumThenBlock(chordNotes().map((n) => n.m), 0.11); }
@@ -249,7 +249,7 @@
       fnBar.dataset.on = fn;
       const nm = T.chordName(dc.root, dc.type);
       const say = { tonic: "dinlenme, varış hissi", sub: "evden uzaklaşma", dom: "gerilim, toniğe dönme isteği" }[fn];
-      setInfo(fn, dc.roman, `${nm} ${T.CHORDS[dc.type].ad.toLocaleLowerCase("tr")}`, `${FN_AD[fn][0].toLocaleUpperCase("tr") + FN_AD[fn].slice(1)}: ${say}.`);
+      setInfo(fn, dc.roman, `${nm} (${T.chordLetter(dc.root, dc.type)}) ${T.CHORDS[dc.type].ad.toLocaleLowerCase("tr")}`, `${FN_AD[fn][0].toLocaleUpperCase("tr") + FN_AD[fn].slice(1)}: ${say}.`);
       Snd.chord(ns.map(T.mtof), { gain: 0.32, dur: 1.2, strum: 0.025 });
     }
 
@@ -422,7 +422,7 @@
       if (/[♯♭]/.test(nm)) cName.append(sv("tspan", { class: "acc" }, nm.match(/[♯♭]/)[0]));
       cSub.textContent = "majör";
       panel.innerHTML = "";
-      panel.append(h("p.ch-sym", acc(name + " majör")), h("p.ch-full", acc("Akraba minör: " + K.minor.replace(/m$/, "") + " minör")));
+      panel.append(h("p.ch-sym", acc(name + " majör"), h("small.ch-let", acc(T.toLetter(name)))), h("p.ch-full", acc("Akraba minör: " + K.minor.replace(/m$/, "") + " minör (" + T.toLetter(K.minor) + ")")));
       let sigText;
       if (K.acc === 0) sigText = "Donanım yok: diyez de bemol de yok.";
       else if (sel === 6) sigText = "6 diyez (Fa♯ majör) ya da 6 bemol (Sol♭ majör). Eşit tamperamanda aynı tuşlar.";
@@ -541,7 +541,7 @@
       const vs = voice(dc.root, T.CHORDS[type].iv, 57);
       vs.forEach((m) => piano.mark(m, FN_CLS[fn], T.pcOf(m) === T.pcOf(dc.root) ? ROMAN_OF(deg, type) : ""));
       now.innerHTML = "";
-      now.append(h("b.c-" + (fn === "sub" ? "wave" : fn === "dom" ? "tension" : "tonic"), T.chordName(dc.root, type)), ` ${FN_AD[fn]}`);
+      now.append(h("b.c-" + (fn === "sub" ? "wave" : fn === "dom" ? "tension" : "tonic"), T.chordBoth(dc.root, type)), ` ${FN_AD[fn]}`);
     }
     // ses: vuruş başına
     function step(i, time) {

@@ -38,7 +38,10 @@
     function setLabels(mode) {
       keyEls.forEach((k, m) => {
         const show = mode === "all" ? !T.isBlack(m) : mode === "c" ? T.pcOf(m) === 0 : false;
-        k.querySelector(".kl").textContent = show ? T.name(m, { octave: mode === "c" }) : "";
+        // solfej adının altında küçük harfle uluslararası adı: Do4 / C4
+        const kl = k.querySelector(".kl");
+        kl.textContent = "";
+        if (show) kl.append(T.name(m, { octave: mode === "c" }), h("small", T.letter(m, { octave: mode === "c" })));
       });
     }
     setLabels(labels);
