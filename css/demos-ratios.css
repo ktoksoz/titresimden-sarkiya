@@ -1,0 +1,30 @@
+/* 2. bölüm (Oranlar ve akort) demo stilleri */
+
+/* perde sarmalı: 12 perde sınıfı düğmesi */
+.ph-notes { display: inline-flex; flex-wrap: wrap; gap: 3px; }
+.ph-note {
+  min-width: 2.5em; padding: 0.28em 0.45em; cursor: pointer;
+  border: 1px solid var(--line); border-radius: var(--r-sm);
+  background: #efe4cc; color: #2b1714; font-weight: 600; font-size: 0.8rem;
+}
+.ph-note.blk { background: #1e100d; color: var(--ink-2); }
+.ph-note:hover { border-color: var(--brass); }
+.ph-note.on { background: var(--tonic); color: #2a1608; border-color: var(--tonic); }
+
+/* akort sistemleri: tablo şeridi */
+.tu-info {
+  display: flex; flex-wrap: wrap; align-items: flex-end; gap: 6px 24px;
+  padding: 8px 16px 10px; border-top: 1px solid var(--line-soft);
+}
+.tu-table { flex: 1 1 320px; }
+.tu-table td:nth-child(2) { color: var(--ink-2); }
+.tu-note { margin: 0; font-size: 0.85rem; color: var(--ink-2); }
+
+.controls .readout { font-size: 0.86rem; color: var(--ink-2); }
+
+@media (max-width: 860px) {
+  .tu-stage .fill { min-height: 260px; }
+  .tu-table { font-size: 0.82rem; }
+  .tu-table th, .tu-table td { padding: 4px 6px; }
+  .ph-note { min-width: 2.2em; font-size: 0.74rem; }
+}

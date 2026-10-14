@@ -1,0 +1,60 @@
+/* 3. bölüm: gamlar ve modlar */
+.sc-main { display: flex; flex-direction: column; justify-content: flex-end; gap: 10px; padding: 18px 22px 22px; }
+.sc-info { flex: 1; min-height: 0; display: flex; flex-direction: column; justify-content: center; gap: 6px; }
+.sc-big {
+  margin: 0; font-family: var(--f-display); font-weight: 600; line-height: 1.05;
+  font-size: clamp(1.9rem, 3.2vw, 3rem); color: var(--ink);
+}
+.sc-big small { font-family: var(--f-body); font-size: 0.42em; font-weight: 500; color: var(--muted); margin-left: 0.6em; }
+.sc-sub { margin: 0; color: var(--ink-2); font-size: 0.95rem; max-width: 52ch; }
+.sc-pattern { margin: 2px 0 4px; display: flex; gap: 10px; font-size: 1.25rem; font-weight: 700; color: var(--ink-2); letter-spacing: 0.02em; }
+.sc-pattern .c-tension, .sc-pattern .c-wave { font-weight: 700; }
+.sc-legend { margin: 4px 0 0; font-size: 0.8rem; color: var(--muted); }
+.sc-legend i { font-style: normal; font-weight: 700; }
+.sc-char { margin: 0; font-size: 0.95rem; color: var(--ink-2); }
+.sc-lab { color: var(--ink-2); font-size: 0.86rem; }
+
+.sc-facts { display: flex; flex-wrap: wrap; gap: 8px 28px; margin: 6px 0 4px; }
+.sc-facts div { display: flex; flex-direction: column; }
+.sc-facts b { font-size: 1.5rem; font-weight: 600; color: var(--ink); font-variant-numeric: tabular-nums; line-height: 1.2; }
+.sc-facts span { font-size: 0.78rem; color: var(--muted); }
+
+.sc-chips { display: flex; flex-wrap: wrap; gap: 4px; }
+.sc-chip {
+  min-width: 2.4em; padding: 0.25em 0.5em; border-radius: var(--r-sm); cursor: pointer;
+  border: 1px solid var(--line); background: rgba(20, 9, 7, 0.4); color: var(--ink-2); font-weight: 600; font-size: 0.84rem;
+}
+.sc-chip:hover { border-color: var(--brass); color: var(--ink); }
+.sc-chip.on { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+
+.sc-board { position: relative; flex: none; }
+.sc-bridges { display: block; width: 100%; height: 64px; overflow: visible; }
+.sc-step { font-family: var(--f-body); font-size: 13px; font-weight: 700; }
+.sc-step.on { font-size: 16px; }
+.piano .key.lit.white { background: linear-gradient(180deg, #f8d98a, #f6ecd6 70%); }
+.piano .key.lit.black { background: linear-gradient(180deg, #6b4a1e, #3f2820); box-shadow: 0 0 14px rgba(242,190,75,.6); }
+
+/* modlar */
+.sc-moderow { flex: 1; min-height: 0; display: flex; align-items: center; gap: clamp(14px, 3vw, 40px); }
+.sc-diskwrap { flex: none; height: 100%; max-height: 300px; min-height: 180px; aspect-ratio: 1; }
+.sc-disk { width: 100%; height: 100%; touch-action: none; cursor: grab; user-select: none; }
+.sc-disk:active { cursor: grabbing; }
+.sc-dnote { font-family: var(--f-body); font-size: 15px; font-weight: 700; pointer-events: none; }
+.sc-dstep { font-family: var(--f-body); font-size: 11px; font-weight: 700; pointer-events: none; }
+.sc-dcenter { font-family: var(--f-display); font-size: 17px; font-style: italic; font-weight: 600; pointer-events: none; }
+.sc-modeinfo { justify-content: center; }
+
+/* pentatonik: notaların izi */
+.sc-trail { flex: 1; min-height: 120px; position: relative; }
+.sc-trail canvas { position: absolute; inset: 0; width: 100%; height: 100%; }
+
+@media (max-width: 860px) {
+  .sc-main { padding: 14px 12px 16px; }
+  .sc-moderow { flex-direction: column; align-items: stretch; }
+  .sc-diskwrap { height: auto; width: min(260px, 70vw); max-height: none; align-self: center; }
+  .piano .mk { font-size: 0.56rem; }
+  .sc-bridges { height: 54px; }
+  .sc-step { font-size: 11px; }
+}
+/* işaretli tuşta oktav etiketi yerine nota adı */
+.sc-board .piano .key[class*="m-"]:not(.m-dim) .kl { display: none; }

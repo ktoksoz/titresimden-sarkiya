@@ -1,0 +1,35 @@
+/* 1. bölüm (Ses nedir?) demo stilleri */
+
+/* hazır frekans çipleri */
+.osc-presets { display: inline-flex; flex-wrap: wrap; gap: 6px; }
+.chip-btn { background: transparent; cursor: pointer; font: inherit; font-size: 0.8rem; }
+.chip-btn:hover { border-color: var(--brass); color: var(--ink); }
+
+/* uyarı ve dipnotlar */
+.snd-warn {
+  margin: 0; padding: 8px 16px 12px; font-size: 0.82rem; color: var(--muted);
+  background: rgba(30, 14, 11, 0.45);
+}
+.snd-warn::before { content: "⚠ "; color: var(--brass-hi); }
+.snd-note { font-size: 0.8rem; color: var(--muted); }
+
+/* toplamsal sentez: üstte dalga, altta çubuklar */
+.add-wrap { display: grid; grid-template-rows: 1fr 1.1fr; }
+.add-wave, .add-bars { position: relative; min-height: 0; }
+.add-wave canvas, .add-bars canvas { position: absolute; inset: 0; width: 100%; height: 100%; }
+.add-bars { border-top: 1px solid var(--line-soft); }
+.add-bars canvas:focus-visible { outline-offset: -3px; }
+
+/* harmonik düğmeleri */
+.ot-btns { display: flex; flex-wrap: wrap; gap: 6px; }
+.ot-btn { display: inline-flex; flex-direction: column; align-items: center; gap: 0; padding: 0.3em 0.7em; min-width: 3.4em; line-height: 1.2; }
+.ot-btn b { font-size: 0.95rem; }
+.ot-btn small { font-size: 0.68rem; color: var(--muted); font-weight: 500; }
+.ot-btn.fund b { color: var(--tonic); }
+.ot-btn.on { background: rgba(93, 184, 163, 0.14); border-color: var(--wave); color: var(--ink); }
+.ot-btn.fund.on { background: rgba(242, 190, 75, 0.14); border-color: var(--tonic); }
+
+@media (max-width: 860px) {
+  .add-wrap { grid-template-rows: 1fr 1fr; }
+  .ot-btn { min-width: 2.8em; padding: 0.25em 0.5em; }
+}

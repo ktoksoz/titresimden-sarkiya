@@ -1,0 +1,595 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Titreşimden Şarkıya</title>
+<meta name="author" content="Koray Toksöz">
+<meta name="description" content="Sesin fiziğinden akorlara, makamlardan ritme: müzik teorisini her slaytta dinleyip oynayarak öğrenin.">
+<meta name="theme-color" content="#2b1714">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..900;1,6..96,400..900&family=Hanken+Grotesk:ital,wght@0,400..700;1,400..700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css?v=202610141713">
+<link rel="stylesheet" href="css/demos-sound.css?v=202610141713">
+<link rel="stylesheet" href="css/demos-ratios.css?v=202610141713">
+<link rel="stylesheet" href="css/demos-scales.css?v=202610141713">
+<link rel="stylesheet" href="css/demos-chords.css?v=202610141713">
+<link rel="stylesheet" href="css/demos-rhythm.css?v=202610141713">
+<link rel="stylesheet" href="css/demos-finale.css?v=202610141713">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cellipse cx='14' cy='22' rx='7' ry='5' transform='rotate(-22 14 22)' fill='%23f2be4b'/%3E%3Cpath d='M20 21V4' stroke='%23f2be4b' stroke-width='2.4'/%3E%3C/svg%3E">
+</head>
+<body>
+
+<main id="deck">
+
+<!-- ================= 0. GİRİŞ ================= -->
+<section class="slide center cover" data-chapter="0" data-demo="cover" data-title="Kapak" id="kapak">
+  <div class="stage bare"></div>
+  <div class="cover-text">
+    <h1>Titreşimden<br>şarkıya</h1>
+    <p>Havada bir kıpırtı nasıl ezgiye, akora, ritme dönüşür? Sesin fiziğinden makamlara, beşliler çemberinden aksak usullere kadar müziğin kurallarını her slaytta dinleyerek ve çalarak keşfedin.</p>
+    <p class="byline">Koray Toksöz</p>
+    <div class="cover-actions">
+      <button class="btn primary big" type="button" onclick="Narrator.start()">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 10v4h4l5 4V6L8 10z" fill="currentColor"/><path d="M16.5 8.5a5 5 0 0 1 0 7M19 6a8.5 8.5 0 0 1 0 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        Sesli anlatımla başla
+      </button>
+      <button class="btn big ghost" type="button" onclick="Snd.unlock(); Deck.next()">Kendi hızımda gez</button>
+    </div>
+    <p class="hint">Tellerin üzerinde gezinin ya da dokunun. Kulaklık ya da hoparlör açık olsun. Anlatımlı tur yaklaşık 15 dakika sürer ve slaytlar kendiliğinden ilerler; istediğiniz an durup deneylerle oynayabilirsiniz. Kendi hızınızda gezerken <kbd>→</kbd> ile ilerleyin.</p>
+    <div class="cover-meta">
+      <a class="gh-link" href="https://github.com/ktoksoz/titresimden-sarkiya" target="_blank" rel="noopener"><svg viewBox="0 0 16 16" aria-hidden="true"><path fill="currentColor" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg><span>Kaynak kodu GitHub'da</span></a>
+      <a class="lic" href="https://creativecommons.org/licenses/by/4.0/deed.tr" target="_blank" rel="license noopener" title="İçerik: Creative Commons Atıf 4.0">
+        <img src="img/cc-cc.svg" alt="Creative Commons" width="20" height="20"><img src="img/cc-by.svg" alt="Atıf" width="20" height="20">
+        <span>İçerik CC BY 4.0 · Kod MIT</span>
+      </a>
+    </div>
+  </div>
+  <aside class="notes"><ul>
+    <li>Teller pentatonik gamdan notalar çalıyor: hangi teli çekerseniz çekin uyumlu duyulur. Bunun nedenini 3. bölümde göreceğiz.</li>
+    <li>Yol haritası: ses fiziği → oranlar ve akort → gamlar → akorlar → ritim → hepsi bir arada.</li>
+    <li>Kısayollar: N notlar, T metni gizle, O tüm slaytlar, F tam ekran, M sesi kapat.</li>
+  </ul></aside>
+</section>
+
+<!-- ================= 1. SES NEDİR? ================= -->
+<section class="slide" data-chapter="1" data-demo="vibration" id="titresim">
+  <div class="text">
+    <h2>Ses bir titreşimdir</h2>
+    <p class="lead">Hoparlörün zarı ileri gittiğinde önündeki havayı sıkıştırır, geri çekildiğinde seyreltir. Bu sıkışma ve seyrelme halkaları saniyede yaklaşık 343 metre hızla kulağımıza ulaşır.</p>
+    <p>Hava molekülleri sesle birlikte yolculuk etmez; her biri yerinde ileri geri sallanıp itmeyi komşusuna aktarır. Stadyumdaki "dalga" gibi: insanlar yerinde kalır, dalga tribünü dolaşır.</p>
+    <p>Kulak zarı bu basınç değişimleriyle birlikte titreşir. İç kulaktaki <strong>salyangoz</strong> titreşimi sinir sinyaline çevirir. Duyduğumuz her şey, havadaki basıncın zamanla nasıl değiştiğinin beyindeki yorumudur.</p>
+    <p class="try">Frekansı değiştirin: zar hızlandıkça sıkışma halkaları sıklaşır. Alttaki eğri aynı anda basıncı gösterir.</p>
+  </div>
+  <div class="stage"></div>
+  <aside class="notes"><ul>
+    <li>Moleküllerin hareketi dalganın yayılma yönündedir (boyuna dalga); tel ve su dalgaları ise enine dalgadır.</li>
+    <li>Ses boşlukta yayılmaz: uzayda patlamalar sessizdir.</li>
+    <li>Suda ses havadakinin yaklaşık 4,3 katı hızlıdır (~1480 m/s).</li>
+  </ul></aside>
+</section>
+
+<section class="slide" data-chapter="1" data-demo="oscillator" id="frekans">
+  <div class="text">
+    <h2>Frekans ve genlik</h2>
+    <p class="lead">Bir sesin iki temel özelliği var: ne kadar sık titreştiği ve ne kadar güçlü titreştiği.</p>
+    <p><strong>Frekans</strong>, saniyedeki titreşim sayısıdır ve hertz (Hz) ile ölçülür. Kulak onu <em>perde</em> olarak duyar: frekans arttıkça ses incelir. Orkestralar akordu çoğunlukla 440 Hz'lik La notasına göre yapar.</p>
+    <p><strong>Genlik</strong>, basınç değişiminin büyüklüğüdür; kulak onu ses şiddeti olarak duyar. Ölçek logaritmiktir: her +6 desibel genliği yaklaşık iki katına çıkarır.</p>
+    <p>Algımız da logaritmiktir. 110'dan 220 Hz'e çıkmak ile 440'tan 880 Hz'e çıkmak aynı "mesafe" gibi duyulur: ikisi de bir oktavdır.</p>
+    <p class="try">Osilatörü açın, frekansı ve genliği kaydırın. Osiloskopta dalganın sıklaştığını, ekranda en yakın nota adını görün.</p>
+  </div>
+  <div class="stage"></div>
+  <aside class="notes"><ul>
+    <li>A4 = 440 Hz standardı 1939 Londra konferansında benimsendi, 1955'te ISO 16 oldu. Bazı orkestralar 442–443 Hz'e akort eder.</li>
+    <li>Kaydırıcı logaritmik: 20 Hz'den 20 kHz'e on oktav var.</li>
+    <li>Düşük frekanslarda (50 Hz altı) küçük hoparlörler neredeyse hiç ses vermez; dizüstü bilgisayarda duyulmayabilir.</li>
+  </ul></aside>
+</section>
+
+<section class="slide" data-chapter="1" data-demo="hearing" id="duyma-siniri">
+  <div class="text">
+    <h2>Kulağınızın sınırı nerede?</h2>
+    <p class="lead">İnsan kulağının duyma aralığı ders kitaplarında 20 Hz ile 20.000 Hz arası olarak geçer. Ama bu, genç ve sağlıklı bir kulak için üst sınırdır.</p>
+    <p>Yaşla birlikte en önce yüksek frekanslar kaybolur (<strong>presbiakuzi</strong>). Çoğu yetişkin 15–17 kHz'in üstünü duymaz; bu tamamen normaldir ve müzik dinlemeyi neredeyse hiç etkilemez. Piyanonun en tiz notası bile yaklaşık 4.186 Hz'dir.</p>
+    <p>Kulak her frekansa eşit duyarlı değildir: en hassas olduğumuz bölge, konuşmanın ve bebek ağlamasının bulunduğu 2–5 kHz arasıdır.</p>
+    <p class="try">Ses düzeyini önce düşük tutun. Taramayı başlatın ve sesi duymadığınız an düğmeye basın.</p>
+  </div>
+  <div class="stage"></div>
+  <aside class="notes"><ul>
+    <li>Sonuç hoparlöre de bağlıdır: dizüstü hoparlörleri 15 kHz üstünü zayıf verir. Kulaklıkla deneyin.</li>
+    <li>Toplulukta herkes aynı anda el kaldırsın: kim nerede duymayı bırakıyor? Gençler genellikle en son bırakır.</li>
+    <li>Yüksek sesle uzun süre müzik dinlemek de aynı bölgeyi (4 kHz civarı) yıpratır.</li>
+  </ul></aside>
+</section>
+
+<section class="slide" data-chapter="1" data-demo="timbre" id="tini">
+  <div class="text">
+    <h2>Tını: aynı nota, farklı ses</h2>
+    <p class="lead">Keman ve flüt aynı La'yı, aynı yükseklikte çalsa da hangisinin çaldığını hemen anlarız. Fark nereden geliyor?</p>
+    <p>Gerçek çalgılar tek bir frekans üretmez. Temel frekansın yanında onun 2, 3, 4… katı olan <strong>harmonikler</strong> de titreşir. Hangi harmoniğin ne kadar güçlü olduğu, sesin parmak izidir: buna <strong>tını</strong> denir.</p>
+    <p>Flütün sesi temel frekansa yakındır, yumuşaktır. Klarnette tek sayılı harmonikler baskındır, bu yüzden "boğuk" gelir. Kemanın yayı teli testere dişine benzer bir hareketle çeker, bu da zengin, parlak bir harmonik dizisi verir.</p>
+    <p>Tınıyı yalnız harmonikler belirlemez: sesin nasıl başlayıp söndüğü (zarf) da önemlidir. Piyanonun ilk vuruşunu kesip dinleyen biri onu tanımakta zorlanır.</p>
+    <p class="try">Çalgılar arasında geçiş yapın: aynı La'nın dalga biçimi ve harmonik çubukları nasıl değişiyor?</p>
+  </div>
+  <div class="stage"></div>
+  <aside class="notes"><ul>
+    <li>Buradaki çalgılar gerçek kayıt değil, harmonik oranlarıyla yapılmış basit taklitler. Amaç fikri göstermek.</li>
+    <li>Klarnet tek taraflı kapalı bir boru gibi davranır; bu yüzden çift sayılı harmonikleri zayıftır.</li>
+  </ul></aside>
+</section>
+
+<section class="slide" data-chapter="1" data-demo="additive" id="additive">
+  <div class="text">
+    <h2>Sesini kendin kur</h2>
+    <p class="lead">Matematikçi <strong>Fourier</strong>'nin 1822'de yayımladığı fikir: her periyodik dalga, sinüs dalgalarının toplamıdır.</p>
+    <p>Tersi de doğru: yeterince sinüsü doğru oranlarla toplarsak istediğimiz dalgayı kurabiliriz. Buna toplamsal (<strong>additive</strong>) sentez denir.</p>
+    <ul>
+      <li><strong>Testere dişi:</strong> bütün harmonikler, n. harmoniğin genliği 1/n.</li>
+      <li><strong>Kare dalga:</strong> yalnız tek harmonikler (1, 3, 5…), genlik 1/n.</li>
+      <li><strong>Üçgen dalga:</strong> yine tek harmonikler, ama çok daha hızlı sönen 1/n² genlikle; bu yüzden yumuşak duyulur.</li>
+    </ul>
+    <p>Kulağımız da benzer bir analiz yapar: salyangozun farklı bölgeleri farklı frekanslarda titreşir. Bir anlamda her an bir <strong>spektrum</strong> dinliyoruz.</p>
+    <p class="try">Harmonik çubuklarını yukarı aşağı sürükleyin ya da bir hazır dalga seçin. Dalga biçimi ve ses anında değişir.</p>
+  </div>
+  <div class="stage"></div>
+  <aside class="notes"><ul>
+    <li>Kare dalganın köşelerindeki küçük taşmalar (Gibbs olayı) sonlu sayıda harmonikle hiçbir zaman tamamen kaybolmaz.</li>
+    <li>Kulak, harmoniklerin faz farklarına neredeyse duyarsızdır: dalga biçimi değişse de ses aynı kalabilir.</li>
+  </ul></aside>
+</section>
+
+<section class="slide" data-chapter="1" data-demo="overtones" id="harmonik-dizisi">
+  <div class="text">
+    <h2>Harmonik dizisi</h2>
+    <p class="lead">Bir tel bütün olarak titreşirken aynı anda yarıları, üçte birleri, dörtte birleri de titreşir. Her bölünme bir harmonik verir.</p>
+    <p>Harmoniklerin perdeleri bize tanıdık gelir. Temel ses Do ise 2. harmonik bir oktav üstteki Do, 3. harmonik Sol, 4. yine Do, 5. Mi, 6. Sol olur. İlk altı harmonik, bir Do majör akorunu oluşturur.</p>
+    <p>Yani müziğin en temel aralıkları (<strong>oktav 2:1</strong>, <strong>beşli 3:2</strong>, <strong>dörtlü 4:3</strong>, <strong>büyük üçlü 5:4</strong>) her doğal seste zaten saklı. Bu, tınıdan oranlara uzanan köprü.</p>
+    <p class="try">Bir harmoniğe tıklayın: tel o kalıpta titreşir, oranı ve en yakın nota adı görünür. "Sırayla çal" dizinin tamamını dinletir.</p>
+  </div>
+  <div class="stage"></div>
+  <aside class="notes"><ul>
+    <li>Gitaristler bunu "flajole" olarak bilir: teli tam ortasına hafifçe dokunarak çalınca bir oktav üst duyulur.</li>
+    <li>7. harmonik, eşit tamperamanlı Si♭'den yaklaşık 31 cent pestir; bu yüzden Batı müziğinde "akort dışı" sayılır.</li>
+  </ul></aside>
+</section>
+
+<!-- ================= 2. ORANLAR VE AKORT ================= -->
+<section class="slide" data-chapter="2" data-demo="monochord" id="monokord">
+  <div class="text">
+    <h2>Pisagor'un monokordu</h2>
+    <p class="lead">Rivayete göre Pisagor bir demircinin önünden geçerken çekiçlerin bazılarının birlikte hoş, bazılarının kötü ses çıkardığını fark etti.</p>
+    <p>Hikâye büyük ihtimalle efsane, ama arkasındaki deney gerçek: <strong>monokord</strong>, bir kutunun üzerine gerilmiş tek bir tel ve kaydırılabilen bir köprüden oluşur. Teli kısalttıkça perde yükselir; frekans tel boyuyla ters orantılıdır.</p>
+    <ul>
+      <li>Teli <strong>yarıdan</strong> bölünce (1/2) <strong>oktav</strong> çıkar: frekans 2:1.</li>
+      <li><strong>Üçte iki</strong> uzunluk <strong>tam beşli</strong> verir: 3:2.</li>
+      <li><strong>Dörtte üç</strong> uzunluk <strong>tam dörtlü</strong> verir: 4:3.</li>
+    </ul>
+    <p>Pisagorcular için bu çok çarpıcıydı: kulağa güzel gelen şey, küçük tam sayıların oranıydı. Evrenin de sayılarla düzenlendiğine inandılar.</p>
+    <p class="try">Köprüyü sürükleyin. Basit bir orana yaklaşınca kesir belirir ve iki tel parçası birlikte temiz duyulur.</p>
+  </div>
+  <div class="stage"></div>
+  <aside class="notes"><ul>
+    <li>Çekiç hikâyesi fiziksel olarak yanlış: çekicin sesi ağırlığıyla bu basit oranda değişmez. Ama tel ile çalışır.</li>
+    <li>Frekans ∝ 1/uzunluk: teli yarıya indirince frekans iki katına çıkar.</li>
+  </ul></aside>
+</section>
+
+<section class="slide" data-chapter="2" data-demo="consonance" id="konsonans">
+  <div class="text">
+    <h2>Konsonans ve dissonans</h2>
+    <p class="lead">Neden bazı aralıklar yumuşak, bazıları pürüzlü duyulur?</p>
+    <p>Frekansları çok yakın iki ses birlikte çalınınca ses şiddeti, aradaki fark kadar hızla dalgalanır: 440 ve 443 Hz saniyede 3 kez "vuruş" yapar. Buna <strong>vuru</strong> denir. Akortçular bu vuruyu sıfırlayarak çalışır.</p>
+    <p>Fark büyüdükçe vuru hızlanır ve bir noktadan sonra ayrı ayrı duyulmaz, bir <strong class="c-tension">pürüz</strong> olarak algılanır. 1965'te <strong>Plomp</strong> ve Levelt bu pürüzü ölçtü. Sonra William <strong>Sethares</strong> eğriyi harmonikli seslere genelleştirdi: iki sesin harmonikleri birbirine yakın düşüp çarpıştıkça pürüz artar.</p>
+    <p>Oktav, beşli ve dörtlü gibi basit oranlarda harmonikler çakışır, çarpışma azalır. Eğrideki <strong class="c-tonic">vadiler</strong> tam olarak bu oranlara denk gelir.</p>
+    <p class="try">İkinci sesi eğri üzerinde sürükleyin. Vuruyu dalgada izleyin, vadilere düşünce sesin nasıl durulduğunu dinleyin.</p>
+  </div>
+  <div class="stage"></div>
+  <aside class="notes"><ul>
+    <li>Konsonans kısmen kültürel de: Batı'da yüzyıllarca üçlüler dissonans sayıldı, bugün ise en tatlı aralıklardan.</li>
+    <li>Eğri, harmonik genlikleri 0,88ⁿ ile azalan altı harmonikli sesler için hesaplandı (Sethares modeli).</li>
+  </ul></aside>
+</section>
+
+<section class="slide" data-chapter="2" data-demo="pitchhelix" id="perde-cemberi">
+  <div class="text">
+    <h2>Oktav ve on iki perde</h2>
+    <p class="lead">Bir Do ile bir oktav üstündeki Do farklı frekanstadır, ama kulağımız onlara "aynı nota" der.</p>
+    <p>Bu yüzden perdeyi iki boyutlu düşünebiliriz. Yükseklik sürekli artar; ama her oktavda aynı noktaya döneriz. Bu dönen kimliğe <strong>kroma</strong> ya da perde sınıfı denir.</p>
+    <p>Batı müziği oktavı <strong>12 yarım sese</strong> böler: Do, Do♯, Re, Re♯, Mi, Fa, Fa♯, Sol, Sol♯, La, La♯, Si. On üçüncü adımda yeniden Do'ya, ama bir kat yukarıya varırız. Perdeleri bir sarmal üzerine dizersek her tur bir oktav olur; yukarıdan bakınca sarmal bir çembere dönüşür.</p>
+    <p class="try">Sarmalı döndürün ya da yukarıdan bakın. Bir notaya tıklayınca bütün oktavlardaki eşleri birlikte yanar.</p>
+  </div>
+  <div class="stage"></div>
+  <aside class="notes"><ul>
+    <li>Roger Shepard, sarmalın bu iki boyutunu kullanarak hiç bitmeden yükselen "Shepard tonu" yanılsamasını kurdu (1964).</li>
+    <li>Neden 12? Sonraki iki slayt cevap veriyor: 12, beşliler zincirinin "neredeyse" kapandığı sayı.</li>
+  </ul></aside>
+</section>
+
+<section class="slide" data-chapter="2" data-demo="comma" id="pisagor-komasi">
+  <div class="text">
+    <h2>Kapanmayan çember: Pisagor koması</h2>
+    <p class="lead">Do'dan başlayıp saf beşlilerle (3:2) yukarı çıkalım: Do, Sol, Re, La, Mi, Si, Fa♯… On ikinci adımda Si♯'ye, yani Do'ya ulaşmalıyız.</p>
+    <p>Ama ulaşamıyoruz. On iki saf beşli, yedi oktavı biraz aşar: (3/2)¹² ≈ 129,75 iken 2⁷ = 128. Aradaki fark <strong class="c-comma">Pisagor koması</strong>dır: yaklaşık <span class="num">23,46</span> cent, yani yarım sesin dörtte birine yakın.</p>
+    <p>Bu küçük fark, akort tarihinin bütün derdidir. Beşlileri saf tutarsak sarmal kapanmaz; çemberi kapatmak istersek beşlilerin bir kısmını ya da hepsini biraz daraltmamız gerekir.</p>
+    <p class="try">"Beşli ekle" ile zinciri adım adım kurun. On ikinci adımda Si♯ ile Do'yu art arda ve birlikte dinleyin: aradaki farkı vuru olarak duyacaksınız.</p>
+  </div>
+  <div class="stage"></div>
+  <aside class="notes"><ul>
+    <li>Kesin oran: 3¹² / 2¹⁹ = 531441 / 524288. Sayfadaki cent değeri bu orandan kodla hesaplanıyor.</li>
+    <li>Pisagor akortunda bu fark tek bir beşliye yüklenir; ortaya çıkan bozuk beşliye "kurt beşlisi" denir.</li>
+  </ul></aside>
+</section>
+
+<section class="slide" data-chapter="2" data-demo="tuning" id="akort-sistemleri">
+  <div class="text">
+    <h2>Üç akort, bir akor</h2>
+    <p class="lead">Çember kapanmadığına göre bir şeyden vazgeçmek zorundayız. Her akort sistemi farklı bir şeyden vazgeçer.</p>
+    <ul>
+      <li><strong>Pisagor akortu:</strong> beşliler saf (3:2). Ama büyük üçlüler geniş kalır (81:64, saf üçlüden ~22 cent tiz) ve sert duyulur.</li>
+      <li><strong>Saf akort:</strong> majör akor 4:5:6 oranında, pürüzsüz. Ama yalnız tek bir tonda; başka tona geçince bazı aralıklar bozulur.</li>
+      <li><strong>Eşit tamperaman:</strong> oktavı 12 eşit parçaya böler; her yarım ses 2<sup>1/12</sup> oranında. Hiçbir aralık (oktav dışında) tam saf değil, ama her ton aynı derecede "iyi".</li>
+    </ul>
+    <p>18. yüzyılda klavyeli çalgılar her tonda çalınabilsin diye "iyi" akortlar yaygınlaştı. <strong>Bach</strong>'ın <em>İyi Düzenlenmiş Klavye</em>'si 24 majör ve minör tonun her birinde bir prelüd ve füg içerir. Bugün piyanolar eşit tamperamanla akort edilir.</p>
+    <p class="try">Aynı Do majör akorunu üç sistemde çalın. Tabloda cent farklarını, dalgada vurunun hızını karşılaştırın.</p>
+  </div>
+  <div class="stage"></div>
+  <aside class="notes"><ul>
+    <li>Eşit tamperamanlı büyük üçlü (400 cent), saf üçlüden (386,3 cent) ~13,7 cent tizdir; dikkatli kulak bunu hafif bir vuru olarak duyar.</li>
+    <li>Bach'ın "iyi düzen"inin tam olarak hangi akort olduğu tartışmalı; eşit tamperaman olmayabilir.</li>
+    <li>Koro ve yaylı çalgılar akort sırasında doğal olarak saf aralıklara yaklaşır.</li>
+  </ul></aside>
+</section>
+
+<section class="slide" data-chapter="2" data-demo="makam" id="turk-muzigi">
+  <div class="text">
+    <h2>Türk müziği ve koma</h2>
+    <p class="lead">Batı oktavı 12 eşit yarım sese bölerken, Türk müziği kuramı tam sesi dokuz parçaya, oktavı ise yaklaşık 53 eşit parçaya böler.</p>
+    <p>Bu küçük birime <strong class="c-comma">koma</strong> denir (<strong>Holdrian</strong> koması, ≈<span class="num">22,64</span> cent). Bugün eğitimde en yaygın kullanılan <strong>Arel</strong>–Ezgi–Uzdilek sisteminde tam ses 9, bakiye 4, küçük mücenneb 5 koma sayılır.</p>
+    <p>Bir <strong>makam</strong> yalnız bir dizi değildir; ezginin hangi perdelerde durup nasıl ilerleyeceğini (seyrini) de tarif eder. Ama dizisi makamın rengini taşır. <strong>Hicaz</strong> dörtlüsü 5 + 12 + 5 komalık adımlarla ilerler. Batı'daki en yakın karşılığı yarım ses, artık ikili, yarım ses (100 + 300 + 100 cent) olur. Benzer, ama aynı değil.</p>
+    <p class="try">Hicaz dizisini ve Batı'daki karşılığını art arda dinleyin. Koma ızgarasında perdelerin nereye düştüğünü karşılaştırın.</p>
+    <details class="more"><summary>Kuram ile icra</summary>
+      <p>Arel–Ezgi–Uzdilek sistemi bir yazım ve öğretim kuramıdır. Usta icracılar perdeleri çoğu zaman bu değerlerden farklı, makama ve ezginin yönüne göre esneterek basar. Burada duyduğunuz, kuramın sentezlenmiş hâli.</p>
+    </details>
+  </div>
+  <div class="stage"></div>
+  <aside class="notes"><ul>
+    <li>Hicaz dörtlüsünün AEU rumuzu SA12S: küçük mücenneb (5) + artık ikili (12) + küçük mücenneb (5) = 22 koma = tam dörtlü.</li>
+    <li>Hicaz makamı dizisi: dügâhta hicaz dörtlüsü + nevâda rast beşlisi (T K S T = 9 + 8 + 5 + 9).</li>
+    <li>53 eşit bölümün bir "koması" (22,64 c), Pisagor koması (23,46 c) ve sintonik komaya (21,51 c) çok yakın. 53'ü cazip kılan da bu.</li>
+  </ul></aside>
+</section>
+
+<!-- ================= 3. GAMLAR VE MODLAR ================= -->
+<section class="slide" data-chapter="3" data-demo="intervals" id="araliklar">
+  <div class="text">
+    <h2>Aralıklar</h2>
+    <p class="lead">Müziğin kelime dağarcığı, iki nota arasındaki mesafelerdir.</p>
+    <p>Piyanoda yan yana iki tuş arasındaki mesafe bir <strong>yarım ses</strong>tir; aralarında bir tuş olanlar <strong>tam ses</strong>. Aralıkların adı, kaç yarım ses içerdiğine göre konur: küçük üçlü 3, büyük üçlü 4, tam beşli 7, oktav 12 yarım ses.</p>
+    <p>Her aralığın kendine has bir rengi vardır. Büyük üçlü aydınlık, küçük üçlü buruk, <strong>triton</strong> (6 yarım ses) huzursuz duyulur. Orta Çağ'da tritona "müzikteki şeytan" denildiği anlatılır.</p>
+    <p class="try">Önce bir tuşa, sonra ikincisine basın: aralığın adı, yarım ses sayısı ve saf oranı görünür.</p>
+  </div>
+  <div class="stage"></div>
+  <aside class="notes"><ul>
+    <li>Kulak eğitimi ipucu: tanıdık şarkı başlangıçları aralıkları ezberlemenin en kolay yolu.</li>
+    <li>"Diabolus in musica" adlandırması Orta Çağ'a dair yaygın bir anlatı; belgelenmesi zayıf.</li>
+  </ul></aside>
+</section>
+
+<section class="slide" data-chapter="3" data-demo="majorscale" id="major-gam">
+  <div class="text">
+    <h2>Majör gam</h2>
+    <p class="lead">Do'dan başlayıp yalnız beyaz tuşlara basarak bir oktav yükselin. Duyduğunuz, Batı müziğinin en tanıdık dizisi: majör gam.</p>
+    <p>Gamı tanımlayan notaların kendisi değil, aralarındaki <strong>adımların deseni</strong>dir: <strong>T T Y T T T Y</strong> (tam, tam, yarım, tam, tam, tam, yarım). Bu deseni hangi notadan başlatırsanız başlatın, aynı "majör" karakterini duyarsınız.</p>
+    <p>İlk nota <strong class="c-tonic">tonik</strong>tir: gamın evi. Yedinci nota toniğin yarım ses altındadır ve ona doğru çekilir; bu yüzden <strong class="c-tension">yeden</strong> denir.</p>
+    <p class="try">Bir başlangıç notası seçip "Gamı çal"a basın. Bilgisayar klavyesindeki A, S, D, F… tuşlarıyla kendiniz de çalabilirsiniz.</p>
+  </div>
+  <div class="stage"></div>
+  <aside class="notes"><ul>
+    <li>Sol majörde desen tutsun diye Fa yerine Fa♯ gerekir. Donanımlar (diyez/bemol sayısı) buradan doğar.</li>
+    <li>Solfej adları (Ut/Do, Re, Mi…) 11. yüzyılda Guido d'Arezzo'nun bir ilahinin hece başlarından türetildi.</li>
+  </ul></aside>
+</section>
+
+<section class="slide" data-chapter="3" data-demo="minor" id="minor">
+  <div class="text">
+    <h2>Minör gamlar</h2>
+    <p class="lead">Majör gamın üçüncü notasını yarım ses indirin: ışık bir anda değişir.</p>
+    <ul>
+      <li><strong>Doğal minör</strong> (T Y T T Y T T): La'dan La'ya beyaz tuşlar. Üçüncü, altıncı ve yedinci dereceler majöre göre küçüktür.</li>
+      <li><strong>Armonik minör</strong>: yedinci derece yarım ses yükseltilir. Böylece toniğe çekilen bir <strong class="c-tension">yeden</strong> kazanılır, ama altıncı ile yedinci arasında doğuya özgü renkte bir artık ikili açılır.</li>
+      <li><strong>Melodik minör</strong>: o artık ikiliyi yumuşatmak için altıncı derece de yükseltilir. Klasik müzikte inerken çoğunlukla doğal minöre dönülür.</li>
+    </ul>
+    <p class="try">Üç minör arasında geçiş yapın. Değişen dereceler klavyede renkle işaretlenir; farkı en çok gamın sonunda duyarsınız.</p>
+  </div>
+  <div class="stage"></div>
+  <aside class="notes"><ul>
+    <li>Armonik minörün 6–7 arasındaki artık ikilisi, Hicaz dörtlüsündeki geniş aralığı hatırlatır; önceki slayta köprü kurun.</li>
+    <li>"Minör hüzünlüdür" eşlemesi büyük ölçüde kültürel; birçok halk müziğinde minör diziler neşeli danslarda kullanılır.</li>
+  </ul></aside>
+</section>
+
+<section class="slide" data-chapter="3" data-demo="modes" id="modlar">
+  <div class="text">
+    <h2>Modlar: aynı notalar, farklı ev</h2>
+    <p class="lead">Beyaz tuşların hepsini kullanıp yalnızca başlangıç notasını değiştirin. Notalar aynı kalır, ama müzik bambaşka bir yere taşınır.</p>
+    <p>Çünkü adımların deseni kayar. Re'den başlayınca <strong>Dor</strong>, Mi'den <strong>Frig</strong>, Fa'dan <strong>Lidya</strong>, Sol'dan <strong>Miksolidya</strong>, La'dan <strong>Eol</strong> (doğal minör), Si'den <strong>Lokriya</strong> modu çıkar. Adlarını Antik Yunan bölgelerinden alırlar, ama bugünkü anlamları Orta Çağ kilise müziğinden gelir.</p>
+    <p>Her modun kendine özgü bir notası, onu majör ya da minörden ayıran bir rengi vardır: Dor'un büyük altılısı, Frig'in küçük ikilisi, Lidya'nın artık dörtlüsü.</p>
+    <p class="try">Diski çevirin: aynı yedi nota farklı bir tonikten çalınır. Karakteristik nota renkle işaretlenir.</p>
+  </div>
+  <div class="stage"></div>
+  <aside class="notes"><ul>
+    <li>Dor: pek çok caz ve folk ezgisi. Frig: flamenko. Lidya: film müziklerinde "uçma, rüya" sahneleri. Miksolidya: rock ve blues riffleri.</li>
+    <li>Frig dizisi, Türk müziğindeki Kürdi dizisine benzer.</li>
+  </ul></aside>
+</section>
+
+<section class="slide" data-chapter="3" data-demo="pentatonic" id="pentatonik">
+  <div class="text">
+    <h2>Pentatonik: her yerde aynı beş nota</h2>
+    <p class="lead">Piyanodaki siyah tuşlara rastgele basın. Ne çalarsanız çalın, kulağa hoş gelir.</p>
+    <p>Siyah tuşlar bir <strong>pentatonik</strong> gam oluşturur: oktavda beş nota, aralarında hiç yarım ses yok. Yarım ses olmayınca pürüzlü küçük ikililer ve gergin triton da olmaz; her nota her notayla iyi geçinir.</p>
+    <p>Bu beş nota, beşliler zincirinin ilk beş halkasıdır (ör. Do, Sol, Re, La, Mi). Basit ve güçlü oranlardan kurulduğu için Çin, Japonya, Batı Afrika, İskoç ve Anadolu halk müziklerinde, blues'ta ve çocuk şarkılarında birbirinden bağımsız olarak karşımıza çıkar.</p>
+    <p class="try">Siyah tuşlarla serbestçe çalın ya da "Doğaçla"ya basın: makine pentatonik gamın içinde rastgele bir ezgi kurar.</p>
+  </div>
+  <div class="stage"></div>
+  <aside class="notes"><ul>
+    <li>Bobby McFerrin'in bir konferansta seyircilerle pentatonik gamı "keşfettiği" video bu slayt için güzel bir örnek.</li>
+    <li>Kapaktaki teller de pentatonikti; şimdi neden hiç kötü ses çıkmadığını biliyoruz.</li>
+  </ul></aside>
+</section>
+
+<!-- ================= 4. AKORLAR VE ARMONİ ================= -->
+<section class="slide" data-chapter="4" data-demo="triads" id="uc-sesliler">
+  <div class="text">
+    <h2>Üç sesliler</h2>
+    <p class="lead">Bir notanın üzerine bir üçlü, onun da üzerine bir üçlü daha koyun: bir akor kurdunuz.</p>
+    <p>Kök, üçlü ve beşliden oluşan bu yapıya <strong>üç sesli</strong> denir. İki üçlünün büyüklüğüne göre dört tür vardır:</p>
+    <ul>
+      <li><strong>Majör</strong>: büyük üçlü + küçük üçlü (4 + 3 yarım ses). Parlak, kararlı. Oranı 4:5:6, harmonik dizisinin içinden çıkar.</li>
+      <li><strong>Minör</strong>: küçük üçlü + büyük üçlü (3 + 4). Buruk, içe dönük.</li>
+      <li><strong>Eksik</strong>: iki küçük üçlü (3 + 3). Sıkışık, gergin; içinde bir triton var.</li>
+      <li><strong>Artık</strong>: iki büyük üçlü (4 + 4). Belirsiz, havada asılı.</li>
+    </ul>
+    <p class="try">Bir kök nota seçip akor türünü değiştirin. Klavyede <span class="c-tonic">kök</span> ve aralıklar etiketlenir.</p>
+  </div>
+  <div class="stage"></div>
+  <aside class="notes"><ul>
+    <li>Artık akor oktavı üç eşit büyük üçlüye böler; bu yüzden hangi notanın kök olduğu kulakla anlaşılmaz.</li>
+    <li>Majör ve minör akor aynı aralıklardan oluşur, yalnızca sıraları ters.</li>
+  </ul></aside>
+</section>
+
+<section class="slide" data-chapter="4" data-demo="sevenths" id="yedililer">
+  <div class="text">
+    <h2>Çevrimler ve dört sesliler</h2>
+    <p class="lead">Akorun notaları aynı kalsa da hangisinin en altta durduğu sesi değiştirir.</p>
+    <p>Kök en alttaysa akor <strong>kök konumunda</strong>dır. Üçlü en alta inerse <strong>birinci çevrim</strong>, beşli inerse <strong>ikinci çevrim</strong> olur. Çevrimler, akorlar arasında sesleri az hareket ettirerek yumuşak geçişler yapmayı sağlar.</p>
+    <p>Üç seslinin üstüne bir üçlü daha eklenince <strong>yedili akor</strong> elde edilir:</p>
+    <ul>
+      <li><strong>maj7</strong>: yumuşak, caz ve bossa nova rengi.</li>
+      <li><strong>7 (dominant yedili)</strong>: içindeki triton yüzünden çözülmek ister.</li>
+      <li><strong>m7</strong>: yumuşak minör. <strong>ø7</strong> (yarım eksik): minör tonun ii akoru. <strong>°7</strong> (eksik yedili): tamamen simetrik, gerilim dolu.</li>
+    </ul>
+    <p class="try">Akoru çevirin ve yedili türleri arasında geçiş yapın. Notalar klavyede ve portede birlikte görünür.</p>
+  </div>
+  <div class="stage"></div>
+  <aside class="notes"><ul>
+    <li>Eksik yedili oktavı dört küçük üçlüye böler: yalnız üç farklı eksik yedili akor vardır.</li>
+    <li>Pop'ta çevrimler genellikle "Do/Mi" gibi eğik çizgiyle yazılır: Do akoru, basta Mi.</li>
+  </ul></aside>
+</section>
+
+<section class="slide" data-chapter="4" data-demo="degrees" id="dereceler">
+  <div class="text">
+    <h2>Gerilim ve çözülme</h2>
+    <p class="lead">Majör gamın her notası üzerine bir akor kurabiliriz. Bu yedi akor, bir tonun ailesidir.</p>
+    <p>Roma rakamlarıyla yazılırlar: I, ii, iii, IV, V, vi, vii°. Büyük harf majör, küçük harf minör akor demektir. Ailenin üç direği vardır:</p>
+    <ul>
+      <li><strong class="c-tonic">I, tonik</strong>: ev. Dinlenme, varış.</li>
+      <li><strong class="c-wave">IV, subdominant</strong>: evden uzaklaşma, yola çıkış.</li>
+      <li><strong class="c-tension">V, dominant</strong>: gerilim. Eve dönme isteği.</li>
+    </ul>
+    <p>Dominant yedili (V7) bu isteği en güçlü hâline getirir. İçindeki <strong class="c-tension">yeden</strong> ses toniğe yarım ses çıkar, yedili de yarım ses iner; arada sıkışan triton çözülür. Bu V–I hareketine tam <strong>kadans</strong> denir ve Batı armonisinin noktalama işaretidir.</p>
+    <p class="try">I, IV ve V'ye sırayla basın. Sonra "Gerilim → çözülme"yi dinleyin: notaların nereye yürüdüğü oklarla gösterilir.</p>
+  </div>
+  <div class="stage"></div>
+  <aside class="notes"><ul>
+    <li>V7'de durup bekleyin: dinleyiciler çözülmeyi neredeyse fiziksel olarak bekler.</li>
+    <li>Pek çok halk şarkısı yalnız I, IV, V ile çalınabilir.</li>
+  </ul></aside>
+</section>
+
+<section class="slide" data-chapter="4" data-demo="circle" id="besliler-cemberi">
+  <div class="text">
+    <h2>Beşliler çemberi</h2>
+    <p class="lead">On iki tonu tam beşli adımlarla dizin: Do, Sol, Re, La, Mi, Si… On iki adımda yeniden Do'ya dönersiniz. Eşit tamperaman sayesinde çember bu kez kapanır.</p>
+    <p>Çember, tonlar arasındaki akrabalığı gösterir. Yan yana iki ton yalnızca bir notada ayrılır: saat yönünde her adımda <strong>donanıma</strong> bir diyez eklenir, ters yönde bir bemol. Do majörün hiç diyezi yoktur; Sol majörün bir (Fa♯), Re majörün iki diyezi vardır.</p>
+    <p>Her majör tonun, aynı notaları paylaşan bir "akraba" minörü vardır: Do majör ile La minör gibi. Besteciler ton değiştirirken (modülasyon) çoğunlukla çemberdeki komşulara geçer; uzak tonlara sıçramak daha çarpıcı duyulur.</p>
+    <p class="try">Çemberde bir tona tıklayın: çember döner, donanımı ve tonun I–IV–V akorları görünür.</p>
+  </div>
+  <div class="stage"></div>
+  <aside class="notes"><ul>
+    <li>Çember ilk kez 17. yüzyılda Nikolay Diletsky'nin bir kuram kitabında, sonra 1728'de Johann David Heinichen'de çizildi.</li>
+    <li>Fa♯ ve Sol♭ eşit tamperamanda aynı tuştur (enharmonik); Pisagor akortunda ise aralarında bir koma vardır.</li>
+  </ul></aside>
+</section>
+
+<section class="slide" data-chapter="4" data-demo="progressions" id="yuruyusler">
+  <div class="text">
+    <h2>Akor yürüyüşleri</h2>
+    <p class="lead">Şarkıların çoğu, birkaç akorun belli bir sırayla tekrar etmesiyle yürür.</p>
+    <ul>
+      <li><strong>I–V–vi–IV</strong>: son kırk yılın pop müziğinde sayısız şarkının altında yatan dört akor. Do – Sol – Lam – Fa.</li>
+      <li><strong>ii–V–I</strong>: cazın temel cümlesi. Subdominanttan dominanta, oradan toniğe.</li>
+      <li><strong>12 ölçülük <span>blues</span></strong>: I, IV ve V'nin 12 ölçüye yayıldığı kalıp. Rock and roll'un da iskeleti.</li>
+    </ul>
+    <p>Aynı yürüyüşü bilen iki müzisyen hiç tanışmadan birlikte çalabilir. Bir yürüyüş, şarkının haritasıdır.</p>
+    <p class="try">Bir yürüyüş seçip "Çal"a basın. Çalan akor çemberde ve klavyede yanar; fonksiyonuna göre rengi değişir.</p>
+  </div>
+  <div class="stage"></div>
+  <aside class="notes"><ul>
+    <li>Avustralyalı komedi grubu Axis of Awesome'ın "4 Chords" skeci, I–V–vi–IV'ün kaç şarkıda olduğunu güldürerek gösterir.</li>
+    <li>Blues'ta akorlar çoğunlukla dominant yedili çalınır (I7, IV7, V7); bu da ona özgü rengi verir.</li>
+  </ul></aside>
+</section>
+
+<!-- ================= 5. RİTİM VE ZAMAN ================= -->
+<section class="slide" data-chapter="5" data-demo="metronome" id="tempo">
+  <div class="text">
+    <h2>Nabız, tempo, ölçü</h2>
+    <p class="lead">Müziğin altında, ayağımızın kendiliğinden yakaladığı düzenli bir nabız atar.</p>
+    <p>Nabzın hızına <strong>tempo</strong> denir ve dakikadaki vuruş sayısıyla (BPM) ölçülür. 60 BPM saniyede bir vuruştur; çoğu pop şarkısı 90–130 BPM arasındadır, dinlenmekteki kalp atışına yakın tempolar sakin duyulur.</p>
+    <p>Vuruşlar gruplara ayrılır: bu gruplara <strong>ölçü</strong> denir. Grubun ilk vuruşu <strong class="c-tonic">kuvvetli</strong>dir. 4/4 marş ve pop, 3/4 vals, 6/8 ise ikiye bölünen üçlü gruplardan oluşan sallantılı bir ölçüdür.</p>
+    <p class="try">Metronomu başlatın, tempoyu ve ölçüyü değiştirin. Kuvvetli zamanlar altın renkte, daha tiz bir tıkla duyulur.</p>
+  </div>
+  <div class="stage"></div>
+  <aside class="notes"><ul>
+    <li>Metronomun patentini 1815'te Johann Maelzel aldı; Beethoven eserlerine metronom işaretleri yazan ilk bestecilerdendi.</li>
+    <li>Toplulukla deneyin: 3/4'te herkes ilk vuruşta el çırpsın.</li>
+  </ul></aside>
+</section>
+
+<section class="slide" data-chapter="5" data-demo="sequencer" id="sirali">
+  <div class="text">
+    <h2>Adım sıralayıcı</h2>
+    <p class="lead">Bir ölçüyü 16 eşit adıma bölün ve her adımda hangi davulun çalacağını işaretleyin. Elektronik müziğin ve hip hop'un temel aleti budur.</p>
+    <p>Pop ve rock'ın iskeleti çok basit: <strong>bas davul</strong> 1. ve 3. vuruşta, <strong>trampet</strong> 2. ve 4. vuruşta (arka vuruş), <strong>hi-hat</strong> ise her sekizlikte. Yer değiştiren tek bir nokta bile türü değiştirebilir.</p>
+    <p><strong>Bossa nova</strong>'da bas bir "dum… dum-dum" sallantısıyla ilerler, tahta vuruşu ise ölçüye eşit dağılmayan bir kalıp çizer. Bu düzensizlik, bir sonraki slaytın konusu olan senkopun ilk tadıdır.</p>
+    <p class="try">Hazır desenlerden birini seçip başlatın, sonra hücrelere tıklayarak kendi ritminizi kurun.</p>
+  </div>
+  <div class="stage"></div>
+  <aside class="notes"><ul>
+    <li>Roland TR-808 (1980) ve TR-909 bu ızgara arayüzünü yaygınlaştırdı.</li>
+    <li>Tempo değişse de ızgara aynı kalır: ritim, zamana göre değil, adımlara göre yazılır.</li>
+  </ul></aside>
+</section>
+
+<section class="slide" data-chapter="5" data-demo="aksak" id="aksak">
+  <div class="text">
+    <h2>Aksak usuller</h2>
+    <p class="lead">Batı'da ölçüler çoğunlukla ikili ve üçlü eşit gruplara bölünür. Anadolu ve Balkanlar'da ise "topal" yürüyen ritimler yaygındır.</p>
+    <p>Türk müziğinde ritim kalıplarına <strong>usul</strong> denir. Eşit olmayan, ikili ve üçlü grupların karışımından oluşan usullere <strong>aksak</strong> denir:</p>
+    <ul>
+      <li><strong>9/8</strong> (2+2+2+3): Roman havası ve Karşılama'nın canlı sallantısı. Son grup bir zaman uzun.</li>
+      <li><strong>7/8</strong> (2+2+3 ya da 3+2+2): Devr-i Turan (2+2+3); Balkan dansları.</li>
+      <li><strong>5/8</strong> (2+3): Türk aksağı; Zeybek ve pek çok türküde.</li>
+    </ul>
+    <p>Dinleyici bunları sayarak değil, bedeniyle "aksayan" bir yürüyüş olarak duyar.</p>
+    <p class="try">Bir usul seçip başlatın. Çember üzerinde gruplar ve <span class="c-tonic">düm</span>–<span class="c-wave">tek</span> vuruşları renkleriyle görünür.</p>
+  </div>
+  <div class="stage"></div>
+  <aside class="notes"><ul>
+    <li>Düm: darbukanın ortasına vurulan pes ses; tek: kenara vurulan tiz ses.</li>
+    <li>Dave Brubeck'in "Blue Rondo à la Turk"ü (1959), İstanbul'da duyduğu 9/8 sokak ritminden esinlenmiştir.</li>
+    <li>Zeybekler genellikle 9/8'dir ama çok ağır çalınır; burada 5/8 ve 7/8 için yaygın örnekler seçildi.</li>
+  </ul></aside>
+</section>
+
+<section class="slide" data-chapter="5" data-demo="syncopation" id="senkop">
+  <div class="text">
+    <h2>Senkop</h2>
+    <p class="lead">Beklenen yerde gelmeyen bir vurgu, dinleyiciyi öne doğru çeker.</p>
+    <p><strong>Senkop</strong>, vurgunun kuvvetli zamandan zayıf zamana ya da vuruşun arasına kaydırılmasıdır. Nabız aynı kalır, ama melodi onunla "saklambaç" oynar. Caz, funk, reggae, Latin müziği ve bugünün pop'u senkopsuz düşünülemez.</p>
+    <p>Gerilim ve çözülme yalnız armonide değil, zamanda da vardır. Senkop ritmin dominantı gibidir: beklenti yaratır, sonra kuvvetli zamana dönünce rahatlatır.</p>
+    <p class="try">Aynı ezgiyi önce düz, sonra senkoplu dinleyin. Vurguların nabza göre nereye kaydığını ızgarada izleyin.</p>
+  </div>
+  <div class="stage"></div>
+  <aside class="notes"><ul>
+    <li>Ragtime (Scott Joplin, 1890'lar) adını bu "yırtılmış zaman"dan (ragged time) alır.</li>
+    <li>Toplulukla deneyin: herkes 1-2-3-4 sayarken siz "ve"lerde el çırpın.</li>
+  </ul></aside>
+</section>
+
+<section class="slide" data-chapter="5" data-demo="polyrhythm" id="poliritim">
+  <div class="text">
+    <h2>Poliritim: 3'e karşı 2</h2>
+    <p class="lead">Aynı süreyi bir el ikiye, diğer el üçe bölerse ne olur?</p>
+    <p>İki farklı bölünme aynı anda çalınınca <strong>poliritim</strong> oluşur. En yaygını 3'e karşı 2'dir: iki ritim yalnızca döngünün başında buluşur, aralarında birbirinin arasına düşen bir desen çizerler.</p>
+    <p>Batı Afrika davul müziği katmanlı poliritimler üzerine kuruludur ve bu miras caza, Afro-Küba müziğine ve oradan bugünün pop'una taşındı. Klasik müzikte de Chopin ve Brahms'ta sık görülür.</p>
+    <p class="try">3:2 ve 4:3 arasında geçiş yapın, sonra iki katmanı tek tek açıp kapatın. İç içe çemberlerde iki nabzın ne zaman buluştuğunu görün.</p>
+  </div>
+  <div class="stage"></div>
+  <aside class="notes"><ul>
+    <li>3:2 için ezber cümlesi: "nice bir-ke-di" gibi altı eşit hece; 1. ve 4. hecede bir el, 1., 3. ve 5. hecede diğer el.</li>
+    <li>Hemiola: 3/4 ile 6/8 arasındaki aynı süreyi farklı gruplama da bir tür 3'e karşı 2'dir.</li>
+  </ul></aside>
+</section>
+
+<!-- ================= 6. HEPSİ BİR ARADA ================= -->
+<section class="slide wide-stage" data-chapter="6" data-demo="compose" id="beste">
+  <div class="text">
+    <h2>Mini beste</h2>
+    <p class="lead">Şimdi hepsini birleştirin: bir akor yürüyüşü, bir davul deseni ve üstünde sizin ezginiz.</p>
+    <p>Melodi ızgarası varsayılan olarak <strong>gamın içine</strong> kilitlidir: yalnız Do majör notalarını çalabilirsiniz ve ne yazarsanız yazın uyumlu duyulur. Çalan akorun notalarına denk gelen hücreler en kararlı olanlardır.</p>
+    <p>Kilidi açınca gamın dışındaki notalar da ızgaraya gelir ve <strong class="c-tension">gerilim renginde</strong> görünür. Onları bilinçli kullanın: bir gam dışı nota, hemen yanındaki gam notasına çözülünce renk katar; tutarsanız kulak tırmalar.</p>
+    <p class="try">Izgaraya birkaç nota yerleştirip çalın. Sonra "Gamın dışına çık"ı açın ve aynı ezgiye bir gam dışı nota ekleyin.</p>
+  </div>
+  <div class="stage"></div>
+  <aside class="notes"><ul>
+    <li>Topluluktan bir gönüllü bir ezgi kursun; sonra gam dışı bir nota ekleyip "kulağa yanlış mı, renkli mi?" diye sorun.</li>
+    <li>Akor tonlarına (çalan akorun notalarına) kuvvetli zamanda basmak, gam notalarına zayıf zamanda basmak klasik bir ezgi kuralıdır.</li>
+  </ul></aside>
+</section>
+
+<section class="slide" data-chapter="6" data-demo="finale" id="kapanis">
+  <div class="text">
+    <h2>Kural mı, kulak mı?</h2>
+    <p class="lead">Bütün bu kurallar, yüzyıllar boyunca kulağın sevdiği şeylerin sonradan yazılmış notlarıdır.</p>
+    <p>Fizik bize basit oranların neden pürüzsüz duyulduğunu anlattı. Akort tarihi, mükemmelliğin bir yerde vazgeçmek demek olduğunu gösterdi. Gamlar, akorlar ve usuller her kültürde aynı malzemeden farklı evler kurdu.</p>
+    <p>Kurallar bir harita, ama müzik yol üstündeki sürprizlerden doğar: bir gam dışı nota, bir senkop, beklenmeyen bir akor. Büyük besteciler kuralları ezberleyip sonra onları bilerek bozdu.</p>
+    <p>Bugün yapay zekâ modelleri de müziği bu kalıplardan öğreniyor. Kuralları kimse yazmıyor: milyonlarca örnekte hangi notanın hangisini izlediğini kendileri buluyor. Nasıl öğrendiklerini merak ediyorsanız: <a href="https://yz.koraytoksoz.com" target="_blank" rel="noopener">Nörondan dil modeline</a>.</p>
+    <p class="try">Teller geri döndü: bu kez hangi gamla çalacaklarını siz seçin.</p>
+    <div class="cover-meta closing">
+      <a class="gh-link" href="https://github.com/ktoksoz/titresimden-sarkiya" target="_blank" rel="noopener"><svg viewBox="0 0 16 16" aria-hidden="true"><path fill="currentColor" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg><span>Kaynak kodu GitHub'da</span></a>
+      <a class="lic" href="https://creativecommons.org/licenses/by/4.0/deed.tr" target="_blank" rel="license noopener" title="İçerik: Creative Commons Atıf 4.0">
+        <img src="img/cc-cc.svg" alt="Creative Commons" width="20" height="20"><img src="img/cc-by.svg" alt="Atıf" width="20" height="20">
+        <span>İçerik CC BY 4.0 · Kod MIT</span>
+      </a>
+    </div>
+    <p class="license">© 2026 Koray Toksöz · Anlatım sesi: ElevenLabs “İrem” · Yazı tipleri: Bodoni Moda, Hanken Grotesk (SIL OFL 1.1)</p>
+  </div>
+  <div class="stage"></div>
+  <aside class="notes"><ul>
+    <li>Kapanış sorusu: "Bir makinenin yazdığı ezgi sizi duygulandırırsa, o müzik midir?"</li>
+    <li>Kaynaklar: Sethares, <em>Tuning, Timbre, Spectrum, Scale</em>; Duffin, <em>How Equal Temperament Ruined Harmony</em>; 3Blue1Brown ve "12tone" YouTube kanalları.</li>
+  </ul></aside>
+</section>
+
+</main>
+
+<div id="notes" role="dialog" aria-label="Sunucu notları"></div>
+<div id="overview" role="dialog" aria-label="Tüm slaytlar"></div>
+
+<nav id="bar" aria-label="Slayt gezinmesi">
+  <div class="chapter-name"></div>
+  <button class="iconbtn" id="btn-prev" aria-label="Önceki slayt"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 6l-6 6 6 6"/></svg></button>
+  <div id="progress"></div>
+  <button class="iconbtn" id="btn-next" aria-label="Sonraki slayt"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg></button>
+  <span class="counter"></span>
+  <span class="volume">
+    <button class="iconbtn" id="btn-mute" aria-label="Sesi kapat (M)" title="Sesi kapat (M)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 10v4h4l5 4V6L8 10z" fill="currentColor" stroke="none"/><path class="w" d="M16.5 8.5a5 5 0 0 1 0 7"/><path class="x" d="M17 9l5 6M22 9l-5 6"/></svg></button>
+    <input type="range" id="vol" min="0" max="1" step="0.01" value="0.7" aria-label="Ses düzeyi">
+  </span>
+  <button class="iconbtn" id="btn-voice" aria-label="Sesli anlatım (A)" title="Sesli anlatım (A)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="3.2"/><path d="M5.5 20c.8-3.6 3.4-5.6 6.5-5.6s5.7 2 6.5 5.6"/><path d="M18.5 4.5a5 5 0 0 1 0 7"/></svg></button>
+  <button class="iconbtn" id="btn-text" aria-label="Açıklama metnini gizle (T)" title="Metni gizle (T)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h10M4 10h10M4 14h7M18 5v14"/></svg></button>
+  <button class="iconbtn" id="btn-notes" aria-label="Sunucu notları (N)" title="Sunucu notları (N)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 3h9l3 3v15H6z"/><path d="M9 11h6M9 15h6"/></svg></button>
+  <button class="iconbtn" id="btn-overview" aria-label="Tüm slaytlar (O)" title="Tüm slaytlar (O)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="4" width="7" height="7"/><rect x="13" y="4" width="7" height="7"/><rect x="4" y="13" width="7" height="7"/><rect x="13" y="13" width="7" height="7"/></svg></button>
+</nav>
+
+<script src="js/theory.js?v=202610141713"></script>
+<script src="js/lib.js?v=202610141713"></script>
+<script src="js/audio.js?v=202610141713"></script>
+<script src="js/piano.js?v=202610141713"></script>
+<script src="js/demos/sound.js?v=202610141713"></script>
+<script src="js/demos/ratios.js?v=202610141713"></script>
+<script src="js/demos/scales.js?v=202610141713"></script>
+<script src="js/demos/chords.js?v=202610141713"></script>
+<script src="js/demos/rhythm.js?v=202610141713"></script>
+<script src="js/demos/finale.js?v=202610141713"></script>
+<script src="js/glossary.js?v=202610141713"></script>
+<script src="js/app.js?v=202610141713"></script>
+<script src="js/narrator.js?v=202610141713"></script>
+<script src="js/guide.js?v=202610141713"></script>
+</body>
+</html>
