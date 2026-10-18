@@ -26,7 +26,7 @@ const wait = +(process.env.WAIT || 1200);
     page.on("console", (m) => { if (m.type() === "error" || m.type() === "warning") logs.push(`[${m.type()}] ${m.text()}`); });
     page.on("pageerror", (e) => logs.push(`[pageerror] ${e.message}`));
     // rehber gösterimini kapat: ekran görüntüleri temiz olsun
-    await page.addInitScript(() => { try { localStorage.setItem("rehber.kapali", "1"); } catch (e) {} });
+    await page.addInitScript(() => { try { localStorage.setItem("muzik.rehber.kapali", "1"); } catch (e) {} });
     const url = "file://" + path.join(ROOT, "index.html");
     await page.goto(url);
     await page.waitForTimeout(600);

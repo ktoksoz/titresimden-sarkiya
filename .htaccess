@@ -1,4 +1,4 @@
-# muzik.koraytoksoz.com — DreamHost (Apache) ayarları
+# egitim.koraytoksoz.com/muzik/ — DreamHost (Apache) ayarları
 
 # HTTP'yi HTTPS'e yönlendir
 <IfModule mod_rewrite.c>

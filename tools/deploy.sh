@@ -9,5 +9,5 @@ sed -i '' -E "s/\?v=[0-9]+\"/?v=$V\"/g" index.html
 echo "Sürüm etiketi: $V"
 rsync -avz \
   --exclude tools --exclude README.md --exclude .DS_Store --exclude .git --exclude node_modules \
-  ./ "$HOST:~/muzik.koraytoksoz.com/"
-echo "Yüklendi: https://muzik.koraytoksoz.com"
+  ./ "$HOST:~/egitim.koraytoksoz.com/muzik/"
+echo "Yüklendi: https://egitim.koraytoksoz.com/muzik/"

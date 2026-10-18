@@ -11,9 +11,8 @@
   // Ses düzeyi hatırlanır; sessize alma ise yalnızca o oturum içindir (sayfa sessiz açılıp
   // kullanıcıyı şaşırtmasın). Neredeyse sıfıra kaydedilmiş düzey de varsayılana döner.
   try {
-    const v = localStorage.getItem("ses.duzey");
+    const v = localStorage.getItem("muzik.ses.duzey");
     if (v != null && +v >= 0.05) volume = Math.max(0, Math.min(1, +v));
-    localStorage.removeItem("ses.kapali");
   } catch (e) {}
 
   function build() {
@@ -83,7 +82,7 @@
   function setVolume(v) {
     volume = Math.max(0, Math.min(1, v));
     if (volume > 0 && muted) muted = false;
-    try { localStorage.setItem("ses.duzey", String(volume)); } catch (e) {}
+    try { localStorage.setItem("muzik.ses.duzey", String(volume)); } catch (e) {}
     sync();
   }
   function setMuted(m) {

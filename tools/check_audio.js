@@ -24,7 +24,7 @@ const MEASURE = async () => {
 (async () => {
   const browser = await chromium.launch({ executablePath: EXE, args: ["--autoplay-policy=no-user-gesture-required"] });
   const page = await browser.newPage({ viewport: { width: 1440, height: 860 } });
-  await page.addInitScript(() => { try { localStorage.setItem("rehber.kapali", "1"); } catch (e) {} });
+  await page.addInitScript(() => { try { localStorage.setItem("muzik.rehber.kapali", "1"); } catch (e) {} });
   await page.goto(URL + "#major-gam");
   await page.mouse.click(5, 5); // kullanıcı hareketi: bağlamı aç
   await page.waitForTimeout(400);
@@ -83,7 +83,7 @@ const MEASURE = async () => {
   const b2 = await chromium.launch({ executablePath: EXE });
   const p2 = await b2.newPage();
   await p2.addInitScript(() => {
-    try { localStorage.setItem("rehber.kapali", "1"); } catch (e) {}
+    try { localStorage.setItem("muzik.rehber.kapali", "1"); } catch (e) {}
     const Orig = window.AudioContext;
     window.AudioContext = class extends Orig {
       constructor(o) { super(o); this._locked = true; super.suspend(); }

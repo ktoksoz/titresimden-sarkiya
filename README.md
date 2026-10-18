@@ -1,6 +1,6 @@
 # Titreşimden Şarkıya
 
-**Canlı site: https://muzik.koraytoksoz.com**
+**Canlı site: https://egitim.koraytoksoz.com/muzik/** (eski adres https://muzik.koraytoksoz.com buraya yönlendirilir; bütün eğitimler: https://egitim.koraytoksoz.com)
 
 Müzik teorisini sesin fiziğinden oranlara, akort sistemlerinden makamlara, gamlardan akorlara ve ritme kadar slayt slayt anlatan, her slaytta dinlenip çalınabilen bir deney bulunan Türkçe, etkileşimli bir sunum sitesi.
 
@@ -100,7 +100,7 @@ NODE_PATH=/tmp/pw/node_modules node tools/shots.js /tmp/shots     # 3 ekran boyu
 ## Yayınlama
 
 ```sh
-tools/deploy.sh            # varsayılan koray@koraytoksoz.com → ~/muzik.koraytoksoz.com/
+tools/deploy.sh            # varsayılan koray@koraytoksoz.com → ~/egitim.koraytoksoz.com/muzik/
 ```
 
 Betik önce `index.html` içindeki `?v=` sürüm etiketini yeniler, böylece tarayıcılar yeni CSS ve JS'i indirir. Sonra `rsync` ile yalnızca değişen dosyaları gönderir. `.htaccess` HTTPS yönlendirmesini, sıkıştırmayı ve önbellek ayarlarını içerir.
@@ -168,4 +168,4 @@ GitHub lisans türünü "Other" olarak gösterir. Bu normaldir: proje çift lisa
 
 **Önerilen atıf:**
 
-> Koray Toksöz, *Titreşimden Şarkıya*, https://muzik.koraytoksoz.com — CC BY 4.0
+> Koray Toksöz, *Titreşimden Şarkıya*, https://egitim.koraytoksoz.com/muzik/ — CC BY 4.0
