@@ -11,6 +11,7 @@
   // Tek bir yakalayıcı: piano.js uygulamanın diğer betiklerinden önce yüklenir, böylece etkin slayttaki
   // piyano A, G, F, T, O gibi tuşları kısayollardan önce alır (stopImmediatePropagation).
   const instances = [];
+  const all = []; // bütün piyanolar (MIDI etkin slayttakileri bulur)
   window.addEventListener("keydown", (e) => { for (const p of instances) { p.onKey(e); if (e.defaultPrevented) return; } }, true);
   window.addEventListener("keyup", (e) => instances.forEach((p) => p.onKeyUp(e)), true);
 
@@ -111,7 +112,13 @@
       const r = k.getBoundingClientRect(), p = el.getBoundingClientRect();
       return { x: r.left + r.width / 2 - p.left, y: r.top - p.top, w: r.width, h: r.height };
     }
-    return { el, mark, clear, press, keyEl: (m) => keyEls.get(m), centerOf, setLabels, whites, from, to };
+    // MIDI klavye: tuş basılı tutulduğu sürece aşağıda kalsın
+    function hold(m, on) { const k = keyEls.get(m); if (k) k.classList.toggle("held", on); }
+    const api = { el, mark, clear, press, hold, keyEl: (m) => keyEls.get(m), centerOf, setLabels, whites, from, to };
+    all.push(api);
+    return api;
   }
+  // bir slayttaki piyanolar
+  Piano.inSlide = (slide) => all.filter((p) => slide && slide.contains(p.el));
   window.Piano = Piano;
 })();

@@ -329,7 +329,15 @@
     const btn = h("button.btn", { type: "button", onclick: () => (playing ? stopSound() : startSound()) }, "Dinle");
     stage.append(h("div.controls", range, btn, h("span.spacer"), info));
     readout();
-    return { enter() { lp.start(); }, leave() { lp.stop(); stopSound(); dragging = false; } };
+    return {
+      enter() { lp.start(); }, leave() { lp.stop(); stopSound(); dragging = false; },
+      // MIDI: iki nota basılıyken aralarındaki aralık eğri üzerinde gösterilir (oktav içine katlanır)
+      onMidi(ev) {
+        if (ev.held.length < 2) return;
+        const d = ev.held[ev.held.length - 1] - ev.held[0];
+        setC((d > 12 ? d % 12 || 12 : d) * 100);
+      },
+    };
   };
   {
     const fx = (c) => 0.06 + (0.9 * c) / 1200;
@@ -653,7 +661,11 @@
     stage.append(h("div.tu-info", table, note));
     stage.append(h("div.controls", sg, again, all));
     render();
-    return { enter() { lp.start(); }, leave() { lp.stop(); tm.clear(); } };
+    return {
+      enter() { lp.start(); }, leave() { lp.stop(); tm.clear(); },
+      // MIDI: klavyeden çalınan notalar seçili akort sisteminde duyulur (tonik Do)
+      midiFreq: (m) => T.tunedFreq(m, sys),
+    };
   };
   G["akort-sistemleri"] = [{ click: "=Pisagor" }, { wait: 2600 }, { click: "=Saf" }, { wait: 2600 }, { click: "=Eşit tamperaman" }];
 
@@ -981,6 +993,15 @@
     stage.append(h("div.controls.top", segEl, h("span.spacer"), consEl), h("div.controls", sl, listen, restart, spd, h("span.spacer"), readout));
     setRatio(1.5, "besli");
     return {
+      // MIDI: iki nota basılıyken aralığın saf oranı seçilir (oktav içine katlanır)
+      onMidi(ev) {
+        if (ev.held.length < 2) return;
+        let d = ev.held[ev.held.length - 1] - ev.held[0];
+        if (d > 12) d = d % 12 || 12;
+        const j = JUST.find((x) => x.s === d); if (!j) return;
+        const p = PRESETS.find((x) => x.n === j.n && x.d === j.d);
+        sl.set(T.cents(j.n / j.d)); segEl.set(p ? p.k : null); setRatio(j.n / j.d, p ? p.k : null);
+      },
       enter() { lp.start(); },
       leave() { lp.stop(); if (d1) d1.stop(); if (d2) d2.stop(); d1 = d2 = null; playing = false; listen.textContent = "Dinle"; listen.classList.remove("on"); },
     };

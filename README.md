@@ -53,6 +53,21 @@ Herhangi bir statik barındırmaya (GitHub Pages, Netlify, Apache vb.) olduğu g
 
 Piyanolu slaytlarda bilgisayar klavyesi de çalar: `A S D F G H J K L` beyaz, `W E T Y U O P` siyah tuşlar. Bu slaytlarda bu harfler kısayol yerine piyanoyu çalar. Her slaytın bağlantısı adres çubuğunda durur (ör. `#pisagor-komasi`).
 
+## MIDI klavye
+
+USB'ye takılı bir MIDI klavye sitenin her yerinde çalgı ve kontrolcü olarak kullanılabilir (Web MIDI API: Chrome, Edge, Firefox; Safari desteklemez). Alt çubuktaki klavye simgesine basıp izin verin; izin bir kez verildiyse sonraki ziyaretlerde kendiliğinden bağlanır.
+
+- **Her slaytta:** Vuruş gücüne göre ses ve sustain pedalı. Ekranın üstünde çalınan notanın, aralığın ya da akorun adı ("Lam (Am) · 1. çevrim") görünür. Slaytta piyano varsa tuş basılı kalır ve piyanonun kendi deneyi çalışır.
+- **Slayta özel:**
+  - Aralıklar: iki notadan aralığın adı.
+  - Nota yazısı: notalar porteye yazılır, "Nota oku" alıştırması klavyeden cevaplanır.
+  - Üç sesliler, Çevrimler, Dört sesliler: basılan akor tanınır; kökü, türü ve çevrimi seçilir.
+  - Konsonans ve Lissajous: iki basılı notanın aralığı eğriye yansır.
+  - Akort sistemleri: klavye seçili akortta (Pisagor, saf, eşit) çalar.
+  - Pentatonik: blues eşliğinin üstünde siz çalarsınız.
+
+Demolar `onMidi(ev)` ve `midiFreq(m)` kancalarıyla MIDI'ye bağlanır (bkz. `js/midi.js`).
+
 ## Yapı
 
 - **`index.html`:** Slayt metinleri, açıklamalar ve sunucu notları (`aside.notes`).
@@ -63,6 +78,7 @@ Piyanolu slaytlarda bilgisayar klavyesi de çalar: `A S D F G H J K L` beyaz, `W
 - **`js/app.js`:** Slayt motoru. İlerleme çubuğu bir portedir: her slayt bir nota başı, her bölüm bir ölçü.
 - **`js/narrator.js`, `audio/<slayt-id>.mp3`:** Sesli anlatım. Metinler `tools/narration.json` içinde.
 - **`js/guide.js`:** Hayalet el.
+- **`js/midi.js`:** MIDI klavye desteği.
 - **`js/glossary.js`:** Tanım balonları ve Vikipedi bağlantıları.
 - **`img/`:** Creative Commons simgeleri.
 - **`tools/`:** Geliştirme sunucusu, yayın betiği, testler.
@@ -95,6 +111,8 @@ node tools/test_theory.js       # frekans, cent, akort, gam, akor ve Hicaz koma 
 npm i --prefix /tmp/pw playwright-core
 NODE_PATH=/tmp/pw/node_modules node tools/check_audio.js           # üretilen sesin frekansını FFT ile ölçer, kısma ve ses kilidi
 NODE_PATH=/tmp/pw/node_modules node tools/shots.js /tmp/shots     # 3 ekran boyutunda ekran görüntüsü, konsol hataları, hayalet el hedefleri
+NODE_PATH=/tmp/pw/node_modules node tools/check_guide.js           # her slaytta hayalet el gösterimi baştan sona
+NODE_PATH=/tmp/pw/node_modules node tools/check_midi.js            # sahte bir MIDI cihazıyla klavye desteği
 ```
 
 ## Yayınlama

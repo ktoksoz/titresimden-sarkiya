@@ -141,7 +141,15 @@
     }
     function play() { strumThenBlock(notes()); }
     render();
-    return { enter() {}, leave() {} };
+    return {
+      enter() {}, leave() {},
+      // MIDI: basılan üç sesliyi tanı, kökü ve türü ona ayarla (ses MIDI'den zaten geliyor)
+      onMidi(ev) {
+        const c = T.identifyChord(ev.held);
+        if (!c || !["maj", "min", "aug", "dim"].includes(c.type)) return;
+        root = c.root; type = c.type; types.set(type); render();
+      },
+    };
   };
   G["uc-sesliler"] = [{ click: "=Re" }, { wait: 1300 }, { click: "=Minör" }, { wait: 1500 }, { click: "=Eksik" }];
 
@@ -236,12 +244,20 @@
     }
     function stopLink() { linkT.forEach(clearTimeout); linkT = []; linkBtn.textContent = "Çevrimle bağla"; linkBtn.classList.remove("on"); }
     render();
-    return { enter() {}, leave() { stopLink(); } };
+    return {
+      enter() {}, leave() { stopLink(); },
+      // MIDI: basılan akorun kökü, türü ve çevrimi (bastaki nota) seçilir
+      onMidi(ev) {
+        const c = T.identifyChord(ev.held);
+        if (!c || !["maj", "min", "dim"].includes(c.type)) return;
+        stopLink(); root = c.root; type = c.type; inv = c.inv; types.set(type); render();
+      },
+    };
   };
   G.cevrimler = [{ click: "=Re" }, { wait: 1200 }, { click: "=1. çevrim" }, { wait: 1400 }, { click: "=2. çevrim" }, { wait: 1400 }, { click: "Çevrimle bağla" }];
 
   Demos.sevenths = (stage) => {
-    let type = "maj7", inv = 0;
+    let type = "maj7", inv = 0, root = 0; // kök MIDI klavyeden değişebilir; varsayılan Do
     const top = h("div.ch-top.ch-top-sev");
     const staffBox = h("div.ch-staffbox");
     const info = h("div.ch-info");
@@ -249,7 +265,7 @@
     const staff = Staff(staffBox, { width: 250, gap: 15 });
     const pianoBox = h("div.ch-piano");
     stage.append(top, pianoBox);
-    const piano = Piano(pianoBox, { from: 60, to: 83 });
+    const piano = Piano(pianoBox, { from: 48, to: 83, compact: true });
     const invBtn = h("button.btn", { type: "button", onclick: () => { inv = (inv + 1) % T.CHORDS[type].iv.length; render(); play(); } }, "Çevir");
     const invLab = h("span.ch-invlab");
     const types = seg([["maj", "Üç sesli"], ["maj7", "maj7"], ["dom7", "7"], ["min7", "m7"], ["hdim7", "ø7"], ["dim7", "°7"]], type,
@@ -258,7 +274,8 @@
 
     function chordNotes() {
       // Do üzerine, üçlü üçlü yazılmış; çevrimde alttaki nota bir oktav yukarı
-      const sp = spellChord(60, 0, type).map((n, k) => ({ ...n, role: k }));
+      const base = root <= 4 ? 60 + root : 48 + root; // çevrimler de piyanoya sığsın
+      const sp = spellChord(base, ROOTS[root][1], type).map((n, k) => ({ ...n, role: k }));
       for (let k = 0; k < inv; k++) { const n = sp.shift(); sp.push({ ...spell(n.m + 12, n.letter), role: n.role }); }
       return sp;
     }
@@ -276,14 +293,22 @@
       invLab.innerHTML = "";
       invLab.append(h("b", INV_AD[inv]), ` · basta ${INV_BASS[sp[0].role]}`);
       info.innerHTML = "";
-      const sym = "Do" + T.CHORDS[type].sym + (inv ? "/" + sp[0].name : "");
+      const sym = ROOTS[root][2] + T.CHORDS[type].sym + (inv ? "/" + sp[0].name : "");
       info.append(h("p.ch-sym", acc(sym), h("small.ch-let", acc(T.toLetter(sym)))), h("p.ch-full", T.CHORDS[type].ad + (inv ? ", " + INV_AD[inv].toLocaleLowerCase("tr") : "")),
         h("p.ch-notes", acc(sp.map((n) => `${n.name} (${T.toLetter(n.name)})`).join(", "))), h("p.ch-desc", SEV_INFO[type]));
-      if (type === "dom7") info.append(h("p.ch-desc.c-tension", "Mi ile Si♭ arasındaki triton kırmızıyla işaretli."));
+      if (type === "dom7") { const r = (k) => sp.find((n) => n.role === k).name; info.append(h("p.ch-desc.c-tension", acc(`${r(1)} ile ${r(3)} arasındaki triton kırmızıyla işaretli.`))); }
     }
     function play() { strumThenBlock(chordNotes().map((n) => n.m), 0.11); }
     render();
-    return { enter() {}, leave() {} };
+    return {
+      enter() {}, leave() {},
+      // MIDI: basılan dört sesliyi (ya da majör üç sesliyi) tanı; kök, tür ve çevrim ona ayarlanır
+      onMidi(ev) {
+        const c = T.identifyChord(ev.held);
+        if (!c || !["maj", "maj7", "dom7", "min7", "hdim7", "dim7"].includes(c.type)) return;
+        root = c.root; type = c.type; inv = Math.min(c.inv, T.CHORDS[type].iv.length - 1); types.set(type); render();
+      },
+    };
   };
   G.yedililer = [{ click: "Çevir" }, { wait: 1500 }, { click: "Çevir" }, { wait: 1500 }, { click: "=7" }];
 

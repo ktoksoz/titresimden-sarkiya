@@ -197,6 +197,28 @@
     const d = degrees(SCALES.major.steps);
     return { root: tonic + d[deg], type: (seventh ? DEGREE_TYPE7 : DEGREE_TYPE)[deg], roman: ROMAN[deg] };
   }
+  /* Basılan notalardan akor tanıma (MIDI klavye için).
+     notes: MIDI numaraları (tekrarlar ve oktav katlamaları olabilir). Dönen: { root, type, inv, bass }
+     ya da tanınmazsa null. inv: bastaki notanın akordaki rolü (0 kök, 1 üçlü, 2 beşli, 3 yedili).
+     Simetrik akorlarda (artık, eksik yedili) kök olarak bastaki nota tercih edilir. */
+  function identifyChord(notes) {
+    if (!notes || notes.length < 3) return null;
+    const bass = Math.min(...notes), pcs = [...new Set(notes.map(pcOf))];
+    if (pcs.length < 3 || pcs.length > 4) return null;
+    const found = [];
+    for (const root of pcs) {
+      const set = pcs.map((pc) => (pc - root + 12) % 12).sort((x, y) => x - y).join(",");
+      for (const [type, c] of Object.entries(CHORDS)) {
+        if (c.iv.slice().sort((x, y) => x - y).join(",") === set) {
+          const inv = c.iv.indexOf((pcOf(bass) - root + 12) % 12);
+          found.push({ root, type, inv, bass });
+        }
+      }
+    }
+    if (!found.length) return null;
+    return found.find((f) => f.inv === 0) || found[0];
+  }
+
   // Fonksiyon: tonik (I, vi, iii), subdominant (IV, ii), dominant (V, vii°)
   const FUNCTION = ["tonic", "sub", "tonic", "sub", "dom", "tonic", "dom"];
 
@@ -233,7 +255,7 @@
     A4, SHARP, FLAT, LETTER, LETTER_FLAT, letter, withLetter, toLetter, isBlack, pcOf, mtof, ftom, cents, centsBetween, octaveOf, name, nearest, fraction, gcd,
     TUNINGS, JUST_FRAC, tunedFreq, pythagoreanRatios, PYTHAGOREAN_COMMA, SYNTONIC_COMMA, HOLDRIAN_COMMA,
     INTERVALS, interval, SCALES, MODES, modeSteps, degrees, scaleNotes, inScale, rotate,
-    CHORDS, chord, chordName, chordLetter, chordBoth, ROMAN, DEGREE_TYPE, DEGREE_TYPE7, diatonicChord, FUNCTION,
+    CHORDS, chord, chordName, chordLetter, chordBoth, identifyChord, ROMAN, DEGREE_TYPE, DEGREE_TYPE7, diatonicChord, FUNCTION,
     CIRCLE, SHARP_ORDER, FLAT_ORDER, roughnessPair, roughness,
     TEMPERAMENTS, FIFTH_ORDER, temperamentCents, triadDeviation,
   };

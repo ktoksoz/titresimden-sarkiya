@@ -94,6 +94,20 @@ eq("Lam akoru harfle Am", T.chordLetter(57, "min"), "Am");
 eq("Sol7 (G7)", T.chordBoth(67, "dom7"), "Sol7 (G7)");
 eq("Metinde harfe çevirme", T.toLetter("Do7/Mi, Si♭♭ ve Lam"), "C7/E, B♭♭ ve Am");
 
+// MIDI akor tanıma
+const id = (ns) => { const r = T.identifyChord(ns); return r && [T.name(r.root, { octave: false }), r.type, r.inv]; };
+eq("Do Mi Sol → Do majör kök konumu", id([60, 64, 67]), ["Do", "maj", 0]);
+eq("Mi Sol Do → Do majör 1. çevrim", id([64, 67, 72]), ["Do", "maj", 1]);
+eq("Sol Do Mi → Do majör 2. çevrim", id([55, 60, 64]), ["Do", "maj", 2]);
+eq("La Do Mi (iki oktav) → Lam", id([45, 57, 60, 64, 69]), ["La", "min", 0]);
+eq("Sol Si Re Fa → Sol7", id([55, 59, 62, 65]), ["Sol", "dom7", 0]);
+eq("Si Re Fa La → Si ø7", id([59, 62, 65, 69]), ["Si", "hdim7", 0]);
+eq("Fa La Do Mi → Fa maj7, basta Fa", id([53, 57, 60, 64]), ["Fa", "maj7", 0]);
+eq("Eksik yedili: bastaki nota kök sayılır", id([59, 62, 65, 68]), ["Si", "dim7", 0]);
+eq("Artık: bastaki nota kök", id([64, 68, 72]), ["Mi", "aug", 0]);
+eq("İki nota akor değildir", T.identifyChord([60, 67]), null);
+eq("Küme akor değildir (Do Re Mi)", T.identifyChord([60, 62, 64]), null);
+
 // Tamperamanlar
 Object.entries(T.TEMPERAMENTS).forEach(([k, t]) => eq(`${t.ad}: 12 beşli = 7 oktav (8400 c)`, t.fifths.reduce((a, b) => a + b), 8400, 1e-9));
 eq("Pisagor kurt beşlisi ≈ 678,49 c", T.TEMPERAMENTS.pythagorean.fifths[8], 678.495, 1e-3);

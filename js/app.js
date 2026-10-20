@@ -72,7 +72,8 @@
     body.append(h("p.keys", { html:
       "Kısayollar: <kbd>→</kbd> / <kbd>Boşluk</kbd> ileri · <kbd>←</kbd> geri · <kbd>N</kbd> sunucu notları · " +
       "<kbd>T</kbd> metni gizle (sunum) · <kbd>A</kbd> sesli anlatım · <kbd>G</kbd> deney gösterimleri · <kbd>M</kbd> sesi kapat · <kbd>O</kbd> bu ekran · <kbd>F</kbd> tam ekran. " +
-      "Piyanolu slaytlarda <kbd>A</kbd>–<kbd>L</kbd> tuşları beyaz, <kbd>W</kbd> <kbd>E</kbd> <kbd>T</kbd> <kbd>Y</kbd> <kbd>U</kbd> tuşları siyah tuşları çalar." }));
+      "Piyanolu slaytlarda <kbd>A</kbd>–<kbd>L</kbd> tuşları beyaz, <kbd>W</kbd> <kbd>E</kbd> <kbd>T</kbd> <kbd>Y</kbd> <kbd>U</kbd> tuşları siyah tuşları çalar. " +
+      "MIDI klavyeniz varsa alt çubuktaki klavye simgesiyle bağlayın (Chrome, Edge, Firefox): her slaytta çalar, akorları tanır ve deneyleri kontrol eder." }));
     overview.append(body);
   }
   buildOverview();
@@ -201,7 +202,7 @@
     const i = slides.findIndex((s) => s.id === id);
     go(i >= 0 ? i : 0, true);
   }
-  window.Deck = { go, next, prev, get current() { return cur; }, get id() { return slides[cur].id; }, get count() { return slides.length; } };
+  window.Deck = { go, next, prev, get demo() { return instances.get(cur) || null; }, get current() { return cur; }, get id() { return slides[cur].id; }, get count() { return slides.length; } };
   window.addEventListener("hashchange", fromHash);
   fromHash();
 })();
