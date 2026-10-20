@@ -57,6 +57,11 @@ const ok = (c, m) => { console.log((c ? "✓ " : "✗ ") + m); if (!c) fail++; }
   await off(55, 59, 62, 65);
   await go("araliklar"); await on(60); await off(60); await on(67); await off(67); await p.waitForTimeout(150);
   ok((await text("#araliklar .stage")).includes("Tam beşli"), "Aralıklar: Do → Sol = tam beşli");
+  // ekran piyanosu Do4–Do6: alçak oktavdaki notalar oktav kaydırılarak gösterilir, aralık bozulmaz
+  await on(48); await off(48); await on(52); await off(52); await p.waitForTimeout(150);
+  ok((await text("#araliklar .stage")).includes("Büyük üçlü"), "Aralıklar: Do3 → Mi3 (piyanonun altında) = büyük üçlü");
+  await on(55); await off(55); await on(60); await off(60); await p.waitForTimeout(150);
+  ok((await text("#araliklar .stage")).includes("Tam dörtlü"), "Aralıklar: Sol3 → Do4 (sınırı aşan) = tam dörtlü");
   await go("nota-yazisi"); await on(67); await off(67); await p.waitForTimeout(150);
   ok((await text("#nota-yazisi .nt-info")).includes("Sol4 · G4"), "Nota yazısı: Sol4 porteye yazıldı");
   await go("akort-sistemleri"); await p.click('#akort-sistemleri .stage button:text-is("Saf")'); await p.evaluate(() => { __f.length = 0; }); await on(64); await off(64);

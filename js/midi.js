@@ -39,13 +39,34 @@
     sustained.delete(m);
   }
 
-  /* --- etkin slayttaki piyanolar --- */
+  /* --- etkin slayttaki piyanolar ---
+     Ekran piyanosu klavyeden dar olabilir (ör. Do4–Do6). Sığmayan notalar oktav kaydırılarak piyanoya taşınır.
+     Kaydırma "yapışkan"dır: nota sığdığı sürece aynı kalır, böylece sınırı aşan aralıklar bozulmaz
+     (Sol3 → Do4 yine dörtlü). Ses ve üstteki etiket gerçek notayı kullanır. */
+  const shift = new WeakMap();   // piyano → oktav kaydırması (yarım ses)
+  const mapped = new Map();      // basılı nota → [piyano, ekrandaki nota]
   function pianoPress(m, on) {
+    if (!on) {
+      (mapped.get(m) || []).forEach(([p, mm]) => p.hold(mm, false));
+      mapped.delete(m);
+      return;
+    }
+    const list = [];
     Piano.inSlide(activeSlide()).forEach((p) => {
-      if (m < p.from || m > p.to) return;
-      p.hold(m, on);
-      if (on) p.press(m, { silent: true }); // piyanonun kendi tuş mantığı (onplay) da çalışsın
+      let k = shift.get(p) || 0;
+      if (m + k < p.from || m + k > p.to) {
+        k = 0;
+        while (m + k < p.from) k += 12;
+        while (m + k > p.to) k -= 12;
+        if (m + k < p.from) return; // piyano bir oktavdan dar ve nota sığmıyor
+        shift.set(p, k);
+      }
+      const mm = m + k;
+      p.hold(mm, true);
+      p.press(mm, { silent: true }); // piyanonun kendi tuş mantığı (onplay) da çalışsın
+      list.push([p, mm]);
     });
+    mapped.set(m, list);
   }
 
   /* --- üstte aralık / akor adı --- */
@@ -101,7 +122,7 @@
     showChip();
   }
   // slayt değişince basılı kalan tuşları bırak
-  window.addEventListener("slidechange", () => { held.clear(); [...voices.keys()].forEach(stopVoice); showChip(); });
+  window.addEventListener("slidechange", () => { held.clear(); mapped.clear(); [...voices.keys()].forEach(stopVoice); showChip(); });
 
   /* --- bağlantı ve düğme --- */
   const inputs = () => (access ? [...access.inputs.values()] : []);
