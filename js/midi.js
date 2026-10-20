@@ -162,5 +162,40 @@
     clearTimeout(toast.t); toast.t = setTimeout(() => el.classList.remove("on"), 2800);
   }
 
+  /* --- ilk ziyarette ipucu: MIDI düğmesinin üstünde bir kez gösterilir --- */
+  const HINT = "muzik.midi.ipucu";
+  let hintEl = null, hintT = 0;
+  function placeHint() {
+    if (!hintEl) return;
+    const r = btn.getBoundingClientRect();
+    const w = hintEl.offsetWidth;
+    const x = Math.max(8, Math.min(innerWidth - w - 8, r.left + r.width / 2 - w / 2));
+    hintEl.style.left = x + "px";
+    hintEl.style.bottom = innerHeight - r.top + 12 + "px";
+    hintEl.style.setProperty("--ax", r.left + r.width / 2 - x + "px"); // ok ucu düğmeyi göstersin
+  }
+  function hideHint() {
+    if (!hintEl) return;
+    clearTimeout(hintT);
+    hintEl.classList.remove("on");
+    const el = hintEl; hintEl = null;
+    setTimeout(() => el.remove(), 250);
+    window.removeEventListener("resize", placeHint);
+  }
+  function showHint() {
+    if (access || btn.hidden || !btn.offsetParent) return;
+    try { if (localStorage.getItem(HINT) === "1" || localStorage.getItem(KEY) === "1") return; localStorage.setItem(HINT, "1"); } catch (e) {}
+    hintEl = h("div#midi-hint", { role: "note" },
+      h("span", "MIDI klavyeniz varsa bağlamak için buraya basın. Tarayıcı bir kez izin isteyecek."),
+      h("button", { type: "button", "aria-label": "İpucunu kapat", onclick: hideHint }, "×"));
+    document.body.append(hintEl);
+    placeHint();
+    requestAnimationFrame(() => hintEl && hintEl.classList.add("on"));
+    window.addEventListener("resize", placeHint);
+    hintT = setTimeout(hideHint, 12000);
+  }
+  btn.addEventListener("click", hideHint);
+  setTimeout(showHint, 3500);
+
   window.Midi = { get held() { return [...held.keys()]; }, on(f) { listeners.push(f); }, get connected() { return inputs().some((i) => i.state === "connected"); }, _message: onMessage };
 })();
